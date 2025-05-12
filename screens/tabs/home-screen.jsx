@@ -97,7 +97,7 @@ export default function HomeScreen() {
                 >
                   <Play stroke='#3B82F6' width={16} height={16} />
                   <Text className='text-blue-500 dark:text-blue-400 font-medium ml-2'>
-                    Get Started
+                    <Link href='/login'>Login now</Link>
                   </Text>
                 </TouchableOpacity>
               </View>

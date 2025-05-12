@@ -8,14 +8,14 @@ const AuthLayout = () => {
   const { isAuthenticated } = useAuthStore();
   console.log('isAuthenticated', isAuthenticated);
 
-  // useEffect(() => {
-  //   if (isAuthenticated) {
-  //     router.replace('/(tabs)');
-  //   }
-  // }, [isAuthenticated]);
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace('/(tabs)');
+    }
+  }, [isAuthenticated]);
 
   return (
-    <Stack>
+    <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen
         name='login'
         options={{

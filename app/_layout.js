@@ -27,8 +27,8 @@ const RootLayout = () => {
     <ThemeProvider>
       <SafeAreaView className='flex-1'>
         <Stack>
-          <Stack.Screen name='(auth)' options={{ headerShown: false }} />
           <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+          <Stack.Screen name='(auth)' options={{ headerShown: false }} />
           <Stack.Screen name='detail/[id]' options={{ headerShown: false }} />
         </Stack>
       </SafeAreaView>
