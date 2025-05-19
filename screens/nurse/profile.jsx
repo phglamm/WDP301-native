@@ -1,10 +1,9 @@
 import { View, Text } from 'react-native';
 import React from 'react';
-
-export default function RegisterScreen() {
+export default function ProfileScreen() {
   return (
     <View>
-      <Text>RegisterScreen</Text>
+      <Text>Nurse Profile Screen</Text>
     </View>
   );
 }

@@ -10,7 +10,7 @@ const ThemeToggle = () => {
   return (
     <Pressable
       onPress={toggleTheme}
-      className='p-2 rounded-full bg-gray-100 dark:bg-gray-800 shadow-sm'
+      className='p-2 max-w-12 rounded-full bg-gray-100 dark:bg-gray-800 shadow-sm'
       style={{
         elevation: 2,
       }}

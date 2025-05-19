@@ -7,143 +7,150 @@ import {
   ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
-  Platform,
   Pressable,
+  Image,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import useAuthStore from '../../stores/useAuthStore';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Eye, EyeOff } from 'lucide-react-native';
+import { useAuthStore } from '../../stores/useAuthStore';
+import { Eye, EyeOff, Mail, Lock } from 'lucide-react-native';
+import { validateEmail } from '../../lib/utils';
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('a.baocute0204@gmail.com');
   const [password, setPassword] = useState('123123');
   const [showPassword, setShowPassword] = useState(false);
-  const { login, isLoading } = useAuthStore();
+  const { isLoading, login } = useAuthStore();
 
   const handleLogin = async () => {
     if (!validateEmail(email)) {
       Alert.alert('Lỗi', 'Email không hợp lệ');
       return;
     }
-
     try {
-      await login(email, password);
+      // const res = await login(email, password);
+      // if (res.data.user.role === 'STUDENT') {
+      //   router.replace('/(student)/home');
+      // } else if (res.data.user.role === 'PARENT') {
+      //   router.replace('/(parent)/home');
+      // } else if (res.data.user.role === 'NURSE') {
+      //   router.replace('/(nurse)/home');
+      // } else {
+      //   router.replace('/(student)/home');
+      // }
+      router.replace('/(student)/home');
     } catch (error) {
-      Alert.alert(
-        'Lỗi đăng nhập',
-        error.message || 'Có lỗi xảy ra khi đăng nhập'
-      );
+      Alert.alert('Lỗi đăng nhập', error || 'Có lỗi xảy ra khi đăng nhập');
     }
   };
 
+  const handleGoogleLogin = () => {
+    Alert.alert('Thông báo', 'Đăng nhập bằng Google sẽ được triển khai sau');
+  };
+
   return (
-    <SafeAreaView className='flex-1 bg-gray-50 dark:bg-gray-900'>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className='flex-1'
-      >
-        {/* Header with Theme Toggle */}
-        <View className='flex-row justify-between items-center px-6 py-4'>
-          <Text className='text-2xl font-bold text-gray-900 dark:text-white'>
-            SmartKid
+    <KeyboardAvoidingView className='flex-1 bg-white dark:bg-gray-900'>
+      <View className='flex-1 px-10 justify-center'>
+        <View className='mb-8'>
+          <Text className='text-5xl font-bold py-4 text-gray-900 dark:text-white text-center'>
+            Đăng nhập
           </Text>
         </View>
 
-        <View className='flex-1 px-6 justify-center'>
-          <View className='mb-10'>
-            <Text className='text-3xl font-bold text-gray-900 dark:text-white text-center'>
-              Chào mừng trở lại!
-            </Text>
-            <Text className='text-gray-600 dark:text-gray-400 text-center mt-2 text-base'>
-              Đăng nhập để tiếp tục hành trình học tập
-            </Text>
+        <View>
+          <View className='relative mb-5'>
+            <View className='absolute left-4 top-1/2 -translate-y-1/2 z-10'>
+              <Mail color='gray' size={24} />
+            </View>
+            <TextInput
+              className='border border-gray-200 dark:border-gray-700 rounded-xl text-xl p-4 py-6 pl-14 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
+              placeholder='Enter your phone or email'
+              placeholderTextColor='#9ca3af'
+              value={email}
+              onChangeText={setEmail}
+              keyboardType='email-address'
+              autoCapitalize='none'
+              autoComplete='email'
+            />
           </View>
 
-          <View className='space-y-6'>
-            <View>
-              <Text className='text-gray-700 dark:text-gray-300 mb-2 font-medium'>
-                Email
-              </Text>
-              <TextInput
-                className='border border-gray-200 dark:border-gray-700 rounded-xl p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
-                placeholder='Nhập email của bạn'
-                placeholderTextColor='#9ca3af'
-                value={email}
-                onChangeText={setEmail}
-                keyboardType='email-address'
-                autoCapitalize='none'
-                autoComplete='email'
-              />
+          <View className='relative'>
+            <View className='absolute left-4 top-1/2 -translate-y-1/2 z-10'>
+              <Lock color='gray' size={24} />
             </View>
-
-            <View>
-              <Text className='text-gray-700 dark:text-gray-300 mb-2 font-medium'>
-                Mật khẩu
-              </Text>
-              <View className='relative'>
-                <TextInput
-                  className='border border-gray-200 dark:border-gray-700 rounded-xl p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white pr-12'
-                  placeholder='Nhập mật khẩu'
-                  placeholderTextColor='#9ca3af'
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!showPassword}
-                  autoComplete='password'
-                />
-                <Pressable
-                  onPress={() => setShowPassword(!showPassword)}
-                  className='absolute right-4 top-4'
-                >
-                  {showPassword ? (
-                    <EyeOff size={24} color='#9ca3af' />
-                  ) : (
-                    <Eye size={24} color='#9ca3af' />
-                  )}
-                </Pressable>
-              </View>
-            </View>
-
-            <TouchableOpacity
-              className={`rounded-xl p-4 ${
-                isLoading
-                  ? 'bg-blue-400 dark:bg-blue-500'
-                  : 'bg-blue-600 dark:bg-blue-700 active:bg-blue-700 dark:active:bg-blue-800'
-              } shadow-sm`}
-              onPress={handleLogin}
-              disabled={isLoading}
+            <TextInput
+              className='border border-gray-200 dark:border-gray-700 text-xl rounded-xl p-4 py-6 pl-14 bg-white dark:bg-gray-800 text-gray-900 dark:text-white pr-12'
+              placeholder='Enter your password'
+              placeholderTextColor='gray'
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              autoComplete='password'
+            />
+            <Pressable
+              onPress={() => setShowPassword(!showPassword)}
+              className='absolute right-4 top-1/2 -translate-y-1/2'
             >
-              {isLoading ? (
-                <ActivityIndicator color='white' />
+              {showPassword ? (
+                <EyeOff size={24} color='gray' />
               ) : (
-                <Text className='text-white text-center font-semibold text-lg'>
-                  Đăng nhập
-                </Text>
+                <Eye size={24} color='gray' />
               )}
-            </TouchableOpacity>
-
-            <View className='flex-row justify-center space-x-1'>
-              <Text className='text-gray-600 dark:text-gray-400'>
-                Chưa có tài khoản?
-              </Text>
-              <TouchableOpacity
-                onPress={() => router.push('/auth/register-screen')}
-                className='active:opacity-70'
-              >
-                <Text className='text-blue-600 dark:text-blue-400 font-medium'>
-                  Đăng ký ngay
-                </Text>
-              </TouchableOpacity>
-            </View>
+            </Pressable>
           </View>
+
+          <View className='items-end mb-5 mt-2'>
+            <TouchableOpacity
+              onPress={() => router.push('/(auth)/forgot-password')}
+              className='active:opacity-70'
+            >
+              <Text className='text-blue-600 dark:text-blue-400 font-medium'>
+                Quên mật khẩu ?
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            className={`rounded-full p-4 mt-2 ${
+              isLoading
+                ? 'bg-primary dark:bg-primary'
+                : 'bg-primary dark:bg-primary active:bg-primary dark:active:bg-primary'
+            } shadow-sm`}
+            onPress={handleLogin}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color='white' size={32} />
+            ) : (
+              <Text className='text-white text-center font-semibold text-xl py-1'>
+                Sign In
+              </Text>
+            )}
+          </TouchableOpacity>
+
+          <View className='flex-row items-center my-5'>
+            <View className='flex-1 h-0.5 bg-gray-200 dark:bg-gray-700' />
+            <Text className='mx-4 text-gray-500 dark:text-gray-400'>OR</Text>
+            <View className='flex-1 h-0.5 bg-gray-200 dark:bg-gray-700' />
+          </View>
+
+          <TouchableOpacity
+            className='flex-row py-5 items-center justify-center border border-gray-200 dark:border-gray-700 rounded-xl p-4 bg-white dark:bg-gray-800'
+            onPress={handleGoogleLogin}
+          >
+            <Image
+              source={{
+                uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1024px-Google_%22G%22_logo.svg.png',
+              }}
+              style={{ width: 20, height: 20 }}
+              className='mr-2'
+            />
+            <Text className='text-gray-800 dark:text-white text-xl font-medium ml-2'>
+              Sign In with Google
+            </Text>
+          </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
-
-const validateEmail = (email) => {
-  const re = /\S+@\S+\.\S+/;
-  return re.test(email);
-};

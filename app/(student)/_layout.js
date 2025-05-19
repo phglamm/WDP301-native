@@ -4,15 +4,16 @@ import { Tabs } from 'expo-router';
 const TabsLayout = () => {
   return (
     <Tabs
-      initialRouteName='index'
+      initialRouteName='home'
       screenOptions={{
-        tabBarActiveTintColor: 'black',
+        tabBarActiveTintColor: '#407CE2',
         tabBarInactiveTintColor: 'gray',
         tabBarStyle: {
           backgroundColor: '#fff',
           borderRadius: 50,
           height: 70,
           paddingTop: 10,
+          paddingBottom: 10,
           marginHorizontal: 20,
           position: 'absolute',
           left: 20,
@@ -22,7 +23,7 @@ const TabsLayout = () => {
       }}
     >
       <Tabs.Screen
-        name='index'
+        name='home'
         options={{
           title: 'Home',
           headerShown: false,
@@ -30,7 +31,21 @@ const TabsLayout = () => {
             <Ionicons
               name={focused ? 'home-sharp' : 'home-outline'}
               color={color}
-              size={24}
+              size={28}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name='settings'
+        options={{
+          title: 'Settings',
+          headerShown: false,
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'settings' : 'settings-outline'}
+              color={color}
+              size={28}
             />
           ),
         }}
@@ -44,21 +59,7 @@ const TabsLayout = () => {
             <Ionicons
               name={focused ? 'person' : 'person-outline'}
               color={color}
-              size={24}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name='settings'
-        options={{
-          title: 'Home',
-          headerShown: false,
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'settings' : 'settings-outline'}
-              color={color}
-              size={24}
+              size={28}
             />
           ),
         }}

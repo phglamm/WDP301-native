@@ -9,7 +9,16 @@ module.exports = {
   ],
   presets: [require('nativewind/preset')],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: '#407CE2',
+        secondary: '#FDB813',
+      },
+      fontFamily: {
+        spaceMono: ['SpaceMono', 'sans-serif'],
+        poppins: ['Poppins', 'sans-serif'],
+      },
+    },
   },
   darkMode: 'class',
   plugins: [],

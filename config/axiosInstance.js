@@ -2,11 +2,9 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import envConfig from './envConfig';
 
-const BASE_URL = envConfig.EXPO_PUBLIC_API_URL;
-
 const axiosInstance = axios.create({
-  baseURL: BASE_URL,
-  timeout: 30000,
+  baseURL: envConfig.EXPO_PUBLIC_API_URL,
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',

@@ -1,21 +1,32 @@
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import '../global.css';
 import { useEffect } from 'react';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import ThemeProvider from '../components/themes/ThemeProvider';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuthStore } from '../stores/useAuthStore';
 
 SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
+  const router = useRouter();
+  const segments = useSegments();
+  const { initialize } = useAuthStore();
+  console.log(segments);
+
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
   useEffect(() => {
+    initialize();
+  }, []);
+
+  useEffect(() => {
     if (loaded || error) {
-      SplashScreen.hideAsync();
+      setTimeout(() => {
+        SplashScreen.hideAsync();
+      }, 100);
     }
   }, [loaded, error]);
 
@@ -25,13 +36,12 @@ const RootLayout = () => {
 
   return (
     <ThemeProvider>
-      <SafeAreaView className='flex-1'>
-        <Stack>
-          <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-          <Stack.Screen name='(auth)' options={{ headerShown: false }} />
-          <Stack.Screen name='detail/[id]' options={{ headerShown: false }} />
-        </Stack>
-      </SafeAreaView>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name='(auth)' />
+        <Stack.Screen name='(parent)' />
+        <Stack.Screen name='(nurse)' />
+        <Stack.Screen name='(student)' />
+      </Stack>
     </ThemeProvider>
   );
 };
