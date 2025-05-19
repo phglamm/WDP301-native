@@ -1,15 +1,33 @@
-import { Link } from 'expo-router';
-import { Text, View, ScrollView, Image, TouchableOpacity } from 'react-native';
+import {
+  Text,
+  View,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Platform,
+  useColorScheme,
+} from 'react-native';
 import { AlertCircle, PlusCircle, Pill, ArrowRight } from 'lucide-react-native';
-import { useAuthStore } from '../../stores/useAuthStore';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
-  const { user, accessToken } = useAuthStore();
+  const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   return (
-    <SafeAreaView className='flex-1 bg-white dark:bg-gray-900'>
-      <ScrollView showsVerticalScrollIndicator={false} className='flex-1'>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: isDark ? '#1a202c' : 'white',
+        paddingTop: Platform.OS === 'ios' ? insets.top : 40,
+      }}
+    >
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        className='flex-1'
+        contentInsetAdjustmentBehavior='automatic'
+      >
         {/* Header */}
         <View className='px-6 pt-4 pb-2 flex-row justify-center items-center text-center'>
           <View className='flex-row items-center'>
@@ -35,7 +53,7 @@ export default function HomeScreen() {
           </Text>
         </View>
         {/* Cards Section */}
-        <View className='px-6 pt-6'>
+        <View className='px-6 pt-6 pb-24'>
           {/* Quản lý thuốc và vật tư */}
           <TouchableOpacity
             className='bg-blue-100 rounded-xl p-4 py-5 mb-8 flex-row justify-between items-center'
@@ -119,6 +137,6 @@ export default function HomeScreen() {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

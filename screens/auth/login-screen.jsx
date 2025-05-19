@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Pressable,
   Image,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -38,7 +39,7 @@ export default function LoginScreen() {
       // } else {
       //   router.replace('/(student)/home');
       // }
-      router.replace('/(student)/home');
+      router.push('/(student)/home');
     } catch (error) {
       Alert.alert('Lỗi đăng nhập', error || 'Có lỗi xảy ra khi đăng nhập');
     }
@@ -49,7 +50,11 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView className='flex-1 bg-white dark:bg-gray-900'>
+    <KeyboardAvoidingView
+      className='flex-1 bg-white dark:bg-gray-900'
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 50 : 0}
+    >
       <View className='flex-1 px-10 justify-center'>
         <View className='mb-8'>
           <Text className='text-5xl font-bold py-4 text-gray-900 dark:text-white text-center'>

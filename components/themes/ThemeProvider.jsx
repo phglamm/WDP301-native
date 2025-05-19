@@ -1,8 +1,9 @@
 import { StatusBar } from 'expo-status-bar';
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useColorScheme, View } from 'react-native';
+import { useColorScheme, Platform } from 'react-native';
 import { useColorScheme as useNativeWindColorScheme } from 'nativewind';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 const ThemeContext = createContext();
 const THEME_PREFERENCE_KEY = '@theme_preference';
@@ -58,7 +59,14 @@ const ThemeProvider = ({ children }) => {
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
-      <View className='flex-1 bg-white dark:bg-gray-900'>{children}</View>
+      <SafeAreaProvider>
+        <SafeAreaView
+          className='flex-1 bg-white dark:bg-gray-900'
+          edges={['right', 'left']}
+        >
+          {children}
+        </SafeAreaView>
+      </SafeAreaProvider>
     </ThemeContext.Provider>
   );
 };

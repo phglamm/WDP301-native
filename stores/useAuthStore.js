@@ -40,6 +40,7 @@ export const useAuthStore = create((set) => ({
 
   logout: async () => {
     try {
+      // await logoutService();
       await SecureStore.deleteItemAsync(TOKEN_KEY);
       await AsyncStorage.removeItem(USER_KEY);
       set({
