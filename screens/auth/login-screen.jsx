@@ -10,43 +10,51 @@ import {
   Pressable,
   Image,
   Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '../../stores/useAuthStore';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react-native';
-import { validateEmail } from '../../lib/utils';
+import { Eye, EyeOff, Mail, Lock, Phone } from 'lucide-react-native';
+import { getHomeRouteByRole, validatePhone } from '../../lib/utils';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const [email, setEmail] = useState('a.baocute0204@gmail.com');
-  const [password, setPassword] = useState('123123');
+  const [phone, setPhone] = useState('0777777777');
+  const [password, setPassword] = useState('12345');
   const [showPassword, setShowPassword] = useState(false);
-  const { isLoading, login } = useAuthStore();
+  const { isLoading, login, error } = useAuthStore();
 
   const handleLogin = async () => {
-    if (!validateEmail(email)) {
-      Alert.alert('Lỗi', 'Email không hợp lệ');
-      return;
-    }
+    // if (!validatePhone(phone)) {
+    //   Alert('Lỗi', 'Số điện thoại không hợp lệ');
+    //   return;
+    // }
+
+    // if (!password || password.length < 6) {
+    //   Alert.alert('Lỗi', 'Mật khẩu phải có ít nhất 6 ký tự');
+    //   return;
+    // }
+
     try {
-      // const res = await login(email, password);
-      // if (res.data.user.role === 'STUDENT') {
-      //   router.replace('/(student)/home');
-      // } else if (res.data.user.role === 'PARENT') {
-      //   router.replace('/(parent)/home');
-      // } else if (res.data.user.role === 'NURSE') {
-      //   router.replace('/(nurse)/home');
-      // } else {
-      //   router.replace('/(student)/home');
-      // }
-      router.push('/(student)/home');
+      const res = await login(phone, password);
+
+      // Sử dụng helper function để xác định route dựa theo role
+      const targetRoute = getHomeRouteByRole(res.data.user, true);
+      router.replace(targetRoute);
     } catch (error) {
-      Alert.alert('Lỗi đăng nhập', error || 'Có lỗi xảy ra khi đăng nhập');
+      // Hiển thị thông báo lỗi từ API
+      const errorMessage =
+        error?.message ||
+        (typeof error === 'string' ? error : 'Có lỗi xảy ra khi đăng nhập');
+
+      Alert.alert('Lỗi đăng nhập', errorMessage);
     }
   };
 
   const handleGoogleLogin = () => {
     Alert.alert('Thông báo', 'Đăng nhập bằng Google sẽ được triển khai sau');
+    router.push('/(student)/home');
   };
 
   return (
@@ -65,17 +73,17 @@ export default function LoginScreen() {
         <View>
           <View className='relative mb-5'>
             <View className='absolute left-4 top-1/2 -translate-y-1/2 z-10'>
-              <Mail color='gray' size={24} />
+              <Phone color='gray' size={24} />
             </View>
             <TextInput
               className='border border-gray-200 dark:border-gray-700 rounded-xl text-xl p-4 py-6 pl-14 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
-              placeholder='Enter your phone or email'
+              placeholder='Enter your phone number'
               placeholderTextColor='#9ca3af'
-              value={email}
-              onChangeText={setEmail}
-              keyboardType='email-address'
-              autoCapitalize='none'
-              autoComplete='email'
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType='phone-pad'
+              // autoCapitalize='none'
+              // autoComplete='tel'
             />
           </View>
 

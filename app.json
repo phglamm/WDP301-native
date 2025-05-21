@@ -8,9 +8,10 @@
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "splash": {
+    "expo-splash-screen": {
       "image": "./assets/images/splash-icon-background.png",
-      "resizeMode": "contain"
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
@@ -27,9 +28,6 @@
       "favicon": "./assets/images/favicon.png",
       "bundler": "metro"
     },
-    "experiments": {
-      "tsconfigPaths": true
-    },
-    "plugins": ["expo-router"]
+    "plugins": ["expo-router", "expo-image-picker"]
   }
 }

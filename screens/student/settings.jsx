@@ -1,15 +1,49 @@
-import { View, Text } from 'react-native';
-import React from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import ThemeToggle from '../../components/themes/ThemeToggle';
+import { View } from 'react-native';
+import React, { useState } from 'react';
+import PlaceholderImage from '../../assets/images/icon.png';
+import ImageViewer from '../../components/common/ImageViewer';
+import ButtonCustom from '../../components/common/ButtonCustom';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function SettingsScreen() {
+  const [selectedImage, setSelectedImage] = useState(undefined);
+  const [showAppOptions, setShowAppOptions] = useState(false);
+  const pickImageAsync = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri);
+    } else {
+      alert('You did not select any image.');
+    }
+  };
   return (
-    <SafeAreaView className='flex-1 bg-white dark:bg-gray-900'>
-      <View className='flex-1 items-center justify-center'>
-        <Text>Student Settings Screen</Text>
-        <ThemeToggle />
+    <View className='bg-white dark:bg-gray-900 flex-1'>
+      <View className='bg-white dark:bg-gray-900 flex-1 items-center justify-center'>
+        <ImageViewer
+          imgSource={PlaceholderImage}
+          selectedImage={selectedImage}
+        />
       </View>
-    </SafeAreaView>
+      {showAppOptions ? (
+        <View />
+      ) : (
+        <View className='bg-white dark:bg-gray-900 flex-1 items-center justify-center'>
+          <ButtonCustom
+            theme='primary'
+            label='Choose a photo'
+            onPress={pickImageAsync}
+          />
+          <ButtonCustom
+            label='Use this photo'
+            onPress={() => setShowAppOptions(true)}
+          />
+        </View>
+      )}
+    </View>
   );
 }

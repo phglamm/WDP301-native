@@ -1,12 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useColorScheme, Platform } from 'react-native';
+import { useColorScheme } from 'react-native';
 import { useColorScheme as useNativeWindColorScheme } from 'nativewind';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import envConfig from '../../config/envConfig';
 
 const ThemeContext = createContext();
-const THEME_PREFERENCE_KEY = '@theme_preference';
+const THEME_PREFERENCE_KEY = envConfig.EXPO_PUBLIC_THEME_KEY;
 
 const ThemeProvider = ({ children }) => {
   const systemColorScheme = useColorScheme();

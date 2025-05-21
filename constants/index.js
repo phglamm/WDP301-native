@@ -1,1 +1,1 @@
-// Some constants for the app
+export const VALID_ROLES = ['student', 'parent', 'nurse'];

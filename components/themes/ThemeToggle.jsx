@@ -6,7 +6,6 @@ import { useTheme } from './ThemeProvider';
 const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === 'dark';
-
   return (
     <Pressable
       onPress={toggleTheme}

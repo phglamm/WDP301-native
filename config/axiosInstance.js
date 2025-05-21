@@ -2,8 +2,11 @@ import axios from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import envConfig from './envConfig';
 
+let API_URL = envConfig.EXPO_PUBLIC_API_URL;
+let TOKEN_KEY = envConfig.EXPO_PUBLIC_TOKEN_KEY;
+
 const axiosInstance = axios.create({
-  baseURL: envConfig.EXPO_PUBLIC_API_URL,
+  baseURL: API_URL,
   timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
@@ -15,42 +18,67 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   async (config) => {
     try {
-      const accessToken = await SecureStore.getItemAsync('accessToken');
-      if (accessToken) {
-        config.headers['Authorization'] = `Bearer ${accessToken}`;
+      const access_token = await SecureStore.getItemAsync(TOKEN_KEY);
+      if (access_token) {
+        config.headers['Authorization'] = `Bearer ${access_token}`;
       }
       return config;
     } catch (error) {
       return Promise.reject(error);
     }
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Response interceptor
 axiosInstance.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    // ERROR NETWORK
-    if (!error.response) {
+  async (response) => {
+    const { code, status, message, data } = response.data;
+
+    if (code === 200 && status === true) {
+      if (data?.access_token) {
+        await SecureStore.setItemAsync(TOKEN_KEY, data.access_token);
+      }
+      return response.data;
+    }
+
+    // unauthorized
+    if (code === 401) {
+      await SecureStore.deleteItemAsync(TOKEN_KEY);
       return Promise.reject({
-        message: 'Không thể kết nối đến máy chủ.',
-        status: 500,
+        message: message || 'Unauthorized',
+        statusCode: 401,
+        data,
       });
     }
 
-    // ERROR 401
-    if (error.response.status === 401) {
-      await SecureStore.deleteItemAsync('accessToken');
+    // other non-success codes
+    return Promise.reject({
+      message: message || 'Đã xảy ra lỗi',
+      statusCode: code,
+      data,
+    });
+  },
+  async (error) => {
+    // Network or no response
+    if (!error.response) {
+      return Promise.reject({
+        message: 'Không thể kết nối đến máy chủ.',
+        statusCode: 500,
+      });
     }
 
-    // ERROR OTHER
+    // In case backend sends non-200 HTTP, fallback to old logic
+    const { data, status } = error.response;
+
+    if (status === 401) {
+      await SecureStore.deleteItemAsync(TOKEN_KEY);
+    }
+
     return Promise.reject({
-      message: error.response?.data?.message || 'Đã xảy ra lỗi',
-      status: error.response?.status,
-      data: error.response?.data,
+      message: data?.message || 'Đã xảy ra lỗi',
+      statusCode: status,
+      data,
     });
   }
 );

@@ -12,13 +12,17 @@ const TabsLayout = () => {
           backgroundColor: '#fff',
           borderRadius: 50,
           height: 70,
+          shadowOpacity: 0.1,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 0 },
+          shadowRadius: 10,
           paddingTop: 10,
           paddingBottom: 10,
           marginHorizontal: 20,
           position: 'absolute',
           left: 20,
           right: 20,
-          bottom: 20,
+          bottom: 10,
         },
       }}
     >

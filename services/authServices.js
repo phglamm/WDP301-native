@@ -1,15 +1,16 @@
 import axiosInstance from '../config/axiosInstance';
 
-export const loginService = async (email, password) => {
+export const loginService = async (phone, password) => {
   try {
-    const response = await axiosInstance.post('/api/auth/login', {
-      email,
+    const response = await axiosInstance.post('/auth/login', {
+      phone,
       password,
     });
-    return response.data;
+    // response = { code, status, message, data }
+    return response;
   } catch (error) {
     console.log('Error at authServices: ', error);
-    throw error.response?.data || error.message;
+    throw error;
   }
 };
 

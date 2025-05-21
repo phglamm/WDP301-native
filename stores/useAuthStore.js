@@ -9,29 +9,39 @@ let USER_KEY = envConfig.EXPO_PUBLIC_USER_KEY;
 
 export const useAuthStore = create((set) => ({
   user: null,
-  accessToken: null,
+  access_token: null,
   isAuthenticated: false,
   isLoading: false,
   error: null,
 
-  login: async (email, password) => {
+  login: async (phone, password) => {
     set({ isLoading: true });
     try {
-      const response = await loginService(email, password);
-      const { user, accessToken } = response.data;
-      await SecureStore.setItemAsync(TOKEN_KEY, accessToken);
-      await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
+      const response = await loginService(phone, password);
+      console.log('🚀 ~ login: ~ response:', response);
+      // response = { code, status, message, data }
+      if (response.code === 200 && response.status) {
+        const { user, access_token } = response.data;
 
-      set({
-        user: user,
-        accessToken: accessToken,
-        isAuthenticated: true,
-      });
+        await SecureStore.setItemAsync(TOKEN_KEY, access_token);
+        await AsyncStorage.setItem(USER_KEY, JSON.stringify(user));
+
+        set({
+          user,
+          access_token,
+          isAuthenticated: true,
+        });
+      } else {
+        throw new Error('Dữ liệu đăng nhập không hợp lệ');
+      }
 
       return response;
     } catch (error) {
       console.log('Error at useAuthStore: ', error);
-      set({ error: error || 'Đăng nhập thất bại' });
+      set({
+        error: error?.message || JSON.stringify(error) || 'Đăng nhập thất bại',
+      });
+
       throw error;
     } finally {
       set({ isLoading: false });
@@ -43,9 +53,10 @@ export const useAuthStore = create((set) => ({
       // await logoutService();
       await SecureStore.deleteItemAsync(TOKEN_KEY);
       await AsyncStorage.removeItem(USER_KEY);
+      await AsyncStorage.clear();
       set({
         user: null,
-        accessToken: null,
+        access_token: null,
         isAuthenticated: false,
       });
     } catch (error) {
@@ -64,7 +75,7 @@ export const useAuthStore = create((set) => ({
 
       if (token && user) {
         set({
-          accessToken: token,
+          access_token: token,
           user: user,
           isAuthenticated: true,
         });
