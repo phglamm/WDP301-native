@@ -1,8 +1,10 @@
 import { Stack } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const AuthLayout = () => {
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    // <SafeAreaView className='flex-1 bg-white dark:bg-gray-900'>
+    <Stack screenOptions={{ headerShown: false }} initialRouteName='login'>
       <Stack.Screen
         name='login'
         options={{
@@ -16,6 +18,7 @@ const AuthLayout = () => {
         }}
       />
     </Stack>
+    // </SafeAreaView>
   );
 };
 

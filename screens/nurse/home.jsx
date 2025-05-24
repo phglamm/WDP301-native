@@ -7,10 +7,11 @@ import {
   Syringe,
   ShieldAlert,
 } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   return (
-    <View className='flex-1 bg-white dark:bg-gray-900'>
+    <SafeAreaView className='flex-1 bg-white dark:bg-gray-900'>
       <ScrollView
         showsVerticalScrollIndicator={false}
         className='flex-1'
@@ -125,6 +126,6 @@ export default function HomeScreen() {
           </View>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }

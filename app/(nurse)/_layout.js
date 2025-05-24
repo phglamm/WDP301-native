@@ -1,20 +1,26 @@
-import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Tabs } from 'expo-router';
+import { Platform } from 'react-native';
+import { useColorScheme } from 'react-native';
 
 const NurseLayout = () => {
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
   return (
     <Tabs
-      initialRouteName='home'
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#407CE2',
-        tabBarInactiveTintColor: 'gray',
         tabBarStyle: {
-          backgroundColor: '#fff',
-          height: 60,
+          height: Platform.OS === 'ios' ? 88 : 80,
+          paddingBottom: Platform.OS === 'ios' ? 28 : 8,
           paddingTop: 10,
+          backgroundColor: isDark ? '#1a1a1a' : '#ffffff',
         },
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: '#007AFF',
+        tabBarInactiveTintColor: isDark ? '#666666' : '#999999',
       }}
+      initialRouteName='home'
     >
       <Tabs.Screen
         name='home'

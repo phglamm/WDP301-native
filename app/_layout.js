@@ -1,12 +1,11 @@
-import { Stack, Slot, useRouter, useSegments } from 'expo-router';
-import '../global.css';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import ThemeProvider from '../components/themes/ThemeProvider';
 import { useAuthStore } from '../stores/useAuthStore';
 import { getHomeRouteByRole } from '../lib/utils';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import '../global.css';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -19,7 +18,12 @@ const RootLayout = () => {
   const { initialize, isAuthenticated, user } = useAuthStore();
 
   const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    MontserratBold: require('../assets/fonts/Montserrat-Bold.ttf'),
+    MontserratRegular: require('../assets/fonts/Montserrat-Regular.ttf'),
+    MontserratSemiBold: require('../assets/fonts/Montserrat-SemiBold.ttf'),
+    MontserratMedium: require('../assets/fonts/Montserrat-Medium.ttf'),
+    MontserratItalic: require('../assets/fonts/Montserrat-Italic.ttf'),
+    MontserratSemiBoldItalic: require('../assets/fonts/Montserrat-SemiBoldItalic.ttf'),
   });
 
   // Initialize data
@@ -29,46 +33,44 @@ const RootLayout = () => {
       setInitialized(true);
     };
     initData();
-  }, []);
+  }, [initialize]);
 
   // Hide splash screen
   useEffect(() => {
-    if (loaded || error) {
+    if ((loaded || error) && initialized) {
       setTimeout(() => {
         SplashScreen.hideAsync();
-      }, 1000);
+      }, 500);
     }
-  }, [loaded, error]);
+  }, [loaded, error, initialized]);
 
   // Auth routes
   useEffect(() => {
     if (!initialized) return;
-
     const inAuthGroup = segments[0] === '(auth)';
-    const isSignedIn = !!user;
-    if (inAuthGroup && isSignedIn && isAuthenticated) {
-      const targetRoute = getHomeRouteByRole(user);
+    const isSignedIn = !!user && isAuthenticated;
+
+    if (inAuthGroup && isSignedIn) {
+      const targetRoute = getHomeRouteByRole(user, true);
       router.replace(targetRoute);
-    } else if (!inAuthGroup && !isSignedIn) {
+    } else if (!inAuthGroup && !isSignedIn && initialized) {
       router.replace('/(auth)/login');
     }
-  }, [segments, user, router, initialized]);
+  }, [segments, user, router, initialized, isAuthenticated]);
 
   // Loading fonts
-  if (!loaded && !error) {
+  if (!initialized || (!loaded && !error)) {
     return null;
   }
 
   return (
     <ThemeProvider>
-      <SafeAreaView className='flex-1 bg-white dark:bg-gray-900'>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name='(auth)' />
-          <Stack.Screen name='(parent)' />
-          <Stack.Screen name='(nurse)' />
-          <Stack.Screen name='(student)' />
-        </Stack>
-      </SafeAreaView>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name='(auth)' />
+        <Stack.Screen name='(parent)' />
+        <Stack.Screen name='(nurse)' />
+        <Stack.Screen name='(student)' />
+      </Stack>
     </ThemeProvider>
   );
 };

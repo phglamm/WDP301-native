@@ -35,7 +35,7 @@ axiosInstance.interceptors.response.use(
   async (response) => {
     const { code, status, message, data } = response.data;
 
-    if (code === 200 && status === true) {
+    if ((code === 200 || code === 201) && status === true) {
       if (data?.access_token) {
         await SecureStore.setItemAsync(TOKEN_KEY, data.access_token);
       }

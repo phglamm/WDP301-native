@@ -8,26 +8,39 @@
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "expo-splash-screen": {
+    "splash": {
       "image": "./assets/images/splash-icon-background.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.campusmedix.app"
+      "bundleIdentifier": "com.campusmedix.app",
+      "infoPlist": {
+        "UIBackgroundModes": ["fetch", "remote-notification"]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.campusmedix.app"
+      "package": "com.campusmedix.app",
+      "permissions": []
     },
     "web": {
       "favicon": "./assets/images/favicon.png",
       "bundler": "metro"
     },
-    "plugins": ["expo-router", "expo-image-picker"]
+    "plugins": ["expo-router", "expo-image-picker"],
+    "assetBundlePatterns": ["**/*"],
+    "fonts": {
+      "Montserrat-Bold": "./assets/fonts/Montserrat-Bold.ttf",
+      "Montserrat-Regular": "./assets/fonts/Montserrat-Regular.ttf",
+      "Montserrat-SemiBold": "./assets/fonts/Montserrat-SemiBold.ttf",
+      "Montserrat-Medium": "./assets/fonts/Montserrat-Medium.ttf",
+      "Montserrat-Italic": "./assets/fonts/Montserrat-Italic.ttf",
+      "Montserrat-SemiBoldItalic": "./assets/fonts/Montserrat-SemiBoldItalic.ttf"
+    }
   }
 }

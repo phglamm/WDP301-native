@@ -2,7 +2,6 @@ import { View } from 'react-native';
 import React, { useState } from 'react';
 import PlaceholderImage from '../../assets/images/icon.png';
 import ImageViewer from '../../components/common/ImageViewer';
-import ButtonCustom from '../../components/common/ButtonCustom';
 import * as ImagePicker from 'expo-image-picker';
 
 export default function SettingsScreen() {
@@ -33,15 +32,9 @@ export default function SettingsScreen() {
         <View />
       ) : (
         <View className='bg-white dark:bg-gray-900 flex-1 items-center justify-center'>
-          <ButtonCustom
-            theme='primary'
-            label='Choose a photo'
-            onPress={pickImageAsync}
-          />
-          <ButtonCustom
-            label='Use this photo'
-            onPress={() => setShowAppOptions(true)}
-          />
+          <Button onPress={pickImageAsync}>
+            <Text>Choose a photo</Text>
+          </Button>
         </View>
       )}
     </View>

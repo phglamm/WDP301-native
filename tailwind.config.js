@@ -12,11 +12,15 @@ module.exports = {
     extend: {
       colors: {
         primary: '#407CE2',
-        secondary: '#FDB813',
+        secondary: '#000000',
       },
       fontFamily: {
-        spaceMono: ['SpaceMono', 'sans-serif'],
-        poppins: ['Poppins', 'sans-serif'],
+        montserratBold: ['MontserratBold', 'sans-serif'],
+        montserratRegular: ['MontserratRegular', 'sans-serif'],
+        montserratSemiBold: ['MontserratSemiBold', 'sans-serif'],
+        montserratMedium: ['MontserratMedium', 'sans-serif'],
+        montserratItalic: ['MontserratItalic', 'sans-serif'],
+        montserratSemiBoldItalic: ['MontserratSemiBoldItalic', 'sans-serif'],
       },
     },
   },

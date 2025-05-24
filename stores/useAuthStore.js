@@ -53,7 +53,6 @@ export const useAuthStore = create((set) => ({
       // await logoutService();
       await SecureStore.deleteItemAsync(TOKEN_KEY);
       await AsyncStorage.removeItem(USER_KEY);
-      await AsyncStorage.clear();
       set({
         user: null,
         access_token: null,
