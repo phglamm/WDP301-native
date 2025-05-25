@@ -1,102 +1,152 @@
-import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
-import React from 'react';
-import { useAuthStore } from '../../stores/useAuthStore';
-import { Redirect } from 'expo-router';
-import ThemeToggle from '../../components/themes/ThemeToggle';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Button,
+  ActivityIndicator,
+  Alert,
+  RefreshControl,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useRouter } from "expo-router";
+import {
+  User,
+  Mail,
+  Phone,
+  LogOut,
+  ChevronRight,
+  Settings,
+  Bell,
+  HelpCircle,
+  Lock,
+} from "lucide-react-native";
+import { useAuthStore } from "../../stores/useAuthStore";
+import { getMySonService } from "../../services/parentServices";
+import ThemeToggle from "../../components/themes/ThemeToggle";
+
+const MenuButton = ({ icon, title, onPress, showBorder = true }) => (
+  <TouchableOpacity
+    onPress={onPress}
+    className={`flex-row items-center px-4 py-4 ${
+      showBorder ? "border-b border-gray-100" : ""
+    }`}
+  >
+    <View className="w-8 h-8 rounded-full bg-gray-100 items-center justify-center">
+      {icon}
+    </View>
+    <Text className="flex-1 ml-3 text-gray-700 text-base">{title}</Text>
+    <ChevronRight size={20} color="#9CA3AF" />
+  </TouchableOpacity>
+);
 
 export default function ProfileScreen() {
-  const { user, logout } = useAuthStore();
+  const router = useRouter();
+  const { logout, user } = useAuthStore();
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState(null);
 
-  if (!user) {
-    return <Redirect href='/login' />;
-  }
+  const handleRefresh = () => {
+    setRefreshing(true);
+  };
 
   const handleLogout = () => {
-    logout();
+    Alert.alert(
+      "Đăng xuất",
+      "Bạn có chắc chắn muốn đăng xuất?",
+      [
+        {
+          text: "Hủy",
+          style: "cancel",
+        },
+        {
+          text: "Đăng xuất",
+          style: "destructive",
+          onPress: logout,
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   return (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      className='bg-white dark:bg-gray-900'
-    >
-      <View className='px-4 pt-6'>
-        {/* Header */}
-        <View className='flex-row items-center justify-between mb-8'>
-          <Text className='text-2xl font-bold text-gray-800 dark:text-white'>
-            Hồ sơ
-          </Text>
-          <ThemeToggle />
-        </View>
+    <SafeAreaView className="flex-1 bg-white">
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header Profile */}
+        <View className="bg-white px-4 py-6">
+          <View className="items-center mb-4">
+            <View className="w-24 h-24 rounded-full bg-blue-100 items-center justify-center mb-3">
+              <User size={48} color="#3B82F6" />
+            </View>
+            <Text className="text-2xl font-bold text-gray-800 mb-1">
+              {user?.fullName}
+            </Text>
+            <Text className="text-base text-gray-500 mb-3">{user?.role}</Text>
+          </View>
 
-        {/* Profile Card */}
-        <View className='bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm mb-6 border border-gray-200 dark:border-gray-700'>
-          <View className='items-center'>
-            <View className='relative'>
-              <Image
-                source={{
-                  uri:
-                    user.avatar ||
-                    'https://randomuser.me/api/portraits/men/36.jpg',
-                }}
-                className='w-24 h-24 rounded-full'
-              />
-              <View className='absolute bottom-0 right-0 bg-blue-500 p-1 rounded-full border-2 border-white dark:border-gray-800'>
-                <Ionicons name='camera' size={16} color='white' />
+          {/* Contact Info */}
+          <View className="flex-row justify-around">
+            <View className="items-center">
+              <View className="w-10 h-10 rounded-full bg-blue-50 items-center justify-center mb-2">
+                <Phone size={20} color="#3B82F6" />
+              </View>
+              <Text className="text-sm text-gray-600">{user?.phone}</Text>
+            </View>
+            <View className="items-center">
+              <View className="w-10 h-10 rounded-full bg-blue-50 items-center justify-center mb-2">
+                <ThemeToggle />
               </View>
             </View>
-
-            <Text className='text-xl font-bold mt-4 text-gray-800 dark:text-white'>
-              {user.fullName}
-            </Text>
-            <Text className='text-sm text-gray-500 dark:text-gray-400 mt-1'>
-              {user.phone}
-            </Text>
-
-            <View className='bg-blue-100 dark:bg-blue-900 px-4 py-1 rounded-full mt-3'>
-              <Text className='text-blue-600 dark:text-blue-300 font-medium'>
-                Sinh viên
-              </Text>
+            <View className="items-center">
+              <View className="w-10 h-10 rounded-full bg-blue-50 items-center justify-center mb-2">
+                <Mail size={20} color="#3B82F6" />
+              </View>
+              <Text className="text-sm text-gray-600">{user?.email}</Text>
             </View>
           </View>
+        </View>
 
-          <View className='flex-row justify-around mt-6 pt-4 border-t border-gray-100 dark:border-gray-700'>
-            <View className='items-center'>
-              <Text className='text-lg font-bold text-gray-800 dark:text-white'>
-                256
-              </Text>
-              <Text className='text-xs text-gray-500 dark:text-gray-400'>
-                Khóa học
-              </Text>
-            </View>
-            <View className='items-center'>
-              <Text className='text-lg font-bold text-gray-800 dark:text-white'>
-                24
-              </Text>
-              <Text className='text-xs text-gray-500 dark:text-gray-400'>
-                Bài tập
-              </Text>
-            </View>
-            <View className='items-center'>
-              <Text className='text-lg font-bold text-gray-800 dark:text-white'>
-                98%
-              </Text>
-              <Text className='text-xs text-gray-500 dark:text-gray-400'>
-                Hoàn thành
-              </Text>
-            </View>
-          </View>
+        {/* Menu Section */}
+        <View className="mt-3 bg-white">
+          <MenuButton
+            icon={<Bell size={20} color="#3B82F6" />}
+            title="Thông báo"
+            onPress={() => router.push("/notification")}
+          />
+          <MenuButton
+            icon={<Settings size={20} color="#3B82F6" />}
+            title="Cài đặt tài khoản"
+            onPress={() => router.push("/settings")}
+          />
+          <MenuButton
+            icon={<Lock size={20} color="#3B82F6" />}
+            title="Bảo mật"
+            onPress={() => router.push("/security")}
+          />
+          <MenuButton
+            icon={<HelpCircle size={20} color="#3B82F6" />}
+            title="Trợ giúp & Hỗ trợ"
+            onPress={() => router.push("/help")}
+            showBorder={false}
+          />
         </View>
 
         {/* Logout Button */}
         <TouchableOpacity
           onPress={handleLogout}
-          className='bg-red-500 rounded-2xl p-4 items-center mb-8'
+          className="mt-6 mx-4 mb-8 bg-red-50 py-4 rounded-xl flex-row items-center justify-center"
         >
-          <Text className='text-white font-bold text-base'>Đăng xuất</Text>
+          <LogOut size={20} color="#EF4444" />
+          <Text className="ml-2 text-red-600 font-medium">Đăng xuất</Text>
         </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

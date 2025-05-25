@@ -1,34 +1,35 @@
-import { Ionicons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
-import { Platform } from 'react-native';
-import { useColorScheme } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
+import { Platform } from "react-native";
+import { useColorScheme } from "react-native";
 
 const NurseLayout = () => {
   const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = colorScheme === "dark";
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          height: Platform.OS === 'ios' ? 88 : 80,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 8,
+          height: Platform.OS === "ios" ? 88 : 80,
+          paddingBottom: Platform.OS === "ios" ? 28 : 8,
           paddingTop: 10,
-          backgroundColor: isDark ? '#1a1a1a' : '#ffffff',
+          backgroundColor: isDark ? "#1a1a1a" : "#ffffff",
         },
         tabBarShowLabel: false,
-        tabBarActiveTintColor: '#007AFF',
-        tabBarInactiveTintColor: isDark ? '#666666' : '#999999',
+        tabBarActiveTintColor: "#007AFF",
+        tabBarInactiveTintColor: isDark ? "#666666" : "#999999",
       }}
-      initialRouteName='home'
+      initialRouteName="home"
     >
+      <Tabs.Screen name="accident" options={{ href: null }} />
       <Tabs.Screen
-        name='home'
+        name="home"
         options={{
-          title: 'Trang chủ',
+          title: "Trang chủ",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
-              name={focused ? 'home-sharp' : 'home-outline'}
+              name={focused ? "home-sharp" : "home-outline"}
               color={color}
               size={28}
             />
@@ -36,12 +37,12 @@ const NurseLayout = () => {
         }}
       />
       <Tabs.Screen
-        name='chat'
+        name="chat"
         options={{
-          title: 'Chatbox AI Provjp',
+          title: "Chatbox AI Provjp",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
-              name={focused ? 'chatbubbles' : 'chatbubbles-outline'}
+              name={focused ? "chatbubbles" : "chatbubbles-outline"}
               color={color}
               size={28}
             />
@@ -49,12 +50,12 @@ const NurseLayout = () => {
         }}
       />
       <Tabs.Screen
-        name='profile'
+        name="profile"
         options={{
-          title: 'Hồ sơ',
+          title: "Hồ sơ",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
-              name={focused ? 'person' : 'person-outline'}
+              name={focused ? "person" : "person-outline"}
               color={color}
               size={28}
             />
