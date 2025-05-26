@@ -112,7 +112,7 @@ export default function HomeScreen() {
                 <Syringe size={48} color="#48BB78" />
               </View>
               <Text className="text-center text-xl font-medium text-gray-700">
-                Gửi thông báo tiêm chủng
+                Kết quả tiêm chủng
               </Text>
             </TouchableOpacity>
 
@@ -125,7 +125,7 @@ export default function HomeScreen() {
                 <Cross size={48} color="#9F7AEA" />
               </View>
               <Text className="text-center text-xl font-medium text-gray-700">
-                Gửi thông báo khám sức khỏe
+                Kết quả khám sức khỏe
               </Text>
             </TouchableOpacity>
           </View>

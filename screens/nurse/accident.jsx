@@ -9,7 +9,7 @@ import {
   Alert,
   Animated,
 } from "react-native";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, use } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ArrowLeft,
@@ -17,10 +17,19 @@ import {
   Plus,
   Activity,
   AlertCircle,
+  Calendar,
+  User,
+  FileText,
+  ChevronRight,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import AccidentDeclareForm from "../../components/nurse/AccidentDeclareForm";
-import { createAccidentEvent } from "../../services/nurseService";
+import {
+  createAccidentEvent,
+  getAccidentHistory,
+} from "../../services/nurseService";
+import { set } from "zod";
+import AccidentHistory from "../../components/nurse/AccidentHistory";
 
 export default function AccidentScreen() {
   const router = useRouter();
@@ -34,9 +43,37 @@ export default function AccidentScreen() {
     type: "",
   });
 
-  // Animation values
+  // Calculate statistics from accidents data
+  const getTodayAccidents = () => {
+    const today = new Date().toDateString();
+    return accidents.filter((accident) => {
+      const accidentDate = new Date(accident.date).toDateString();
+      return accidentDate === today;
+    }).length;
+  };
 
-  // FIXED: Moved handleSubmitAccident to the top before it's used
+  const getWeekAccidents = () => {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    return accidents.filter((accident) => {
+      const accidentDate = new Date(accident.date);
+      return accidentDate >= oneWeekAgo;
+    }).length;
+  };
+  const fetchAccidents = async () => {
+    try {
+      const response = await getAccidentHistory();
+      setAccidents(response.data || []);
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching accidents:", error);
+      Alert.alert("Lỗi", "Không thể tải dữ liệu tai nạn.");
+    }
+  };
+  useEffect(() => {
+    fetchAccidents();
+  }, []);
+
   const handleSubmitAccident = async () => {
     setIsSubmitting(true);
     try {
@@ -59,6 +96,8 @@ export default function AccidentScreen() {
                 summary: "",
                 type: "",
               });
+              // Refresh accidents list
+              fetchAccidents();
             },
           },
         ]);
@@ -84,12 +123,79 @@ export default function AccidentScreen() {
     setCurrentView("history");
   };
 
-  const handleRefresh = () => {
+  const handleViewAccidentDetail = (accident) => {
+    // Navigate to accident detail screen with accident data
+    router.push({
+      pathname: "/(nurse)/accident-detail",
+      params: { accidentId: accident.id },
+    });
+    console.log("accidentId", accident.id);
+  };
+
+  const handleRefresh = async () => {
     setRefreshing(true);
-    // Simulate a network request
-    setTimeout(() => {
+    try {
+      const response = await getAccidentHistory();
+      setAccidents(response.data || []);
+    } catch (error) {
+      console.error("Error refreshing accidents:", error);
+    } finally {
       setRefreshing(false);
-    }, 2000);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString || dateString === "Invalid Date") {
+      return "Không xác định";
+    }
+    const date = new Date(dateString);
+    return date.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getAccidentTypeColor = (type) => {
+    switch (type?.toLowerCase()) {
+      case "chấn thương":
+        return {
+          bg: "bg-red-100",
+          text: "text-red-700",
+          border: "border-red-200",
+          icon: "#EF4444",
+        };
+      case "bệnh tật":
+        return {
+          bg: "bg-orange-100",
+          text: "text-orange-700",
+          border: "border-orange-200",
+          icon: "#F97316",
+        };
+      case "vật lý":
+        return {
+          bg: "bg-blue-100",
+          text: "text-blue-700",
+          border: "border-blue-200",
+          icon: "#3B82F6",
+        };
+      case "khẩn cấp":
+        return {
+          bg: "bg-purple-100",
+          text: "text-purple-700",
+          border: "border-purple-200",
+          icon: "#8B5CF6",
+        };
+      default:
+        return {
+          bg: "bg-gray-100",
+          text: "text-gray-700",
+          border: "border-gray-200",
+          icon: "#6B7280",
+        };
+    }
   };
 
   // If showing form, render the form component
@@ -108,6 +214,23 @@ export default function AccidentScreen() {
             onBack={() => setCurrentView("select")}
           />
         </KeyboardAvoidingView>
+      </SafeAreaView>
+    );
+  }
+
+  // History view
+  if (currentView === "history") {
+    return (
+      <SafeAreaView className="flex-1 bg-white">
+        <AccidentHistory
+          accidents={accidents}
+          setCurrentView={setCurrentView}
+          handleViewAccidentDetail={handleViewAccidentDetail}
+          refreshing={refreshing}
+          handleRefresh={handleRefresh}
+          formatDate={formatDate}
+          getAccidentTypeColor={getAccidentTypeColor}
+        />
       </SafeAreaView>
     );
   }
@@ -144,7 +267,9 @@ export default function AccidentScreen() {
                 <AlertCircle size={20} color="#EF4444" />
                 <Text className="text-red-600 font-semibold ml-2">Hôm nay</Text>
               </View>
-              <Text className="text-2xl font-bold text-red-700 mt-1">0</Text>
+              <Text className="text-2xl font-bold text-red-700 mt-1">
+                {getTodayAccidents()}
+              </Text>
               <Text className="text-red-500 text-xs">tai nạn</Text>
             </View>
             <View className="flex-1 bg-blue-50 p-4 rounded-xl border border-blue-100">
@@ -154,7 +279,9 @@ export default function AccidentScreen() {
                   Tuần này
                 </Text>
               </View>
-              <Text className="text-2xl font-bold text-blue-700 mt-1">0</Text>
+              <Text className="text-2xl font-bold text-blue-700 mt-1">
+                {getWeekAccidents()}
+              </Text>
               <Text className="text-blue-500 text-xs">tai nạn</Text>
             </View>
           </View>
@@ -186,7 +313,7 @@ export default function AccidentScreen() {
             >
               <Clock size={22} color="#6B7280" />
               <Text className="text-gray-700 font-bold ml-2 text-base">
-                Lịch sử
+                Lịch sử ({accidents.length})
               </Text>
             </TouchableOpacity>
           </View>
@@ -206,7 +333,7 @@ export default function AccidentScreen() {
             showsVerticalScrollIndicator={false}
           >
             {/* Quick Actions Section */}
-            <View className="mb-6">
+            {/* <View className="mb-6">
               <Text className="text-lg font-montserratSemiBold text-gray-800 mb-4">
                 Hành động nhanh
               </Text>
@@ -254,7 +381,7 @@ export default function AccidentScreen() {
                   />
                 </TouchableOpacity>
               </View>
-            </View>
+            </View> */}
 
             {/* Recent Activity Section */}
             <View className="mb-6">
@@ -262,19 +389,67 @@ export default function AccidentScreen() {
                 Hoạt động gần đây
               </Text>
 
-              <View className="bg-white p-6 rounded-xl border border-gray-200">
-                <View className="items-center">
-                  <View className="bg-gray-100 p-4 rounded-full mb-3">
-                    <Clock size={24} color="#6B7280" />
+              {accidents.length === 0 ? (
+                <View className="bg-white p-6 rounded-xl border border-gray-200">
+                  <View className="items-center">
+                    <View className="bg-gray-100 p-4 rounded-full mb-3">
+                      <Clock size={24} color="#6B7280" />
+                    </View>
+                    <Text className="text-gray-500 font-medium">
+                      Chưa có hoạt động nào
+                    </Text>
+                    <Text className="text-gray-400 text-sm mt-1 text-center">
+                      Các sự kiện tai nạn sẽ hiển thị ở đây
+                    </Text>
                   </View>
-                  <Text className="text-gray-500 font-medium">
-                    Chưa có hoạt động nào
-                  </Text>
-                  <Text className="text-gray-400 text-sm mt-1 text-center">
-                    Các sự kiện tai nạn sẽ hiển thị ở đây
-                  </Text>
                 </View>
-              </View>
+              ) : (
+                <View className="space-y-3">
+                  {accidents.slice(0, 3).map((accident, index) => {
+                    const typeColors = getAccidentTypeColor(accident.type);
+                    return (
+                      <TouchableOpacity
+                        key={accident.id || index}
+                        onPress={() => handleViewAccidentDetail(accident)}
+                        className="bg-white p-4 rounded-xl border border-gray-200 active:bg-gray-50"
+                      >
+                        <View className="flex-row items-center justify-between">
+                          <View className="flex-1">
+                            <View
+                              className={`self-start px-3 py-1 rounded-full ${typeColors.bg} mb-1`}
+                            >
+                              <Text
+                                className={`text-sm font-semibold ${typeColors.text}`}
+                              >
+                                {accident.type}
+                              </Text>
+                            </View>
+                            <Text className="font-semibold text-gray-800">
+                              {accident.summary}
+                            </Text>
+                            <Text className="text-sm text-gray-500 mt-1">
+                              {accident.student?.fullName} •{" "}
+                              {formatDate(accident.date)}
+                            </Text>
+                          </View>
+                          <ChevronRight size={16} color="#9CA3AF" />
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
+
+                  {accidents.length > 3 && (
+                    <TouchableOpacity
+                      onPress={handleViewHistory}
+                      className="bg-blue-50 p-3 rounded-xl border border-blue-100 active:bg-blue-100"
+                    >
+                      <Text className="text-blue-600 font-semibold text-center">
+                        Xem tất cả {accidents.length} sự kiện
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
             </View>
           </ScrollView>
         </View>

@@ -33,11 +33,11 @@ const AccidentDeclareForm = ({
 
   const TYPE_OPTIONS = [
     {
-      label: "Phần mềm",
-      color: "blue",
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-200",
-      textColor: "text-blue-600",
+      label: "Bệnh tật",
+      color: "purple",
+      bgColor: "bg-purple-50",
+      borderColor: "border-purple-200",
+      textColor: "text-purple-600",
     },
     {
       label: "Vật lý",
@@ -48,17 +48,15 @@ const AccidentDeclareForm = ({
     },
     {
       label: "Thần kinh",
-      color: "purple",
-      bgColor: "bg-purple-50",
-      borderColor: "border-purple-200",
-      textColor: "text-purple-600",
+      color: "blue",
+      bgColor: "bg-blue-50",
+      borderColor: "border-blue-200",
+      textColor: "text-blue-600",
     },
   ];
 
-  const isFormValid = formData.studentCode && formData.summary && formData.type;
-
   return (
-    <View className="flex-1 bg-gray-50">
+    <View className="flex-1">
       {/* Enhanced Header */}
       <View className="bg-white p-6 border-b border-gray-100 shadow-sm">
         <View className="flex-row items-center mb-2">
@@ -90,10 +88,10 @@ const AccidentDeclareForm = ({
       >
         {/* Form Header */}
         <View className="px-6 py-6">
-          <View className="bg-gradient-to-r from-red-500 to-orange-500 p-6 rounded-2xl mb-6">
+          <View className="bg-red-500 p-6 rounded-2xl mb-6">
             <View className="flex-row items-center">
-              <View className="bg-white bg-opacity-20 p-3 rounded-full">
-                <AlertTriangle size={24} color="white" />
+              <View className="bg-red bg-opacity-20 p-3 rounded-full">
+                <AlertTriangle size={35} color="white" />
               </View>
               <View className="ml-4 flex-1">
                 <Text className="text-white text-xl font-bold">
@@ -114,13 +112,13 @@ const AccidentDeclareForm = ({
             <View className="flex-row items-center mb-3">
               <User size={20} color="#6B7280" />
               <Text className="text-lg font-semibold text-gray-800 ml-2">
-                Mã số Sinh Viên *
+                Mã số Học Sinh *
               </Text>
             </View>
             <View className="relative">
               <TextInput
                 className="border-2 border-gray-200 rounded-2xl px-4 py-4 text-base bg-white focus:border-blue-500"
-                placeholder="Nhập mã sinh viên (VD: SV001)"
+                placeholder="Nhập mã học sinh (VD: SV001)"
                 value={formData.studentCode}
                 onChangeText={(text) =>
                   setFormData((prev) => ({ ...prev, studentCode: text }))
@@ -179,66 +177,60 @@ const AccidentDeclareForm = ({
               Chọn loại tai nạn phù hợp nhất:
             </Text>
 
-            <View className="space-y-3">
-              {TYPE_OPTIONS.map((option) => {
-                const isSelected = formData.type === option.label;
+            {TYPE_OPTIONS.map((option) => {
+              const isSelected = formData.type === option.label;
 
-                return (
-                  <TouchableOpacity
-                    key={option.label}
-                    onPress={() =>
-                      setFormData((prev) => ({ ...prev, type: option.label }))
-                    }
-                    className={`p-4 rounded-2xl border-2 flex-row items-center justify-between active:scale-98 ${
-                      isSelected
-                        ? `${option.bgColor} ${option.borderColor}`
-                        : "bg-white border-gray-200"
-                    }`}
-                  >
-                    <View className="flex-row items-center">
-                      <View
-                        className={`w-4 h-4 rounded-full border-2 ${
-                          isSelected
-                            ? `bg-${option.color}-500 border-${option.color}-500`
-                            : "border-gray-300"
-                        }`}
-                      >
-                        {isSelected && (
-                          <View className="w-2 h-2 bg-white rounded-full m-auto" />
-                        )}
-                      </View>
-                      <Text
-                        className={`font-semibold ml-3 ${
-                          isSelected ? option.textColor : "text-gray-600"
-                        }`}
-                      >
-                        {option.label}
-                      </Text>
-                    </View>
-                    {isSelected && (
-                      <CheckCircle
-                        size={20}
-                        color={`#${option.color === "blue" ? "3B82F6" : option.color === "red" ? "EF4444" : "8B5CF6"}`}
-                      />
-                    )}
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+              return (
+                <TouchableOpacity
+                  key={option.label}
+                  onPress={() =>
+                    setFormData((prev) => ({ ...prev, type: option.label }))
+                  }
+                  className={`p-4 rounded-2xl border-2 flex-row items-center justify-between mt-5 ${
+                    isSelected
+                      ? `${option.bgColor} ${option.borderColor}`
+                      : "bg-white border-gray-200"
+                  }`}
+                >
+                  <View className="flex-row items-center">
+                    <View
+                      className={`w-4 h-4 rounded-full border-2 ${
+                        isSelected
+                          ? `bg-${option.color}-500 border-${option.color}-500`
+                          : "border-gray-300"
+                      }`}
+                    ></View>
+                    <Text
+                      className={`font-semibold ml-3 ${
+                        isSelected ? option.textColor : "text-gray-600"
+                      }`}
+                    >
+                      {option.label}
+                    </Text>
+                  </View>
+                  {isSelected && (
+                    <CheckCircle
+                      size={20}
+                      color={`#${option.color === "blue" ? "3B82F6" : option.color === "red" ? "EF4444" : "8B5CF6"}`}
+                    />
+                  )}
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
           {/* Submit Button */}
           <View className="mb-6">
             <TouchableOpacity
               onPress={handleSubmit}
-              disabled={isSubmitting || !isFormValid}
+              disabled={isSubmitting}
               className={`py-4 rounded-2xl flex-row items-center justify-center ${
-                isSubmitting || !isFormValid
+                isSubmitting
                   ? "bg-gray-300"
-                  : "bg-gradient-to-r from-blue-500 to-blue-600 shadow-lg active:scale-98"
+                  : "bg-blue-600 shadow-lg active:scale-98"
               }`}
               style={
-                !isSubmitting && isFormValid
+                !isSubmitting
                   ? {
                       shadowColor: "#3B82F6",
                       shadowOffset: { width: 0, height: 4 },
@@ -265,12 +257,6 @@ const AccidentDeclareForm = ({
                 </View>
               )}
             </TouchableOpacity>
-
-            {!isFormValid && (
-              <Text className="text-red-500 text-sm text-center mt-2">
-                Vui lòng điền đầy đủ thông tin bắt buộc (*)
-              </Text>
-            )}
           </View>
 
           {/* Help Text */}
