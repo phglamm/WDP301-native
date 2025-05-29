@@ -25,7 +25,7 @@ import {
   Pill,
 } from "lucide-react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { getAccidentById } from "../../services/nurseService"; // You'll need to create this function
+import { getAccidentById } from "../../services/nurseService";
 
 export default function AccidentDetailScreen() {
   const router = useRouter();
@@ -38,12 +38,43 @@ export default function AccidentDetailScreen() {
       if (params.accidentId) {
         try {
           setLoading(true);
-          // If you have a getAccidentById service function
           const response = await getAccidentById(params.accidentId);
-          if (response.status && response.data) {
-            setAccident(response.data);
+
+          // Handle the API response structure
+          if (
+            response.status &&
+            response.data &&
+            Array.isArray(response.data) &&
+            response.data.length > 0
+          ) {
+            // Since API returns an array, take the first element
+            const accidentData = response.data[0];
+
+            // Map the API response to match your screen's expected structure
+            const mappedAccident = {
+              id: accidentData.id,
+              summary: accidentData.summary || "",
+              type: accidentData.type || "",
+              // Handle null date - use current date as fallback or leave as null
+              date: accidentData.date || new Date().toISOString(),
+              student: {
+                fullName: accidentData.student?.fullName || "Không xác định",
+                studentCode: accidentData.student?.studentCode || "N/A",
+                address: accidentData.student?.address || "",
+              },
+              nurse: {
+                id: accidentData.nurse?.id,
+                fullName: accidentData.nurse?.fullName || "Không xác định",
+                phone: accidentData.nurse?.phone || "",
+                email: accidentData.nurse?.email || "",
+                role: accidentData.nurse?.role || "nurse",
+              },
+              accidentMedicines: accidentData.accidentMedicines || [],
+            };
+
+            setAccident(mappedAccident);
           } else {
-            throw new Error("Failed to fetch accident details");
+            throw new Error("No accident data found");
           }
         } catch (error) {
           console.error("Error fetching accident details:", error);
@@ -60,8 +91,13 @@ export default function AccidentDetailScreen() {
           summary: params.summary || "",
           type: params.type || "",
           date: new Date().toISOString(),
-          student: { fullName: "Đang tải...", studentCode: "" },
-          nurse: { fullName: "Đang tải..." },
+          student: { fullName: "Đang tải...", studentCode: "", address: "" },
+          nurse: {
+            fullName: "Đang tải...",
+            phone: "",
+            email: "",
+            role: "nurse",
+          },
           accidentMedicines: [],
         });
         setLoading(false);
@@ -128,46 +164,34 @@ export default function AccidentDetailScreen() {
     }
   };
 
-  const handleShare = async () => {
-    if (!accident) return;
-
-    try {
-      const shareContent = `
-📋 Báo cáo tai nạn
-
-🏥 Loại: ${accident.type || "Không xác định"}
-📝 Mô tả: ${accident.summary || "Không có mô tả"}
-
-👤 Học sinh:
-• Tên: ${accident.student?.fullName || "Không xác định"}
-• Mã số: ${accident.student?.studentCode || "N/A"}
-• Địa chỉ: ${accident.student?.address || "Không có"}
-
-⚕️ Y tá xử lý:
-• Tên: ${accident.nurse?.fullName || "Không xác định"}
-• Số điện thoại: ${accident.nurse?.phone || "Không có"}
-• Email: ${accident.nurse?.email || "Không có"}
-
-📅 Thời gian: ${formatDate(accident.date)}
-
-💊 Thuốc đã sử dụng: ${accident.accidentMedicines?.length || 0} loại
-      `.trim();
-
-      await Share.share({
-        message: shareContent,
-        title: "Báo cáo tai nạn",
-      });
-    } catch (error) {
-      console.error("Error sharing:", error);
+  const getRoleDisplayText = (role) => {
+    switch (role?.toLowerCase()) {
+      case "nurse":
+        return "Y tá";
+      case "parent":
+        return "Phụ huynh";
+      case "teacher":
+        return "Giáo viên";
+      case "admin":
+        return "Quản trị viên";
+      default:
+        return role || "Không xác định";
     }
   };
 
-  const handleEdit = () => {
-    // Navigate to edit screen with accident data
-    router.push({
-      pathname: "/(nurse)/accident-edit",
-      params: { accident: JSON.stringify(accident) },
-    });
+  const getRoleColorClass = (role) => {
+    switch (role?.toLowerCase()) {
+      case "nurse":
+        return { bg: "bg-green-100", text: "text-green-700" };
+      case "parent":
+        return { bg: "bg-blue-100", text: "text-blue-700" };
+      case "teacher":
+        return { bg: "bg-purple-100", text: "text-purple-700" };
+      case "admin":
+        return { bg: "bg-red-100", text: "text-red-700" };
+      default:
+        return { bg: "bg-gray-100", text: "text-gray-700" };
+    }
   };
 
   if (!accident || loading) {
@@ -184,52 +208,16 @@ export default function AccidentDetailScreen() {
   }
 
   const typeColors = getAccidentTypeColor(accident.type);
+  const roleColors = getRoleColorClass(accident.nurse?.role);
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-50">
+    <SafeAreaView className="flex-1 bg-white">
       {/* Header */}
-      <View className="bg-white shadow-sm border-b border-gray-100 px-6 py-4">
-        <View className="flex-row items-center justify-between">
-          <View className="flex-row items-center">
-            <TouchableOpacity
-              onPress={() => router.back()}
-              className="p-2 rounded-full bg-gray-100 active:bg-gray-200 mr-3"
-            >
-              <ArrowLeft size={20} color="#6B7280" />
-            </TouchableOpacity>
-            <View>
-              <Text className="text-xl font-montserratBold text-gray-800">
-                Chi tiết tai nạn
-              </Text>
-              <Text className="text-gray-500 font-montserratRegular text-sm">
-                ID: #{accident.id}
-              </Text>
-            </View>
-          </View>
-
-          <View className="flex-row gap-2">
-            <TouchableOpacity
-              onPress={handleShare}
-              className="p-2 rounded-full bg-blue-100 active:bg-blue-200"
-            >
-              <Share2 size={20} color="#3B82F6" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleEdit}
-              className="p-2 rounded-full bg-green-100 active:bg-green-200"
-            >
-              <Edit3 size={20} color="#22C55E" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-
       <ScrollView
-        className="flex-1"
+        className="flex-1 bg-white"
         contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Accident Type & Summary */}
         <View className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-100">
           <View className="flex-row items-start justify-between mb-4">
             <View
@@ -256,7 +244,6 @@ export default function AccidentDetailScreen() {
           </View>
         </View>
 
-        {/* Student Information */}
         <View className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-100">
           <View className="flex-row items-center mb-4">
             <View className="bg-blue-100 p-2 rounded-full mr-3">
@@ -302,14 +289,13 @@ export default function AccidentDetailScreen() {
           </View>
         </View>
 
-        {/* Nurse Information */}
         <View className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-100">
           <View className="flex-row items-center mb-4">
             <View className="bg-green-100 p-2 rounded-full mr-3">
               <Activity size={20} color="#22C55E" />
             </View>
             <Text className="text-lg font-montserratBold text-gray-800">
-              Y tá xử lý
+              Người xử lý
             </Text>
           </View>
 
@@ -356,29 +342,16 @@ export default function AccidentDetailScreen() {
                 Vai trò
               </Text>
               <View
-                className={`self-start px-3 py-1 rounded-full ${
-                  accident.nurse?.role === "nurse"
-                    ? "bg-green-100"
-                    : "bg-gray-100"
-                }`}
+                className={`self-start px-3 py-1 rounded-full ${roleColors.bg}`}
               >
-                <Text
-                  className={`text-sm font-semibold ${
-                    accident.nurse?.role === "nurse"
-                      ? "text-green-700"
-                      : "text-gray-700"
-                  }`}
-                >
-                  {accident.nurse?.role === "nurse"
-                    ? "Y tá"
-                    : accident.nurse?.role || "Không xác định"}
+                <Text className={`text-sm font-semibold ${roleColors.text}`}>
+                  {getRoleDisplayText(accident.nurse?.role)}
                 </Text>
               </View>
             </View>
           </View>
         </View>
 
-        {/* Medicines Used */}
         <View className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <View className="flex-row items-center mb-4">
             <View className="bg-purple-100 p-2 rounded-full mr-3">
