@@ -1,5 +1,4 @@
 import {
-  Button,
   View,
   TextInput,
   Text,
@@ -7,6 +6,8 @@ import {
   Alert,
   ScrollView,
   ActivityIndicator,
+  Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import PlaceholderImage from '../../assets/images/icon.png';
@@ -17,8 +18,8 @@ import {
   sendMedicineRequestService,
 } from '../../services/parentServices';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-export default function SendMedicineForm({ navigation, onClose }) {
+import { ArrowLeft } from 'lucide-react-native';
+export default function SendMedicineForm({ onClose }) {
   const [selectedImage, setSelectedImage] = useState(undefined);
   const [studentId, setStudentId] = useState('');
   const [note, setNote] = useState('');
@@ -46,7 +47,7 @@ export default function SendMedicineForm({ navigation, onClose }) {
 
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: [ImagePicker.MediaTypeOptions.Images],
+      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Sử dụng giá trị hợp lệ
       allowsEditing: true,
       quality: 1,
     });
@@ -127,172 +128,169 @@ export default function SendMedicineForm({ navigation, onClose }) {
   };
 
   return (
-    <View className='flex-1 bg-white dark:bg-gray-900 '>
-      {/* Header */}
-      <View className='bg-white dark:bg-gray-800 px-4 py-6 shadow-sm border-b border-gray-200 dark:border-gray-700  mt-10'>
-        <View className='flex-row items-center justify-between'>
-          <Text className='text-2xl font-bold text-gray-800 dark:text-white'>
-            Tạo Yêu Cầu Thuốc Mới
-          </Text>
+    <SafeAreaView className='flex-1 bg-white dark:bg-gray-900'>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className='flex-1'
+      >
+        {/* Header */}
+        <View className='flex-row items-center justify-between p-4 bg-white border-b border-gray-200'>
           {onClose && (
-            <TouchableOpacity
-              onPress={onClose}
-              className='p-2 -mr-2'
-              accessibilityLabel='Đóng form'
-              accessibilityRole='button'
-            >
-              <Text className='text-blue-500 dark:text-blue-400 text-lg font-semibold'>
-                Đóng
-              </Text>
+            <TouchableOpacity onPress={onClose} className='p-1'>
+              <ArrowLeft size={20} color='#407CE2' />
             </TouchableOpacity>
           )}
-        </View>
-      </View>
-
-      {/* Content */}
-      <ScrollView className='flex-1 px-4 my-5'>
-        {/* Image Selection */}
-        <View className='items-center mb-8'>
-          <View className='bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700'>
-            <ImageViewer
-              imgSource={PlaceholderImage}
-              selectedImage={selectedImage}
-            />
-          </View>
-          <TouchableOpacity
-            onPress={handleShowImageOptions}
-            className='bg-blue-500 active:bg-blue-600 px-6 py-4 rounded-xl mt-4 w-full shadow-lg'
-            disabled={isLoading}
-            accessibilityLabel={
-              selectedImage ? 'Thay đổi ảnh đã chọn' : 'Chọn ảnh cho yêu cầu'
-            }
-            accessibilityRole='button'
-          >
-            <Text className='text-white font-semibold text-center text-lg'>
-              {selectedImage ? '📷 Thay đổi ảnh' : '📷 Tải hóa đơn thuốc'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Student Selection */}
-        <View className='mb-8'>
-          <Text className='text-lg font-semibold mb-3 text-gray-700 dark:text-gray-300'>
-            Gửi cho *
+          <Text className='text-lg font-semibold text-gray-900'>
+            Tạo yêu cầu gửi thuốc
           </Text>
-          {mySons.length > 0 ? (
-            <View className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden'>
-              {mySons.map((son, index) => (
-                <TouchableOpacity
-                  key={son.id}
-                  onPress={() => setStudentId(son.id)}
-                  className={`p-4 ${
-                    studentId === son.id
-                      ? 'bg-blue-50 dark:bg-blue-900'
-                      : 'bg-white dark:bg-gray-800'
-                  } ${
-                    index < mySons.length - 1
-                      ? 'border-b border-gray-100 dark:border-gray-700'
-                      : ''
-                  }`}
-                  accessibilityLabel={`Chọn học sinh ${son.fullName}`}
-                  accessibilityState={{ selected: studentId === son.id }}
-                  accessibilityRole='radio'
-                >
-                  <View className='flex-row items-center'>
-                    <View
-                      className={`w-5 h-5 rounded-full border-2 mr-3 ${
-                        studentId === son.id
-                          ? 'border-blue-500 bg-blue-500'
-                          : 'border-gray-300 dark:border-gray-600'
-                      }`}
-                    >
-                      {studentId === son.id && (
-                        <View className='w-full h-full rounded-full bg-white dark:bg-gray-800 scale-50' />
-                      )}
-                    </View>
-                    <Text
-                      className={`text-base font-medium ${
-                        studentId === son.id
-                          ? 'text-blue-600 dark:text-blue-300'
-                          : 'text-gray-800 dark:text-gray-200'
-                      }`}
-                    >
-                      {son.fullName}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
+          <View className='w-8' />
+        </View>
+
+        {/* Content */}
+        <ScrollView className='flex-1 px-4 my-5'>
+          {/* Image Selection */}
+          <View className='items-center mb-8'>
+            <View className='bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700'>
+              <ImageViewer
+                imgSource={PlaceholderImage}
+                selectedImage={selectedImage}
+              />
             </View>
-          ) : (
-            <View className='bg-white dark:bg-gray-800 p-6 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm'>
-              <Text className='text-base text-gray-500 dark:text-gray-400 text-center'>
-                Không có thông tin học sinh để chọn.
+            <TouchableOpacity
+              onPress={handleShowImageOptions}
+              className='bg-blue-500 active:bg-blue-600 px-6 py-4 rounded-xl mt-4 w-full shadow-lg'
+              disabled={isLoading}
+              accessibilityLabel={
+                selectedImage ? 'Thay đổi ảnh đã chọn' : 'Chọn ảnh cho yêu cầu'
+              }
+              accessibilityRole='button'
+            >
+              <Text className='text-white font-semibold text-center text-lg'>
+                {selectedImage ? '📷 Thay đổi ảnh' : '📷 Tải hóa đơn thuốc'}
               </Text>
-            </View>
-          )}
-        </View>
-
-        {/* Note Input */}
-        <View className='mb-8'>
-          <Text className='text-lg font-semibold mb-3 text-gray-700 dark:text-gray-300'>
-            Ghi chú (tùy chọn)
-          </Text>
-          <View className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm'>
-            <TextInput
-              value={note}
-              onChangeText={setNote}
-              placeholder='Nhập ghi chú cho yêu cầu thuốc'
-              placeholderTextColor='#9CA3AF'
-              multiline
-              numberOfLines={4}
-              className='p-4 text-gray-800 dark:text-white h-24'
-              textAlignVertical='top'
-              editable={!isLoading}
-              accessibilityLabel='Ghi chú cho yêu cầu thuốc'
-            />
+            </TouchableOpacity>
           </View>
-        </View>
 
-        {/* Action Buttons */}
-        <View className='pb-10'>
-          <TouchableOpacity
-            onPress={handleSubmit}
-            disabled={isLoading}
-            className={`${
-              isLoading ? 'bg-gray-400' : 'bg-green-500 active:bg-green-600'
-            } py-4 px-6 rounded-xl shadow-lg mb-3`}
-            accessibilityLabel='Gửi yêu cầu thuốc'
-            accessibilityRole='button'
-          >
-            {isLoading ? (
-              <View className='flex-row items-center justify-center'>
-                <ActivityIndicator size='small' color='white' />
-                <Text className='text-white font-semibold ml-2 text-lg'>
-                  Đang gửi...
-                </Text>
+          {/* Student Selection */}
+          <View className='mb-8'>
+            <Text className='text-lg font-semibold mb-3 text-gray-700 dark:text-gray-300'>
+              Gửi cho *
+            </Text>
+            {mySons.length > 0 ? (
+              <View className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm overflow-hidden'>
+                {mySons.map((son, index) => (
+                  <TouchableOpacity
+                    key={son.id}
+                    onPress={() => setStudentId(son.id)}
+                    className={`p-4 ${
+                      studentId === son.id
+                        ? 'bg-blue-50 dark:bg-blue-900'
+                        : 'bg-white dark:bg-gray-800'
+                    } ${
+                      index < mySons.length - 1
+                        ? 'border-b border-gray-100 dark:border-gray-700'
+                        : ''
+                    }`}
+                    accessibilityLabel={`Chọn học sinh ${son.fullName}`}
+                    accessibilityState={{ selected: studentId === son.id }}
+                    accessibilityRole='radio'
+                  >
+                    <View className='flex-row items-center'>
+                      <View
+                        className={`w-5 h-5 rounded-full border-2 mr-3 ${
+                          studentId === son.id
+                            ? 'border-blue-500 bg-blue-500'
+                            : 'border-gray-300 dark:border-gray-600'
+                        }`}
+                      >
+                        {studentId === son.id && (
+                          <View className='w-full h-full rounded-full bg-white dark:bg-gray-800 scale-50' />
+                        )}
+                      </View>
+                      <Text
+                        className={`text-base font-medium ${
+                          studentId === son.id
+                            ? 'text-blue-600 dark:text-blue-300'
+                            : 'text-gray-800 dark:text-gray-200'
+                        }`}
+                      >
+                        {son.fullName}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
               </View>
             ) : (
-              <Text className='text-white font-semibold text-center text-lg'>
-                ✓ Gửi Yêu Cầu
-              </Text>
+              <View className='bg-white dark:bg-gray-800 p-6 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm'>
+                <Text className='text-base text-gray-500 dark:text-gray-400 text-center'>
+                  Không có thông tin học sinh để chọn.
+                </Text>
+              </View>
             )}
-          </TouchableOpacity>
+          </View>
 
-          {onClose && (
+          {/* Note Input */}
+          <View className='mb-8'>
+            <Text className='text-lg font-semibold mb-3 text-gray-700 dark:text-gray-300'>
+              Ghi chú (tùy chọn)
+            </Text>
+            <View className='bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm'>
+              <TextInput
+                value={note}
+                onChangeText={setNote}
+                placeholder='Nhập ghi chú cho yêu cầu thuốc'
+                placeholderTextColor='#9CA3AF'
+                multiline
+                numberOfLines={4}
+                className='p-4 text-gray-800 dark:text-white h-24'
+                textAlignVertical='top'
+                editable={!isLoading}
+                accessibilityLabel='Ghi chú cho yêu cầu thuốc'
+              />
+            </View>
+          </View>
+
+          {/* Action Buttons */}
+          <View className='pb-10'>
             <TouchableOpacity
-              onPress={onClose}
+              onPress={handleSubmit}
               disabled={isLoading}
-              className='bg-gray-500 active:bg-gray-600 py-4 px-6 rounded-xl shadow-lg'
-              accessibilityLabel='Hủy và quay lại'
+              className={`${
+                isLoading ? 'bg-gray-400' : 'bg-green-500 active:bg-green-600'
+              } py-4 px-6 rounded-xl shadow-lg mb-3`}
+              accessibilityLabel='Gửi yêu cầu thuốc'
               accessibilityRole='button'
             >
-              <Text className='text-white font-semibold text-center text-lg'>
-                ← Quay lại
-              </Text>
+              {isLoading ? (
+                <View className='flex-row items-center justify-center'>
+                  <ActivityIndicator size='small' color='white' />
+                  <Text className='text-white font-semibold ml-2 text-lg'>
+                    Đang gửi...
+                  </Text>
+                </View>
+              ) : (
+                <Text className='text-white font-semibold text-center text-lg'>
+                  ✓ Gửi Yêu Cầu
+                </Text>
+              )}
             </TouchableOpacity>
-          )}
-        </View>
-      </ScrollView>
-    </View>
+
+            {onClose && (
+              <TouchableOpacity
+                onPress={onClose}
+                disabled={isLoading}
+                className='bg-gray-500 active:bg-gray-600 py-4 px-6 rounded-xl shadow-lg'
+                accessibilityLabel='Hủy và quay lại'
+                accessibilityRole='button'
+              >
+                <Text className='text-white font-semibold text-center text-lg'>
+                  ← Quay lại
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

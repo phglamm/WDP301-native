@@ -8,28 +8,25 @@ import {
   Alert,
   RefreshControl,
   ActivityIndicator,
-  Dimensions,
-  TextInput,
   Modal,
+  Platform,
+  KeyboardAvoidingView,
 } from 'react-native';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import SendMedicineForm from '../../components/parent/SendMedicineForm';
 import { getSendMedicineRequestHistoryService } from '../../services/parentServices';
-import { ArrowLeft, Search } from 'lucide-react-native';
+import { ArrowLeft, ChevronDown, Send } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import { formatDate } from '../../lib/utils';
 
-const { width, height } = Dimensions.get('window');
-
-export default function SendMedicine({ navigation }) {
+export default function SendMedicine() {
   const router = useRouter();
   const [medicineHistory, setMedicineHistory] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [searchNote, setSearchNote] = useState('');
   const [selectedStudent, setSelectedStudent] = useState('all');
-  const [dateFilter, setDateFilter] = useState('all'); // 'all', 'today', 'week', 'month'
-  const [showFilterModal, setShowFilterModal] = useState(false);
+  const [showStudentDropdown, setShowStudentDropdown] = useState(false);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [selectedImageUri, setSelectedImageUri] = useState(null);
 
@@ -47,30 +44,22 @@ export default function SendMedicine({ navigation }) {
     setSelectedImageUri(null);
   };
 
-  const formatDate = (dateString) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-    } catch (error) {
-      return dateString;
-    }
-  };
-
   const fetchMedicineHistory = async () => {
     try {
+      setIsLoading(true);
       const response = await getSendMedicineRequestHistoryService();
+
       if (response.code === 200 && response.data) {
         setMedicineHistory(response.data);
+      } else {
+        console.error('Invalid API response:', response);
+        Alert.alert('Lỗi', 'Dữ liệu trả về không hợp lệ từ server.');
+        setMedicineHistory([]);
       }
     } catch (error) {
       console.error('Error fetching medicine history:', error);
       Alert.alert('Lỗi', 'Không thể tải lịch sử yêu cầu thuốc.');
+      setMedicineHistory([]);
     } finally {
       setIsLoading(false);
     }
@@ -87,17 +76,18 @@ export default function SendMedicine({ navigation }) {
     fetchMedicineHistory();
   }, []);
 
-  // Get unique students for filter
   const uniqueStudents = useMemo(() => {
     const students = medicineHistory
       .map((item) => item.student)
-      .filter(Boolean);
+      .filter((student) => student && student.id && student.fullName);
+
     const unique = students.reduce((acc, student) => {
       if (!acc.find((s) => s.id === student.id)) {
         acc.push(student);
       }
       return acc;
     }, []);
+
     return unique;
   }, [medicineHistory]);
 
@@ -105,74 +95,59 @@ export default function SendMedicine({ navigation }) {
   const filteredHistory = useMemo(() => {
     let filtered = [...medicineHistory];
 
-    // Filter by search note
-    if (searchNote.trim()) {
-      filtered = filtered.filter((item) =>
-        item.note?.toLowerCase().includes(searchNote.toLowerCase())
-      );
-    }
-
     // Filter by student
     if (selectedStudent !== 'all') {
-      filtered = filtered.filter(
-        (item) => item.student?.id === selectedStudent
-      );
-    }
-
-    // Filter by date
-    if (dateFilter !== 'all') {
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
       filtered = filtered.filter((item) => {
-        const itemDate = new Date(item.date);
-
-        switch (dateFilter) {
-          case 'today':
-            return itemDate >= today;
-          case 'week':
-            const weekAgo = new Date(today);
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            return itemDate >= weekAgo;
-          case 'month':
-            const monthAgo = new Date(today);
-            monthAgo.setMonth(monthAgo.getMonth() - 1);
-            return itemDate >= monthAgo;
-          default:
-            return true;
-        }
+        return (
+          item.student && String(item.student.id) === String(selectedStudent)
+        );
       });
     }
 
     // Sort by date (newest first)
-    return filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-  }, [medicineHistory, searchNote, selectedStudent, dateFilter]);
+    return filtered.sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateB - dateA;
+    });
+  }, [medicineHistory, selectedStudent]);
 
   const clearAllFilters = () => {
-    setSearchNote('');
     setSelectedStudent('all');
-    setDateFilter('all');
   };
 
-  const hasActiveFilters =
-    searchNote.trim() || selectedStudent !== 'all' || dateFilter !== 'all';
+  const hasActiveFilters = selectedStudent !== 'all';
+
+  const handleStudentSelect = (studentId) => {
+    setSelectedStudent(studentId);
+    setShowStudentDropdown(false);
+  };
+
+  const getSelectedStudentName = () => {
+    if (selectedStudent === 'all') return 'Tất cả học sinh';
+    const student = uniqueStudents.find(
+      (s) => String(s.id) === String(selectedStudent)
+    );
+    return student ? student.fullName : 'Tất cả học sinh';
+  };
 
   useEffect(() => {
     fetchMedicineHistory();
   }, []);
 
   if (showForm) {
-    return (
-      <SendMedicineForm navigation={navigation} onClose={handleFormClose} />
-    );
+    return <SendMedicineForm onClose={handleFormClose} />;
   }
 
   return (
-    <View className='flex-1 bg-white dark:bg-gray-900'>
-      <View className='flex-1 mt-10'>
-        {/* Header */}
+    <SafeAreaView className='flex-1 bg-white dark:bg-gray-900'>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className='flex-1'
+      >
         <View className='bg-white dark:bg-gray-800 px-4 py-6 shadow-sm border-b border-gray-200 dark:border-gray-700'>
-          <View className='flex-row items-center justify-start gap-4 mb-4'>
+          {/* Header */}
+          <View className='flex-row items-center justify-start gap-4 mb-6'>
             <TouchableOpacity onPress={() => router.push('/home')}>
               <ArrowLeft size={24} color='#6B7280' />
             </TouchableOpacity>
@@ -186,42 +161,38 @@ export default function SendMedicine({ navigation }) {
             </View>
           </View>
 
+          {/* Create Request Button */}
           <TouchableOpacity
             onPress={handleToggleForm}
             className='bg-blue-500 active:bg-blue-600 py-4 px-6 rounded-xl shadow-lg mb-4'
             accessibilityLabel='Tạo yêu cầu thuốc mới'
             accessibilityRole='button'
           >
-            <Text className='text-white text-lg font-semibold text-center'>
-              Tạo Yêu Cầu Mới
-            </Text>
+            <View className='flex-row items-center justify-center gap-4'>
+              <Send size={20} color='white' />
+              <Text className='text-white text-lg font-semibold text-center'>
+                Tạo Yêu Cầu Mới
+              </Text>
+            </View>
           </TouchableOpacity>
 
-          {/* Search Bar */}
-          <View className='bg-gray-50 dark:bg-gray-700 rounded-xl px-4 py-1 mb-3 border-2 border-gray-200 dark:border-gray-700 flex-row items-center'>
-            <Search size={20} color='#9CA3AF' />
-            <TextInput
-              value={searchNote}
-              onChangeText={setSearchNote}
-              placeholder='Tìm kiếm theo ghi chú...'
-              placeholderTextColor='#9CA3AF'
-              className='text-gray-800 dark:text-white text-base ml-3'
-            />
-          </View>
-
           {/* Filter Bar */}
-          <View className='flex-row items-center justify-between'>
-            <TouchableOpacity
-              onPress={() => setShowFilterModal(true)}
-              className='flex-row items-center bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-lg'
-            >
-              <Text className='text-gray-700 dark:text-gray-300 mr-2'>
-                🔍 Lọc
-              </Text>
-              {hasActiveFilters && (
-                <View className='w-2 h-2 bg-blue-500 rounded-full' />
-              )}
-            </TouchableOpacity>
+          <View className='flex-row items-center justify-between mb-4'>
+            {/* Student Filter Button */}
+            <View className='flex-1 mr-4'>
+              <TouchableOpacity
+                onPress={() => setShowStudentDropdown(true)}
+                className='flex-row items-center justify-between bg-gray-100 dark:bg-gray-700 px-4 py-3 rounded-lg'
+              >
+                <Text
+                  className='text-gray-700 dark:text-gray-300 flex-1'
+                  numberOfLines={1}
+                >
+                  🔍 {getSelectedStudentName()}
+                </Text>
+                <ChevronDown size={16} color='#6B7280' />
+              </TouchableOpacity>
+            </View>
 
             <View className='flex-row items-center'>
               {hasActiveFilters && (
@@ -271,254 +242,224 @@ export default function SendMedicine({ navigation }) {
                   <Text className='text-gray-500 dark:text-gray-400 text-center text-lg mb-2'>
                     {medicineHistory.length === 0
                       ? 'Chưa có yêu cầu thuốc nào'
-                      : 'Không tìm thấy yêu cầu phù hợp'}
+                      : hasActiveFilters
+                      ? 'Không tìm thấy yêu cầu phù hợp'
+                      : 'Không có dữ liệu'}
                   </Text>
                   <Text className='text-gray-400 dark:text-gray-500 text-center text-sm'>
                     {medicineHistory.length === 0
                       ? 'Nhấn "Tạo Yêu Cầu Mới" để gửi yêu cầu thuốc đầu tiên'
-                      : 'Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm'}
+                      : hasActiveFilters
+                      ? 'Thử thay đổi bộ lọc'
+                      : 'Dữ liệu sẽ được hiển thị ở đây'}
                   </Text>
                 </View>
               ) : (
                 <View className='pb-4'>
-                  {filteredHistory.map((item, index) => (
-                    <View
-                      key={item.id || index}
-                      className='mb-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden'
-                    >
-                      {/* Date Header */}
-                      <View className='flex-row justify-between items-center p-4 pb-2 border-b border-gray-50 dark:border-gray-700'>
-                        <Text className='text-sm font-medium text-gray-600 dark:text-gray-400'>
-                          📅 {formatDate(item.date)}
-                        </Text>
-                      </View>
+                  {filteredHistory.map((item, index) => {
+                    // Kiểm tra data integrity
+                    if (!item) return null;
 
-                      {/* Main Content */}
-                      <View className='p-4'>
-                        <View className='flex-row'>
-                          {/* Image */}
-                          <View className='mr-4'>
-                            {item.image ? (
-                              <TouchableOpacity
-                                onPress={() => handleShowImageModal(item.image)}
-                                activeOpacity={0.7}
-                              >
-                                <Image
-                                  source={{ uri: item.image }}
-                                  className='w-20 h-20 rounded-lg bg-gray-100 dark:bg-gray-700'
-                                  resizeMode='cover'
-                                />
-                              </TouchableOpacity>
-                            ) : (
-                              <View className='w-20 h-20 rounded-lg bg-gray-100 dark:bg-gray-700 items-center justify-center'>
-                                <Text className='text-gray-400 text-xs'>
-                                  Không có ảnh
-                                </Text>
-                              </View>
-                            )}
-                          </View>
+                    return (
+                      <View
+                        key={item.id || `item-${index}`}
+                        className='mb-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden'
+                      >
+                        {/* Date Header */}
+                        <View className='flex-row justify-between items-center p-4 pb-2 border-b border-gray-50 dark:border-gray-700'>
+                          <Text className='text-sm font-medium text-gray-600 dark:text-gray-400'>
+                            📅{' '}
+                            {item.date
+                              ? formatDate(item.date)
+                              : 'Không có ngày'}
+                          </Text>
+                        </View>
 
-                          {/* Info */}
-                          <View className='flex-1'>
-                            <Text className='text-lg font-semibold text-gray-800 dark:text-white mb-1'>
-                              👤 {item.student?.fullName || 'Không rõ tên'}
-                            </Text>
-
-                            <View className='space-y-1 mb-2'>
-                              <Text className='text-sm text-gray-600 dark:text-gray-400'>
-                                🆔 MSSV: {item.student?.studentCode || 'N/A'}
-                              </Text>
+                        {/* Main Content */}
+                        <View className='p-4'>
+                          <View className='flex-row'>
+                            {/* Image */}
+                            <View className='mr-4'>
+                              {item.image ? (
+                                <TouchableOpacity
+                                  onPress={() =>
+                                    handleShowImageModal(item.image)
+                                  }
+                                  activeOpacity={0.7}
+                                >
+                                  <Image
+                                    source={{ uri: item.image }}
+                                    className='w-20 h-20 rounded-lg bg-gray-100 dark:bg-gray-700'
+                                    resizeMode='cover'
+                                  />
+                                </TouchableOpacity>
+                              ) : (
+                                <View className='w-20 h-20 rounded-lg bg-gray-100 dark:bg-gray-700 items-center justify-center'>
+                                  <Text className='text-gray-400 text-xs'>
+                                    Không có ảnh
+                                  </Text>
+                                </View>
+                              )}
                             </View>
 
-                            {item.note && (
-                              <View className='bg-gray-50 dark:bg-gray-700 p-3 rounded-lg'>
-                                <Text className='text-xs text-gray-500 dark:text-gray-400 mb-1'>
-                                  📝 Ghi chú:
-                                </Text>
-                                <Text className='text-sm text-gray-700 dark:text-gray-300'>
-                                  {item.note}
+                            {/* Info */}
+                            <View className='flex-1'>
+                              <Text className='text-lg font-semibold text-gray-800 dark:text-white mb-1'>
+                                👤 {item.student?.fullName || 'Không rõ tên'}
+                              </Text>
+
+                              <View className='space-y-1 mb-2'>
+                                <Text className='text-sm text-gray-600 dark:text-gray-400'>
+                                  🆔 MSSV: {item.student?.studentCode || 'N/A'}
                                 </Text>
                               </View>
-                            )}
+
+                              {item.note && item.note.trim() && (
+                                <View className='bg-gray-50 dark:bg-gray-700 p-2 rounded-lg'>
+                                  <Text className='text-xs text-gray-500 dark:text-gray-400 mb-1'>
+                                    📝 Ghi chú:
+                                  </Text>
+                                  <Text className='text-sm text-gray-700 dark:text-gray-300'>
+                                    {item.note}
+                                  </Text>
+                                </View>
+                              )}
+                            </View>
                           </View>
                         </View>
                       </View>
-                    </View>
-                  ))}
+                    );
+                  })}
                 </View>
               )}
             </ScrollView>
           )}
         </View>
-      </View>
 
-      {/* Filter Modal */}
-      <Modal
-        visible={showFilterModal}
-        transparent
-        animationType='slide'
-        onRequestClose={() => setShowFilterModal(false)}
-      >
-        <View className='flex-1 bg-black/50 justify-end'>
-          <View className='bg-white dark:bg-gray-800 rounded-t-3xl p-6 max-h-96'>
-            <View className='flex-row items-center justify-between mb-6'>
-              <Text className='text-xl font-bold text-gray-800 dark:text-white'>
-                Bộ lọc
-              </Text>
-              <TouchableOpacity
-                onPress={() => setShowFilterModal(false)}
-                className='p-2'
-              >
-                <Text className='text-blue-500 text-lg'>Đóng</Text>
-              </TouchableOpacity>
-            </View>
-
-            <ScrollView showsVerticalScrollIndicator={false}>
-              {/* Student Filter */}
-              <View className='mb-6'>
-                <Text className='text-lg font-semibold mb-3 text-gray-700 dark:text-gray-300'>
-                  Học sinh
+        {/* Student Filter Modal */}
+        <Modal
+          visible={showStudentDropdown}
+          transparent
+          animationType='fade'
+          onRequestClose={() => setShowStudentDropdown(false)}
+        >
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => setShowStudentDropdown(false)}
+            className='flex-1 bg-black/50 justify-center items-center p-4'
+          >
+            <View className='bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md max-h-96'>
+              {/* Header */}
+              <View className='flex-row items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700'>
+                <Text className='text-lg font-bold text-gray-800 dark:text-white'>
+                  Lọc theo học sinh
                 </Text>
-                <View className='space-y-2'>
-                  <TouchableOpacity
-                    onPress={() => setSelectedStudent('all')}
-                    className={`p-3 rounded-lg flex-row items-center ${
+                <TouchableOpacity
+                  onPress={() => setShowStudentDropdown(false)}
+                  className='p-1'
+                >
+                  <Text className='text-blue-500 text-lg'>✕</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Options */}
+              <ScrollView
+                className='max-h-80'
+                showsVerticalScrollIndicator={false}
+              >
+                <TouchableOpacity
+                  onPress={() => handleStudentSelect('all')}
+                  className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 ${
+                    selectedStudent === 'all'
+                      ? 'bg-blue-50 dark:bg-blue-900'
+                      : ''
+                  }`}
+                >
+                  <Text
+                    className={`${
                       selectedStudent === 'all'
-                        ? 'bg-blue-50 dark:bg-blue-900'
-                        : 'bg-gray-50 dark:bg-gray-700'
+                        ? 'text-blue-600 dark:text-blue-300 font-medium'
+                        : 'text-gray-700 dark:text-gray-300'
                     }`}
                   >
-                    <View
-                      className={`w-4 h-4 rounded-full border-2 mr-3 ${
-                        selectedStudent === 'all'
-                          ? 'border-blue-500 bg-blue-500'
-                          : 'border-gray-300 dark:border-gray-600'
-                      }`}
-                    />
-                    <Text
-                      className={`font-medium ${
-                        selectedStudent === 'all'
-                          ? 'text-blue-600 dark:text-blue-300'
-                          : 'text-gray-700 dark:text-gray-300'
-                      }`}
-                    >
-                      Tất cả học sinh
-                    </Text>
-                  </TouchableOpacity>
+                    Tất cả học sinh
+                  </Text>
+                </TouchableOpacity>
 
-                  {uniqueStudents.map((student) => (
+                {uniqueStudents.length > 0 ? (
+                  uniqueStudents.map((student) => (
                     <TouchableOpacity
                       key={student.id}
-                      onPress={() => setSelectedStudent(student.id)}
-                      className={`p-3 rounded-lg flex-row items-center ${
-                        selectedStudent === student.id
+                      onPress={() => handleStudentSelect(student.id)}
+                      className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 ${
+                        String(selectedStudent) === String(student.id)
                           ? 'bg-blue-50 dark:bg-blue-900'
-                          : 'bg-gray-50 dark:bg-gray-700'
+                          : ''
                       }`}
                     >
-                      <View
-                        className={`w-4 h-4 rounded-full border-2 mr-3 ${
-                          selectedStudent === student.id
-                            ? 'border-blue-500 bg-blue-500'
-                            : 'border-gray-300 dark:border-gray-600'
-                        }`}
-                      />
                       <Text
-                        className={`font-medium ${
-                          selectedStudent === student.id
-                            ? 'text-blue-600 dark:text-blue-300'
+                        className={`${
+                          String(selectedStudent) === String(student.id)
+                            ? 'text-blue-600 dark:text-blue-300 font-medium'
                             : 'text-gray-700 dark:text-gray-300'
                         }`}
                       >
-                        {student.fullName}
+                        {student.fullName || 'Không rõ tên'}
+                      </Text>
+                      <Text className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
+                        MSSV: {student.studentCode || 'N/A'}
                       </Text>
                     </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
+                  ))
+                ) : (
+                  <View className='p-4'>
+                    <Text className='text-gray-500 dark:text-gray-400 text-center'>
+                      Chưa có học sinh nào
+                    </Text>
+                  </View>
+                )}
+              </ScrollView>
+            </View>
+          </TouchableOpacity>
+        </Modal>
 
-              {/* Date Filter */}
-              <View className='mb-6'>
-                <Text className='text-lg font-semibold mb-3 text-gray-700 dark:text-gray-300'>
-                  Thời gian
-                </Text>
-                <View className='space-y-2'>
-                  {[
-                    { key: 'all', label: 'Tất cả' },
-                    { key: 'today', label: 'Hôm nay' },
-                    { key: 'week', label: '7 ngày qua' },
-                    { key: 'month', label: '30 ngày qua' },
-                  ].map((option) => (
-                    <TouchableOpacity
-                      key={option.key}
-                      onPress={() => setDateFilter(option.key)}
-                      className={`p-3 rounded-lg flex-row items-center ${
-                        dateFilter === option.key
-                          ? 'bg-blue-50 dark:bg-blue-900'
-                          : 'bg-gray-50 dark:bg-gray-700'
-                      }`}
-                    >
-                      <View
-                        className={`w-4 h-4 rounded-full border-2 mr-3 ${
-                          dateFilter === option.key
-                            ? 'border-blue-500 bg-blue-500'
-                            : 'border-gray-300 dark:border-gray-600'
-                        }`}
-                      />
-                      <Text
-                        className={`font-medium ${
-                          dateFilter === option.key
-                            ? 'text-blue-600 dark:text-blue-300'
-                            : 'text-gray-700 dark:text-gray-300'
-                        }`}
-                      >
-                        {option.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Image Viewer Modal */}
-      <Modal
-        visible={isImageModalVisible}
-        transparent
-        animationType='fade'
-        onRequestClose={handleCloseImageModal}
-      >
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={handleCloseImageModal}
-          className='flex-1 bg-black/80 items-center justify-center p-4'
+        {/* Xem ảnh chi tiết */}
+        <Modal
+          visible={isImageModalVisible}
+          transparent
+          animationType='fade'
+          onRequestClose={handleCloseImageModal}
         >
-          <View className='bg-white dark:bg-gray-800 p-2 rounded-xl shadow-2xl w-full max-w-md'>
-            {selectedImageUri ? (
-              <Image
-                source={{ uri: selectedImageUri }}
-                className='w-full h-auto rounded-lg'
-                style={{ aspectRatio: 1, minHeight: width * 0.8 }}
-                resizeMode='contain'
-              />
-            ) : (
-              <View className='w-full h-64 items-center justify-center'>
-                <Text className='text-gray-500 dark:text-gray-400'>
-                  Không có ảnh để hiển thị
-                </Text>
-              </View>
-            )}
-            <TouchableOpacity
-              onPress={handleCloseImageModal}
-              className='absolute top-3 right-3 bg-gray-700/50 dark:bg-black/50 p-2 rounded-full z-10'
-            >
-              <Text className='text-white text-lg'>✕</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
-    </View>
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={handleCloseImageModal}
+            className='flex-1 bg-black/80 items-center justify-center p-4'
+          >
+            <View className='bg-white dark:bg-gray-800 p-2 rounded-xl shadow-2xl w-full max-w-md'>
+              {selectedImageUri ? (
+                <Image
+                  source={{ uri: selectedImageUri }}
+                  className='w-full h-auto rounded-lg'
+                  style={{ aspectRatio: 1 }}
+                  resizeMode='contain'
+                />
+              ) : (
+                <View className='w-full h-64 items-center justify-center'>
+                  <Text className='text-gray-500 dark:text-gray-400'>
+                    Không có ảnh để hiển thị
+                  </Text>
+                </View>
+              )}
+              <TouchableOpacity
+                onPress={handleCloseImageModal}
+                className='absolute top-3 right-3 bg-gray-700/50 dark:bg-black/50 p-2 rounded-full z-10'
+              >
+                <Text className='text-white text-lg'>✕</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

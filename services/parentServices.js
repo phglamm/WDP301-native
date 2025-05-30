@@ -74,3 +74,49 @@ export const getSendMedicineRequestHistoryService = async () => {
     throw error;
   }
 };
+
+export const getChatHistoryService = async () => {
+  try {
+    const response = await axiosInstance.get('/chat-ai');
+    return response;
+  } catch (error) {
+    console.log('Error getting chat history: ', error);
+    throw error;
+  }
+};
+
+export const sendChatMessageService = async (message) => {
+  try {
+    const response = await axiosInstance.post('/chat-ai', {
+      content: message,
+    });
+    return response;
+  } catch (error) {
+    console.log('Error sending chat message: ', error);
+    throw error;
+  }
+};
+
+// Vaccine Services
+export const getVaccinationsService = async () => {
+  try {
+    const response = await axiosInstance.get('/vaccination');
+    return response;
+  } catch (error) {
+    console.log('Error getting vaccinations: ', error);
+    throw error;
+  }
+};
+
+export const declareVaccinationService = async (vaccinationData) => {
+  try {
+    const response = await axiosInstance.post(
+      '/vaccination/student',
+      vaccinationData
+    );
+    return response;
+  } catch (error) {
+    console.log('Error creating vaccination record: ', error);
+    throw error;
+  }
+};

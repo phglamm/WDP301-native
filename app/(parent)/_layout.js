@@ -25,6 +25,7 @@ const ParentLayout = () => {
     >
       <Tabs.Screen name='health-declaration' options={{ href: null }} />
       <Tabs.Screen name='send-medicine' options={{ href: null }} />
+      <Tabs.Screen name='vaccine-declaration' options={{ href: null }} />
       <Tabs.Screen
         name='home'
         options={{

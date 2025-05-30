@@ -36,19 +36,6 @@ const NurseLayout = () => {
         }}
       />
       <Tabs.Screen
-        name='chat'
-        options={{
-          title: 'Chatbox AI Provjp',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'chatbubbles' : 'chatbubbles-outline'}
-              color={color}
-              size={28}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name='profile'
         options={{
           title: 'Hồ sơ',
