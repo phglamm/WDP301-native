@@ -1,3 +1,3 @@
-import ChatScreen from '../../components/chat';
+import Chatbox from '../../screens/parent/chatbox';
 
-export default () => <ChatScreen />;
+export default () => <Chatbox />;

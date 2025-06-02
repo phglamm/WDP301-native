@@ -6,6 +6,7 @@ import {
   ScrollView,
   Image,
   FlatList,
+  ImageBackground,
 } from 'react-native';
 import WidgetCustom from '../../components/common/WidgetCustom';
 import {
@@ -14,6 +15,8 @@ import {
   Newspaper,
   BellRing,
   Pill,
+  Bell,
+  Syringe,
 } from 'lucide-react-native';
 import { Link, useRouter } from 'expo-router';
 import { useAuthStore } from '../../stores/useAuthStore';
@@ -52,6 +55,11 @@ export default function HomeScreen() {
   const router = useRouter();
 
   return (
+    // <ImageBackground
+    //   source={require('../../assets/images/splash-background.png')}
+    //   style={{ flex: 1 }}
+    //   resizeMode='cover'
+    // >
     <ScrollView
       contentContainerStyle={{
         flexGrow: 1,
@@ -134,13 +142,13 @@ export default function HomeScreen() {
             }}
           />
           <WidgetCustom
-            icon={<Newspaper size={48} color='#407CE2' />}
-            title='Blogs'
+            icon={<Syringe size={48} color='#407CE2' />}
+            title='Khai báo tiêm chủng'
             backgroundColor='bg-blue-100'
             borderColor='border-blue-200'
             textColor='text-blue-600'
             onPress={() => {
-              router.push('/blogs');
+              router.push('/vaccine-declaration');
             }}
           />
         </View>
@@ -155,8 +163,19 @@ export default function HomeScreen() {
               router.push('/send-medicine');
             }}
           />
+          <WidgetCustom
+            icon={<Bell size={48} color='red' />}
+            title='Thông báo từ nhà trường'
+            backgroundColor='bg-red-100'
+            borderColor='border-red-200'
+            textColor='text-red-700'
+            onPress={() => {
+              router.push('/notification');
+            }}
+          />
         </View>
       </View>
     </ScrollView>
+    // </ImageBackground>
   );
 }
