@@ -31,6 +31,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import HeaderIcon from '../../components/layouts/HeaderIcon';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import ParentHeader from '../../components/layouts/ParentHeader';
 
 const { width } = Dimensions.get('window');
 
@@ -189,31 +190,19 @@ export default function Blogs() {
   return (
     <SafeAreaView className='flex-1 bg-white dark:bg-gray-900'>
       <KeyboardAvoidingView
-        className='flex-1 bg-white p-4'
+        className='flex-1 bg-white'
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        {/* Header Section */}
-        <View className='bg-white border-b border-gray-100'>
-          {/* Header */}
-          <View className='flex-row items-center justify-start gap-4 mb-4'>
-            <TouchableOpacity onPress={() => router.push('/home')}>
-              <ArrowLeft size={24} color='#6B7280' />
-            </TouchableOpacity>
-            <View>
-              <Text className='text-2xl font-montserratBold text-gray-800'>
-                Bài viết 📚
-              </Text>
-              <Text className='text-gray-500 font-montserratRegular'>
-                Chia sẻ kiến thức và kinh nghiệm
-              </Text>
-            </View>
-          </View>
+        {/* Header */}
+        <ParentHeader
+          title='Bài viết 📚'
+          description='Chia sẻ kiến thức và kinh nghiệm'
+          onBack={() => router.push('/home')}
+        />
+        {/* Tabs */}
+        <View className='p-4 bg-white border-b border-gray-100'>
           {/* Tabs */}
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            className='my-4'
-          >
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -258,7 +247,7 @@ export default function Blogs() {
         </View>
         {/* Main Content */}
         <ScrollView
-          className='flex-1'
+          className='flex-1 px-4'
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
@@ -266,8 +255,8 @@ export default function Blogs() {
         >
           {/* Featured Posts Section */}
           {activeTab === 'all' && searchQuery.length === 0 && (
-            <View className='mb-6 mt-4 '>
-              <Text className='text-xl font-bold text-gray-800 mb-2'>
+            <View className='mt-4 mb-6 '>
+              <Text className='mb-2 text-xl font-bold text-gray-800'>
                 Bài viết nổi bật ⭐
               </Text>
               <ScrollView
@@ -278,7 +267,7 @@ export default function Blogs() {
                 {featuredPosts.map((post, index) => (
                   <TouchableOpacity
                     key={post.id}
-                    className='mr-4 bg-white rounded-3xl overflow-hidden border border-gray-200'
+                    className='mr-4 overflow-hidden bg-white border border-gray-200 rounded-3xl'
                     style={{
                       width: width * 0.75,
                     }}
@@ -290,32 +279,32 @@ export default function Blogs() {
                       resizeMode='cover'
                     />
                     <View className='absolute top-3 right-3'>
-                      <View className='bg-orange-500 rounded-full px-3 py-1'>
-                        <Text className='text-white text-xs font-bold'>
+                      <View className='px-3 py-1 bg-orange-500 rounded-full'>
+                        <Text className='text-xs font-bold text-white'>
                           Nổi bật
                         </Text>
                       </View>
                     </View>
                     <View className='p-4'>
                       <Text
-                        className='text-lg font-bold text-gray-800 mb-2'
+                        className='mb-2 text-lg font-bold text-gray-800'
                         numberOfLines={2}
                       >
                         {post.title}
                       </Text>
                       <Text
-                        className='text-gray-600 text-sm mb-3'
+                        className='mb-3 text-sm text-gray-600'
                         numberOfLines={2}
                       >
                         {post.description}
                       </Text>
                       <View className='flex-row items-center justify-between'>
-                        <Text className='text-blue-600 font-medium text-xs'>
+                        <Text className='text-xs font-medium text-blue-600'>
                           {post.author}
                         </Text>
                         <View className='flex-row items-center'>
                           <Heart size={14} color='#EF4444' />
-                          <Text className='text-gray-500 text-xs ml-1'>
+                          <Text className='ml-1 text-xs text-gray-500'>
                             {post.likes}
                           </Text>
                         </View>
@@ -345,12 +334,12 @@ export default function Blogs() {
             {filteredPosts.length === 0 ? (
               <View className='items-center py-20'>
                 <BookOpen size={64} color='#D1D5DB' />
-                <Text className='text-gray-500 text-lg mt-4 mb-2'>
+                <Text className='mt-4 mb-2 text-lg text-gray-500'>
                   {searchQuery
                     ? 'Không tìm thấy bài viết phù hợp'
                     : 'Chưa có bài viết nào'}
                 </Text>
-                <Text className='text-gray-400 text-center px-8'>
+                <Text className='px-8 text-center text-gray-400'>
                   {searchQuery
                     ? 'Thử tìm kiếm với từ khóa khác'
                     : 'Hãy quay lại sau để xem thêm bài viết mới'}
@@ -365,7 +354,7 @@ export default function Blogs() {
                   return (
                     <TouchableOpacity
                       key={post.id}
-                      className='bg-white rounded-2xl overflow-hidden mb-4'
+                      className='mb-4 overflow-hidden bg-white rounded-2xl'
                       style={{
                         width: (width - 48) / 2 - 8,
                         marginRight: index % 2 === 0 ? 16 : 0,
@@ -388,7 +377,7 @@ export default function Blogs() {
                         <View className='flex-row items-center justify-between mb-2'>
                           <View className='flex-row items-center'>
                             <Calendar size={12} color='#9CA3AF' />
-                            <Text className='text-gray-500 text-xs ml-1'>
+                            <Text className='ml-1 text-xs text-gray-500'>
                               {post.date}
                             </Text>
                           </View>
@@ -405,14 +394,14 @@ export default function Blogs() {
 
                         {/* Title */}
                         <Text
-                          className='text-sm font-bold text-gray-800 mb-2 leading-4'
+                          className='mb-2 text-sm font-bold leading-4 text-gray-800'
                           numberOfLines={2}
                         >
                           {post.title}
                         </Text>
 
                         {/* Doctor */}
-                        <Text className='text-blue-600 font-medium text-xs mb-3'>
+                        <Text className='mb-3 text-xs font-medium text-blue-600'>
                           {post.author}
                         </Text>
 
@@ -421,9 +410,9 @@ export default function Blogs() {
                           {post.tags.slice(0, 2).map((tag, tagIndex) => (
                             <View
                               key={tagIndex}
-                              className='bg-blue-50 rounded-full px-2 py-1 mr-1 mb-1'
+                              className='px-2 py-1 mb-1 mr-1 rounded-full bg-blue-50'
                             >
-                              <Text className='text-blue-600 text-xs font-medium'>
+                              <Text className='text-xs font-medium text-blue-600'>
                                 {tag}
                               </Text>
                             </View>
@@ -452,7 +441,7 @@ export default function Blogs() {
 
                           <View className='flex-row items-center'>
                             <Eye size={14} color='#9CA3AF' />
-                            <Text className='text-gray-500 text-xs ml-1'>
+                            <Text className='ml-1 text-xs text-gray-500'>
                               {post.views}
                             </Text>
                           </View>

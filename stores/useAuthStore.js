@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
-import { loginService, logoutService } from '../services/authServices';
+import { loginService } from '../services/authServices';
 import envConfig from '../config/envConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 

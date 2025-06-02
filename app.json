@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "CampusMedix",
-    "slug": "campus-medix",
-    "scheme": "campus-medix",
+    "slug": "campusmedix",
+    "scheme": "campusmedix",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -14,19 +14,38 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
       "bundleIdentifier": "com.campusmedix.app",
+      "supportsTablet": true,
+      "icon": "./assets/images/icon.png",
       "infoPlist": {
-        "UIBackgroundModes": ["fetch", "remote-notification"]
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLName": "campusmedix.payment",
+            "CFBundleURLSchemes": ["campusmedix"]
+          }
+        ]
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.campusmedix.app",
-      "permissions": []
+      "permissions": [],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "campusmedix",
+              "host": "*"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/images/favicon.png",
