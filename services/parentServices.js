@@ -1,5 +1,6 @@
 import axiosInstance from '../config/axiosInstance';
 
+// My Son - Danh sách con
 export const getMySonService = async () => {
   try {
     const response = await axiosInstance.get('/student/parent');
@@ -10,6 +11,7 @@ export const getMySonService = async () => {
   }
 };
 
+// Health Profile - Tạo hồ sơ sức khỏe
 export const createHealthProfileService = async (healthData) => {
   try {
     const response = await axiosInstance.post('/health-profile', healthData);
@@ -22,7 +24,7 @@ export const createHealthProfileService = async (healthData) => {
     throw error;
   }
 };
-
+// Health Profile - Lịch sử hồ sơ sức khỏe
 export const getHealthProfileHistoryService = async (studentId) => {
   try {
     const response = await axiosInstance.get(
@@ -35,6 +37,7 @@ export const getHealthProfileHistoryService = async (studentId) => {
   }
 };
 
+// Medicine Request - Gửi yêu cầu thuốc
 export const sendMedicineRequestService = async (imageUri, studentId, note) => {
   try {
     const formData = new FormData();
@@ -64,7 +67,7 @@ export const sendMedicineRequestService = async (imageUri, studentId, note) => {
     throw error;
   }
 };
-
+// Medicine Request - Lịch sử yêu cầu thuốc
 export const getSendMedicineRequestHistoryService = async () => {
   try {
     const response = await axiosInstance.get('/medicine-request/parent');
@@ -75,6 +78,7 @@ export const getSendMedicineRequestHistoryService = async () => {
   }
 };
 
+// Chat AI - Lịch sử chat
 export const getChatHistoryService = async () => {
   try {
     const response = await axiosInstance.get('/chat-ai');
@@ -84,7 +88,7 @@ export const getChatHistoryService = async () => {
     throw error;
   }
 };
-
+// Chat AI - Gửi tin nhắn
 export const sendChatMessageService = async (message) => {
   try {
     const response = await axiosInstance.post('/chat-ai', {
@@ -97,7 +101,55 @@ export const sendChatMessageService = async (message) => {
   }
 };
 
-// Vaccine Services
+// Injection Event - Danh sách all event đang mở đăng ký
+export const getAvailableInjectionEventService = async () => {
+  try {
+    const response = await axiosInstance.get('/injection-event/available');
+    return response;
+  } catch (error) {
+    console.log('Error getting available injection event: ', error);
+    throw error;
+  }
+};
+// Injection Event - Danh sách event ba mẹ đã đăng ký cho student đó
+export const getInjectionEventHadRegisteredService = async (studentId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/transaction/register/${studentId}`
+    );
+    return response;
+  } catch (error) {
+    console.log('Error getting injection event had registered: ', error);
+    throw error;
+  }
+};
+// Injection Event - Đăng ký event
+export const registerInjectionEventService = async (
+  parentId,
+  studentId,
+  injectionEventId
+) => {
+  const parentIdString = parentId.toString();
+  const studentIdString = studentId.toString();
+  const injectionEventIdString = injectionEventId.toString();
+  console.log('🚀 ~ parentIdString:', parentIdString);
+  console.log('🚀 ~ studentIdString:', studentIdString);
+  console.log('🚀 ~ injectionEventIdString:', injectionEventIdString);
+  try {
+    const response = await axiosInstance.post(`/payment/momo/create`, {
+      parentId: parentIdString,
+      studentId: studentIdString,
+      injectionEventId: injectionEventIdString,
+    });
+    console.log('🚀 ~ response:', response);
+    return response;
+  } catch (error) {
+    console.log('Error registering injection event: ', error);
+    throw error;
+  }
+};
+
+// Vaccine Declaration - Danh sách all vaccine
 export const getVaccinationsService = async () => {
   try {
     const response = await axiosInstance.get('/vaccination');
@@ -107,7 +159,19 @@ export const getVaccinationsService = async () => {
     throw error;
   }
 };
-
+// Vaccine Declaration - Danh sách vaccine đã khai báo
+export const getVaccineHadDeclaredService = async (studentId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/vaccination/student/${studentId}`
+    );
+    return response;
+  } catch (error) {
+    console.log('Error getting vaccine had declared: ', error);
+    throw error;
+  }
+};
+// Vaccine Declaration - Khai báo tiêm chủng
 export const declareVaccinationService = async (vaccinationData) => {
   try {
     const response = await axiosInstance.post(

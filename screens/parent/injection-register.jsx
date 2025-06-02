@@ -1,44 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import { Text, View, TouchableOpacity, ScrollView } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { KeyboardAvoidingView, Platform } from 'react-native';
-import { getMySonService } from '../../services/parentServices';
 import { useRouter } from 'expo-router';
-import VaccineDeclareForm from '../../components/parent/VaccineDeclareForm';
 import { ChevronRight } from 'lucide-react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useParentStore } from '../../stores/useParentStore';
 import StudentCard from '../../components/parent/StudentCard';
+import InjectionRegisterForm from '../../components/parent/InjectionRegisterForm';
 import ParentHeader from '../../components/layouts/ParentHeader';
-import LoadingCustom from '../../components/common/LoadingCustom';
 
-export default function VaccineDeclarationScreen() {
+export default function InjectionRegister() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-  const [mySon, setMySon] = useState([]);
   const [selectedSon, setSelectedSon] = useState(null);
-  const [isError, setIsError] = useState(false);
-  const [currentView, setCurrentView] = useState('select'); // select, form
-
-  const fetchMySon = async () => {
-    try {
-      setIsLoading(true);
-      const response = await getMySonService();
-      if (response.data) {
-        setMySon(response.data);
-      }
-    } catch (error) {
-      setIsError(true);
-      console.error('Error fetching sons:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [currentView, setCurrentView] = useState('select');
+  const { mySon, getMySon } = useParentStore();
 
   useEffect(() => {
-    fetchMySon();
+    getMySon();
   }, []);
 
   const handleSelectSon = (son) => {
     setSelectedSon(son);
+    console.log('Selected son: ', son);
   };
 
   const handleContinue = () => {
@@ -47,54 +36,25 @@ export default function VaccineDeclarationScreen() {
     }
   };
 
-  if (isLoading) {
-    return <LoadingCustom />;
-  }
-
-  if (isError) {
-    return (
-      <SafeAreaView className='items-center justify-center flex-1 bg-white'>
-        <Text className='mb-4 text-xl text-red-500 font-montserratBold'>
-          Có lỗi xảy ra khi tải dữ liệu
-        </Text>
-        <TouchableOpacity
-          className='px-4 py-2 border border-blue-500 rounded-lg hover:bg-blue-500'
-          onPress={fetchMySon}
-        >
-          <Text className='text-base text-blue-500 font-montserratBold hover:text-white'>
-            Thử lại
-          </Text>
-        </TouchableOpacity>
-      </SafeAreaView>
-    );
-  }
-
   if (currentView === 'form') {
     return (
-      <SafeAreaView className='flex-1 bg-white'>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          className='flex-1'
-        >
-          <VaccineDeclareForm
-            selectedSon={selectedSon}
-            onBack={() => setCurrentView('select')}
-          />
-        </KeyboardAvoidingView>
-      </SafeAreaView>
+      <InjectionRegisterForm
+        selectedSon={selectedSon}
+        onBack={() => setCurrentView('select')}
+      />
     );
   }
 
   return (
     <SafeAreaView className='flex-1 bg-white dark:bg-gray-900'>
       <KeyboardAvoidingView
+        className='flex-1 bg-white'
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className='flex-1'
       >
         {/* Header */}
         <ParentHeader
-          title='Khai báo tiêm chủng 💉'
-          description='Khai báo tiêm chủng cho con'
+          title='Đăng ký tiêm vaccine 💉'
+          description='Đăng ký tiêm vaccine cho con'
           onBack={() => router.push('/home')}
         />
 
@@ -106,9 +66,9 @@ export default function VaccineDeclarationScreen() {
         >
           <View className='mb-6'>
             <Text className='mb-4 text-xl font-semibold text-gray-800'>
-              Khai báo cho:
+              Danh sách con:
             </Text>
-            {mySon.length === 0 ? (
+            {!mySon || mySon.length === 0 ? (
               <View className='items-center py-12'>
                 <Text className='text-center text-gray-500'>
                   Không có dữ liệu học sinh
@@ -148,7 +108,7 @@ export default function VaccineDeclarationScreen() {
                 onPress={handleContinue}
               >
                 <Text className='mr-2 text-lg font-semibold text-white'>
-                  Tiếp tục
+                  Tiếp tục đăng ký
                 </Text>
                 <ChevronRight size={20} color='#fff' />
               </TouchableOpacity>

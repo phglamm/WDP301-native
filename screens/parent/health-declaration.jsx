@@ -21,6 +21,7 @@ import HealthDeclarationHistory from '../../components/parent/HealthDeclarationH
 import { BookOpen, Plus, Clock, ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import StudentCard from '../../components/parent/StudentCard';
+import ParentHeader from '../../components/layouts/ParentHeader';
 
 export default function HealthDeclarationScreen() {
   const router = useRouter();
@@ -164,7 +165,7 @@ export default function HealthDeclarationScreen() {
   //           >
   //             <User size={24} color={isSelected ? '#fff' : '#6B7280'} />
   //           </View>
-  //           <View className='flex-1 justify-center items-center ml-3'>
+  //           <View className='items-center justify-center flex-1 ml-3'>
   //             <Text
   //               className={`font-bold text-base ${
   //                 isSelected ? 'text-blue-800' : 'text-gray-800'
@@ -174,7 +175,7 @@ export default function HealthDeclarationScreen() {
   //               {student.fullName || student.name || 'Học sinh'}
   //             </Text>
 
-  //             <Text className='text-gray-500 text-sm'>
+  //             <Text className='text-sm text-gray-500'>
   //               {student.studentCode || 'Mã HS'}
   //             </Text>
   //           </View>
@@ -186,7 +187,7 @@ export default function HealthDeclarationScreen() {
   //           {student.className && (
   //             <View className='flex-row items-center'>
   //               <School size={16} color='#6B7280' />
-  //               <Text className='text-gray-600 text-sm ml-2 flex-1'>
+  //               <Text className='flex-1 ml-2 text-sm text-gray-600'>
   //                 Lớp {student.className}
   //               </Text>
   //             </View>
@@ -244,25 +245,16 @@ export default function HealthDeclarationScreen() {
         className='flex-1'
       >
         {/* Header */}
-        <View className='bg-white shadow-sm border-b border-gray-100 p-4'>
-          <View className='flex-row items-center justify-start gap-4 mb-4'>
-            <TouchableOpacity onPress={() => router.push('/home')}>
-              <ArrowLeft size={24} color='#6B7280' />
-            </TouchableOpacity>
-            <View>
-              <Text className='text-2xl font-montserratBold text-gray-800'>
-                Hồ sơ sức khỏe 🏥
-              </Text>
-              <Text className='text-gray-500 font-montserratRegular'>
-                Quản lý thông tin sức khỏe của con bạn
-              </Text>
-            </View>
-          </View>
-
+        <ParentHeader
+          title='Khai báo sức khỏe 🩺'
+          description='Khai báo thông tin sức khỏe'
+          onBack={() => router.push('/home')}
+        />
+        <View className='px-4 bg-white border-b border-gray-100 shadow-sm'>
           {/* Stats */}
-          <View className='flex-row justify-between my-4 '>
+          <View className='flex-row justify-between mx-5'>
             <View className='items-center '>
-              <Text className='text-xl font-bold text-blue-600 bg-blue-100 p-2 px-4 rounded-md'>
+              <Text className='p-2 px-4 text-xl font-bold text-blue-600 bg-blue-100 rounded-md'>
                 {sonData.length}
               </Text>
               <Text className='text-gray-500 font-montserratMedium'>
@@ -270,13 +262,13 @@ export default function HealthDeclarationScreen() {
               </Text>
             </View>
             <View className='items-center'>
-              <Text className='text-xl font-bold text-green-600 bg-green-100 p-2 px-4 rounded-md'>
+              <Text className='p-2 px-4 text-xl font-bold text-green-600 bg-green-100 rounded-md'>
                 {healthProfiles.length}
               </Text>
               <Text className='text-gray-500 font-montserratMedium'>Hồ sơ</Text>
             </View>
             <View className='items-center'>
-              <Text className='text-xl font-bold text-orange-600 bg-orange-100 p-2 px-4 rounded-md'>
+              <Text className='p-2 px-4 text-xl font-bold text-orange-600 bg-orange-100 rounded-md'>
                 {selectedSon ? 1 : 0}
               </Text>
               <Text className='text-gray-500 font-montserratMedium'>
@@ -287,20 +279,20 @@ export default function HealthDeclarationScreen() {
 
           {/* Action Buttons */}
           {selectedSon && (
-            <View className='flex-row gap-10'>
+            <View className='flex-row gap-10 my-4'>
               <TouchableOpacity
                 onPress={handleStartDeclaration}
-                className='flex-1 bg-blue-500 py-3 rounded-xl flex-row items-center justify-center'
+                className='flex-row items-center justify-center flex-1 py-3 bg-blue-500 rounded-xl'
               >
                 <Plus size={20} color='white' />
-                <Text className='text-white font-bold ml-2'>Tạo hồ sơ mới</Text>
+                <Text className='ml-2 font-bold text-white'>Tạo hồ sơ mới</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleViewHistory}
-                className='flex-1 bg-gray-200 py-3 rounded-xl flex-row items-center justify-center'
+                className='flex-row items-center justify-center flex-1 py-3 bg-gray-200 rounded-xl'
               >
                 <Clock size={20} color='#6B7280' />
-                <Text className='text-gray-700 font-bold ml-2'>Lịch sử</Text>
+                <Text className='ml-2 font-bold text-gray-700'>Lịch sử</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -313,25 +305,25 @@ export default function HealthDeclarationScreen() {
           showsVerticalScrollIndicator={false}
         >
           {loading ? (
-            <View className='flex-1 items-center justify-center py-20'>
+            <View className='items-center justify-center flex-1 py-20'>
               <ActivityIndicator size='large' color='#3B82F6' />
-              <Text className='text-gray-500 mt-4'>
+              <Text className='mt-4 text-gray-500'>
                 Đang tải danh sách học sinh...
               </Text>
             </View>
           ) : sonData.length === 0 ? (
-            <View className='flex-1 items-center justify-center py-20'>
+            <View className='items-center justify-center flex-1 py-20'>
               <BookOpen size={64} color='#D1D5DB' />
-              <Text className='text-gray-500 text-lg mt-4 mb-2'>
+              <Text className='mt-4 mb-2 text-lg text-gray-500'>
                 Chưa có học sinh nào
               </Text>
-              <Text className='text-gray-400 text-center px-8'>
+              <Text className='px-8 text-center text-gray-400'>
                 Liên hệ nhà trường để thêm thông tin học sinh
               </Text>
             </View>
           ) : (
             <>
-              <Text className='text-lg font-bold text-gray-800 mb-4'>
+              <Text className='mb-4 text-lg font-bold text-gray-800'>
                 Danh sách học sinh ({sonData.length})
               </Text>
 
