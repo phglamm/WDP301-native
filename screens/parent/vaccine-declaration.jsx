@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import {
+  Text,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { getMySonService } from '../../services/parentServices';
@@ -17,6 +23,7 @@ export default function VaccineDeclarationScreen() {
   const [selectedSon, setSelectedSon] = useState(null);
   const [isError, setIsError] = useState(false);
   const [currentView, setCurrentView] = useState('select'); // select, form
+  const [refetch, setRefetch] = useState(false);
 
   const fetchMySon = async () => {
     try {
@@ -45,6 +52,12 @@ export default function VaccineDeclarationScreen() {
     if (selectedSon) {
       setCurrentView('form');
     }
+  };
+
+  const handleRefresh = () => {
+    setRefetch(true);
+    fetchMySon();
+    setRefetch(false);
   };
 
   if (isLoading) {
@@ -103,6 +116,9 @@ export default function VaccineDeclarationScreen() {
           className='flex-1'
           contentContainerStyle={{ padding: 16 }}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refetch} onRefresh={handleRefresh} />
+          }
         >
           <View className='mb-6'>
             <Text className='mb-4 text-xl font-semibold text-gray-800'>

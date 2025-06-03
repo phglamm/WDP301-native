@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,8 @@ import {
   TextInput,
   ActivityIndicator,
   Alert,
+  RefreshControl,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import {
   getVaccinationsService,
   declareVaccinationService,
@@ -25,10 +25,9 @@ import StudentDeclareCard from './StudentDeclareCard';
 import LoadingCustom from '../common/LoadingCustom';
 import VaccineDeclareSuccess from './VaccineDeclareSuccess';
 import ParentHeaderSub from '../layouts/ParentHeaderSub';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
 
 export default function VaccineDeclareForm({ selectedSon, onBack }) {
-  const router = useRouter();
   const [vaccinations, setVaccinations] = useState([]);
   const [vaccineHadDeclared, setVaccineHadDeclared] = useState([]);
   const [selectedVaccine, setSelectedVaccine] = useState(null);
@@ -36,6 +35,7 @@ export default function VaccineDeclareForm({ selectedSon, onBack }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState('select');
+  const [refetch, setRefetch] = useState(false);
 
   const fetchVaccinations = async () => {
     try {
@@ -80,6 +80,13 @@ export default function VaccineDeclareForm({ selectedSon, onBack }) {
     setSelectedVaccine(null);
     setDoses('');
     setCurrentStep('select');
+  };
+
+  const handleRefresh = () => {
+    setRefetch(true);
+    fetchVaccinations();
+    fetchVaccineHadDeclared();
+    setRefetch(false);
   };
 
   // Xử lý khai báo vaccine
@@ -235,16 +242,7 @@ export default function VaccineDeclareForm({ selectedSon, onBack }) {
     return (
       <View className='flex-1 bg-white'>
         {/* Header */}
-        <View className='flex-row items-center justify-between p-4 bg-white border-b border-gray-200'>
-          <TouchableOpacity onPress={handleBackToSelect} className='p-1'>
-            <Ionicons name='arrow-back' size={20} color='#407CE2' />
-          </TouchableOpacity>
-          <Text className='text-lg font-semibold text-gray-900'>
-            Khai báo tiêm chủng
-          </Text>
-          <View className='w-8' />
-        </View>
-
+        <ParentHeaderSub onBack={handleBackToSelect} title='Chọn vaccine' />
         <ScrollView className='flex-1 p-4'>
           {/* Student Info */}
           <View className='p-4 mb-6 bg-blue-50 rounded-2xl'>
@@ -361,6 +359,9 @@ export default function VaccineDeclareForm({ selectedSon, onBack }) {
         <ScrollView
           className='flex-1 px-4 pt-6'
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refetch} onRefresh={handleRefresh} />
+          }
         >
           <View className='mb-4'>
             <Text className='text-lg font-bold text-gray-900'>
