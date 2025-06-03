@@ -49,7 +49,7 @@ export default function HomeScreen() {
         <View className="px-6 pt-6 pb-24">
           {/* Quản lý thuốc và vật tư */}
           <TouchableOpacity
-            className="bg-blue-100 rounded-xl p-4 py-6 mb-8 flex-row justify-between items-center shadow-md border-2 border-blue-200"
+            className="bg-blue-100 rounded-xl p-4 py-6 mb-8 flex-row justify-between items-center  border-2 border-blue-200"
             activeOpacity={0.7}
           >
             <View className="flex-1 flex-col items-start justify-between gap-4">
@@ -75,7 +75,7 @@ export default function HomeScreen() {
           <View className="flex-row justify-between mb-8 min-h-[150px]">
             {/* Tạo sự kiện y tế */}
             <TouchableOpacity
-              className="bg-pink-100 rounded-xl p-6 w-[48%] items-center shadow-md border-2 border-pink-200"
+              className="bg-pink-100 rounded-xl p-6 w-[48%] items-center  border-2 border-pink-200"
               activeOpacity={0.7}
               onPress={() => router.push("/(nurse)/accident")}
             >
@@ -83,14 +83,15 @@ export default function HomeScreen() {
                 <ShieldAlert size={48} color="#B83280" />
               </View>
               <Text className="text-center text-xl font-medium text-gray-700">
-                Sự kiện tai nạn mới
+                Tai nạn
               </Text>
             </TouchableOpacity>
 
             {/* Yêu cầu của parents */}
             <TouchableOpacity
-              className="bg-yellow-50 rounded-xl p-6 w-[48%] items-center shadow-md border-2 border-yellow-200"
+              className="bg-yellow-50 rounded-xl p-6 w-[48%] items-center border-2 border-yellow-200"
               activeOpacity={0.7}
+              onPress={() => router.push("/(nurse)/medicine-request")}
             >
               <View className="h-12 w-12 rounded-full justify-center items-center mb-4">
                 <BellRing size={48} color="#D69E2E" />
@@ -105,27 +106,28 @@ export default function HomeScreen() {
           <View className="flex-row justify-between mb-8 min-h-[150px]">
             {/* New Accident Event */}
             <TouchableOpacity
-              className="bg-green-100 rounded-xl p-6 w-[48%] items-center shadow-md border-2 border-green-200"
+              className="bg-green-100 rounded-xl p-6 w-[48%] items-center border-2 border-green-200"
               activeOpacity={0.7}
+              onPress={() => router.push("/(nurse)/injection")}
             >
               <View className="h-12 w-12 rounded-full justify-center items-center mb-4">
                 <Syringe size={48} color="#48BB78" />
               </View>
               <Text className="text-center text-xl font-medium text-gray-700">
-                Kết quả tiêm chủng
+                Tiêm Chủng
               </Text>
             </TouchableOpacity>
 
             {/* Medical Request */}
             <TouchableOpacity
-              className="bg-purple-100 rounded-xl p-6 w-[48%] items-center shadow-md border-2 border-purple-200"
+              className="bg-purple-100 rounded-xl p-6 w-[48%] items-center  border-2 border-purple-200"
               activeOpacity={0.7}
             >
               <View className="h-12 w-12 rounded-full justify-center items-center mb-4">
                 <Cross size={48} color="#9F7AEA" />
               </View>
               <Text className="text-center text-xl font-medium text-gray-700">
-                Kết quả khám sức khỏe
+                Khám Sức Khỏe
               </Text>
             </TouchableOpacity>
           </View>
