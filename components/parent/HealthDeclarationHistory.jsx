@@ -30,7 +30,6 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
   const studentProfiles = healthProfiles.filter(
     (p) => String(p.student.id) === String(selectedSon?.id)
   );
-  console.log('🚀 ~ studentProfiles:', studentProfiles);
   const getBMI = (weight, height) => {
     if (!weight || !height) return null;
     const heightInMeters = height / 100;
@@ -74,10 +73,10 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
             {studentProfiles.length === 0 ? (
               <View className='items-center py-20'>
                 <FileText size={64} color='#D1D5DB' />
-                <Text className='text-gray-500 text-lg mt-4 mb-2'>
+                <Text className='mt-4 mb-2 text-lg text-gray-500'>
                   Chưa có hồ sơ nào
                 </Text>
-                <Text className='text-gray-400 text-center'>
+                <Text className='text-center text-gray-400'>
                   Hãy tạo hồ sơ sức khỏe đầu tiên
                 </Text>
               </View>
@@ -85,8 +84,8 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
               <>
                 {/* Latest Profile Summary */}
                 {studentProfiles.length > 0 && (
-                  <View className='bg-blue-50 p-4 rounded-2xl mb-6 border border-gray-200'>
-                    <Text className='text-lg font-montserratBold text-gray-800 mb-3'>
+                  <View className='p-4 mb-6 border border-gray-200 bg-blue-50 rounded-2xl'>
+                    <Text className='mb-3 text-lg text-gray-800 font-montserratBold'>
                       📃 Hồ sơ mới nhất
                     </Text>
                     {(() => {
@@ -104,7 +103,7 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
                             <Text className='text-xl font-bold text-blue-600'>
                               {bmi || '--'}
                             </Text>
-                            <Text className='text-gray-500 text-sm'>BMI</Text>
+                            <Text className='text-sm text-gray-500'>BMI</Text>
                             <Text className={`text-xs ${bmiStatus.color}`}>
                               {bmiStatus.status}
                             </Text>
@@ -113,7 +112,7 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
                             <Text className='text-xl font-bold text-green-600'>
                               {healthScore || '--'}
                             </Text>
-                            <Text className='text-gray-500 text-sm'>
+                            <Text className='text-sm text-gray-500'>
                               Điểm SK
                             </Text>
                             <Text className='text-xs text-gray-400'>
@@ -124,7 +123,7 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
                             <Text className='text-xl font-bold text-purple-600'>
                               {latest.bloodType || '--'}
                             </Text>
-                            <Text className='text-gray-500 text-sm'>
+                            <Text className='text-sm text-gray-500'>
                               Nhóm máu
                             </Text>
                           </View>
@@ -135,7 +134,7 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
                 )}
 
                 {/* Profile List */}
-                <Text className='text-lg font-bold text-gray-800 mb-4'>
+                <Text className='mb-4 text-lg font-bold text-gray-800'>
                   Tất cả hồ sơ
                 </Text>
 
@@ -150,7 +149,7 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
                   return (
                     <View
                       key={profile.id}
-                      className='mb-4 p-4 rounded-2xl border-2 bg-white border-gray-200'
+                      className='p-4 mb-4 bg-white border-2 border-gray-200 rounded-2xl'
                     >
                       {/* Header */}
                       <View className='flex-row items-center justify-between mb-3'>
@@ -160,14 +159,14 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
                             Hồ sơ #{studentProfiles.length - index}
                           </Text>
                           {index === 0 && (
-                            <View className='ml-2 bg-blue-500 rounded-full px-2 py-1'>
-                              <Text className='text-white text-xs font-bold'>
+                            <View className='px-2 py-1 ml-2 bg-blue-500 rounded-full'>
+                              <Text className='text-xs font-bold text-white'>
                                 Mới nhất
                               </Text>
                             </View>
                           )}
                         </View>
-                        <Text className='text-gray-500 text-sm'>
+                        <Text className='text-sm text-gray-500'>
                           {new Date(
                             profile.createdAt || Date.now()
                           ).toLocaleDateString('vi-VN')}
@@ -179,30 +178,30 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
                         <View className='flex-1 mr-2'>
                           <View className='flex-row items-center mb-2'>
                             <Scale size={16} color='#3B82F6' />
-                            <Text className='ml-2 text-gray-600 font-medium'>
+                            <Text className='ml-2 font-medium text-gray-600'>
                               Cân nặng: {profile.weight}kg
                             </Text>
                           </View>
                           <View className='flex-row items-center mb-2'>
                             <Ruler size={16} color='#10B981' />
-                            <Text className='ml-2 text-gray-600 font-medium'>
+                            <Text className='ml-2 font-medium text-gray-600'>
                               Chiều cao: {profile.height}cm
                             </Text>
                           </View>
                           <View className='flex-row items-center'>
                             <Droplet size={16} color='#EF4444' />
-                            <Text className='ml-2 text-gray-600 font-medium'>
+                            <Text className='ml-2 font-medium text-gray-600'>
                               Nhóm máu: {profile.bloodType}
                             </Text>
                           </View>
                         </View>
 
                         {/* BMI Card */}
-                        <View className='bg-blue-50 rounded-xl p-3 items-center min-w-20'>
-                          <Text className='text-blue-600 font-bold text-lg'>
+                        <View className='items-center p-3 bg-blue-50 rounded-xl min-w-20'>
+                          <Text className='text-lg font-bold text-blue-600'>
                             {bmi || '--'}
                           </Text>
-                          <Text className='text-gray-500 text-xs mb-1'>
+                          <Text className='mb-1 text-xs text-gray-500'>
                             BMI
                           </Text>
                           <Text
@@ -229,7 +228,7 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
 
                         <View className='flex-row items-center gap-1'>
                           <Ear size={16} color='#F59E0B' />
-                          <Text className=' text-gray-600'>
+                          <Text className='text-gray-600 '>
                             Thính giác: {profile.hearing}/10
                           </Text>
                           {profile.hearing >= 8 ? (
@@ -242,15 +241,15 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
 
                       {/* Health Score */}
                       {healthScore && (
-                        <View className='bg-green-50 rounded-xl p-3 mb-3'>
+                        <View className='p-3 mb-3 bg-green-50 rounded-xl'>
                           <View className='flex-row items-center justify-between'>
                             <View className='flex-row items-center'>
                               <Activity size={16} color='#10B981' />
-                              <Text className='ml-2 text-green-800 font-medium'>
+                              <Text className='ml-2 font-medium text-green-800'>
                                 Điểm sức khỏe tổng quát
                               </Text>
                             </View>
-                            <Text className='text-green-600 font-bold text-lg'>
+                            <Text className='text-lg font-bold text-green-600'>
                               {healthScore}/10
                             </Text>
                           </View>
@@ -265,12 +264,12 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
                             color='#EF4444'
                             style={{ marginTop: 2 }}
                           />
-                          <View className='ml-2 flex-1'>
-                            <Text className='text-red-600 font-medium mb-1'>
+                          <View className='flex-1 ml-2'>
+                            <Text className='mb-1 font-medium text-red-600'>
                               Dị ứng:
                             </Text>
-                            <View className='bg-red-50 rounded-xl p-2'>
-                              <Text className='text-red-700 text-sm'>
+                            <View className='p-2 bg-red-50 rounded-xl'>
+                              <Text className='text-sm text-red-700'>
                                 {profile.allergies}
                               </Text>
                             </View>
@@ -280,17 +279,17 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
 
                       {/* Notes */}
                       {profile.note && (
-                        <View className='flex-row items-start mt-2 pt-3 border-t border-gray-200'>
+                        <View className='flex-row items-start pt-3 mt-2 border-t border-gray-200'>
                           <FileText
                             size={16}
                             color='#6B7280'
                             style={{ marginTop: 2 }}
                           />
-                          <View className='ml-2 flex-1'>
-                            <Text className='text-gray-600 font-medium mb-1'>
+                          <View className='flex-1 ml-2'>
+                            <Text className='mb-1 font-medium text-gray-600'>
                               Ghi chú:
                             </Text>
-                            <Text className='text-gray-600 text-sm leading-4'>
+                            <Text className='text-sm leading-4 text-gray-600'>
                               {profile.note}
                             </Text>
                           </View>
@@ -298,9 +297,9 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
                       )}
 
                       {/* Created time */}
-                      <View className='flex-row items-center mt-3 pt-3 border-t border-gray-200'>
+                      <View className='flex-row items-center pt-3 mt-3 border-t border-gray-200'>
                         <Clock size={14} color='#9CA3AF' />
-                        <Text className='text-gray-400 text-xs ml-2'>
+                        <Text className='ml-2 text-xs text-gray-400'>
                           Cập nhật:{' '}
                           {new Date(
                             profile.createdAt || Date.now()
