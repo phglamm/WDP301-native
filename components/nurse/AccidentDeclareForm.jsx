@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   Text,
   ScrollView,
@@ -7,6 +7,8 @@ import {
   TextInput,
   ActivityIndicator,
   Alert,
+  Modal,
+  FlatList,
 } from "react-native";
 import {
   ArrowRight,
@@ -14,7 +16,10 @@ import {
   FileText,
   AlertTriangle,
   CheckCircle,
+  ChevronDown,
+  Search,
 } from "lucide-react-native";
+import { getAllStudent } from "../../services/nurseService";
 
 const AccidentDeclareForm = ({
   formData,
@@ -23,6 +28,38 @@ const AccidentDeclareForm = ({
   onSubmit,
   onBack,
 }) => {
+  const [students, setStudents] = useState([]);
+  const [showStudentModal, setShowStudentModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStudent, setSelectedStudent] = useState(null);
+
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      try {
+        const response = await getAllStudent();
+        setStudents(response.data);
+      } catch (error) {
+        console.error("Error fetching student data:", error);
+        Alert.alert("Lỗi", "Không thể tải thông tin học sinh.");
+      }
+    };
+    fetchStudentData();
+  }, []);
+
+  // Filter students based on search query
+  const filteredStudents = students.filter(
+    (student) =>
+      student.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      student.studentCode.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleStudentSelect = (student) => {
+    setSelectedStudent(student);
+    setFormData((prev) => ({ ...prev, studentCode: student.studentCode }));
+    setShowStudentModal(false);
+    setSearchQuery("");
+  };
+
   const handleSubmit = () => {
     if (!formData.studentCode || !formData.summary || !formData.type) {
       Alert.alert("Thông báo", "Vui lòng điền đầy đủ thông tin bắt buộc.");
@@ -54,6 +91,23 @@ const AccidentDeclareForm = ({
       textColor: "text-blue-600",
     },
   ];
+
+  const renderStudentItem = ({ item }) => (
+    <TouchableOpacity
+      onPress={() => handleStudentSelect(item)}
+      className="p-4 border-b border-gray-100 bg-white active:bg-gray-50"
+    >
+      <Text className="font-semibold text-gray-800 text-base">
+        {item.fullName}
+      </Text>
+      <Text className="text-gray-500 text-sm mt-1">
+        Mã số: {item.studentCode}
+      </Text>
+      <Text className="text-gray-400 text-xs mt-1" numberOfLines={1}>
+        {item.address}
+      </Text>
+    </TouchableOpacity>
+  );
 
   return (
     <View className="flex-1">
@@ -107,30 +161,41 @@ const AccidentDeclareForm = ({
 
         {/* Form Fields */}
         <View className="px-6">
-          {/* Student Code Field */}
+          {/* Student Selection Field */}
           <View className="mb-6">
             <View className="flex-row items-center mb-3">
               <User size={20} color="#6B7280" />
               <Text className="text-lg font-semibold text-gray-800 ml-2">
-                Mã số Học Sinh *
+                Chọn Học Sinh *
               </Text>
             </View>
-            <View className="relative">
-              <TextInput
-                className="border-2 border-gray-200 rounded-2xl px-4 py-4 text-base bg-white focus:border-blue-500"
-                placeholder="Nhập mã học sinh (VD: SV001)"
-                value={formData.studentCode}
-                onChangeText={(text) =>
-                  setFormData((prev) => ({ ...prev, studentCode: text }))
-                }
-                placeholderTextColor="#9CA3AF"
-              />
-              {formData.studentCode && (
-                <View className="absolute right-4 top-4">
-                  <CheckCircle size={20} color="#22C55E" />
-                </View>
-              )}
-            </View>
+            <TouchableOpacity
+              onPress={() => setShowStudentModal(true)}
+              className="border-2 border-gray-200 rounded-2xl px-4 py-4 bg-white flex-row items-center justify-between focus:border-blue-500"
+            >
+              <View className="flex-1">
+                {selectedStudent ? (
+                  <View>
+                    <Text className="text-base font-semibold text-gray-800">
+                      {selectedStudent.fullName}
+                    </Text>
+                    <Text className="text-sm text-gray-500 mt-1">
+                      Mã số: {selectedStudent.studentCode}
+                    </Text>
+                  </View>
+                ) : (
+                  <Text className="text-base text-gray-400">
+                    Chọn học sinh từ danh sách
+                  </Text>
+                )}
+              </View>
+              <View className="flex-row items-center">
+                {selectedStudent && (
+                  <CheckCircle size={20} color="#22C55E" className="mr-2" />
+                )}
+                <ChevronDown size={20} color="#6B7280" />
+              </View>
+            </TouchableOpacity>
           </View>
 
           {/* Summary Field */}
@@ -272,7 +337,68 @@ const AccidentDeclareForm = ({
           </View>
         </View>
       </ScrollView>
+
+      {/* Student Selection Modal */}
+      <Modal
+        visible={showStudentModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+      >
+        <View className="flex-1 bg-white">
+          {/* Modal Header */}
+          <View className="bg-white p-4 border-b border-gray-200 shadow-sm">
+            <View className="flex-row items-center justify-between mb-4">
+              <Text className="text-xl font-bold text-gray-800">
+                Chọn Học Sinh
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setShowStudentModal(false);
+                  setSearchQuery("");
+                }}
+                className="p-2 rounded-full bg-gray-100"
+              >
+                <Text className="text-gray-600 font-semibold">Đóng</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Search Input */}
+            <View className="relative">
+              <TextInput
+                className="border border-gray-300 rounded-xl px-4 py-3 pr-10 bg-gray-50"
+                placeholder="Tìm kiếm theo tên hoặc mã số..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                placeholderTextColor="#9CA3AF"
+              />
+              <View className="absolute right-3 top-3">
+                <Search size={20} color="#6B7280" />
+              </View>
+            </View>
+          </View>
+
+          {/* Student List */}
+          <FlatList
+            data={filteredStudents}
+            renderItem={renderStudentItem}
+            keyExtractor={(item) => item.id.toString()}
+            className="flex-1"
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <View className="p-8 items-center">
+                <User size={48} color="#9CA3AF" />
+                <Text className="text-gray-500 text-center mt-4 text-base">
+                  {searchQuery
+                    ? "Không tìm thấy học sinh nào"
+                    : "Chưa có dữ liệu học sinh"}
+                </Text>
+              </View>
+            }
+          />
+        </View>
+      </Modal>
     </View>
   );
 };
+
 export default AccidentDeclareForm;

@@ -250,3 +250,13 @@ export const getMedicineRequestDetail = async (requestId) => {
     throw error.response?.data || error.message;
   }
 };
+
+export const getAllStudent = async () => {
+  try {
+    const response = await axiosInstance.get(`/student`);
+    return response;
+  } catch (error) {
+    console.log("Error at getAllStudents: ", error);
+    throw error.response?.data || error.message;
+  }
+};

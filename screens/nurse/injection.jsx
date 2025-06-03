@@ -158,8 +158,8 @@ export default function InjectionScreen() {
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
+      // hour: "2-digit",
+      // minute: "2-digit",
     });
   };
 
@@ -315,17 +315,17 @@ export default function InjectionScreen() {
               <Text className="text-blue-500 text-xs">sự kiện</Text>
             </View>
 
-            <View className="flex-1 bg-purple-50 p-4 rounded-xl border border-purple-100">
+            <View className="flex-1 bg-orange-50 p-4 rounded-xl border border-orange-100">
               <View className="flex-row items-center mb-2">
-                <Clock size={18} color="#8B5CF6" />
-                <Text className="text-purple-600 font-semibold ml-2 text-sm">
+                <Clock size={18} color="#f97316" />
+                <Text className="text-orange-500 font-semibold ml-2 text-sm">
                   Tháng này
                 </Text>
               </View>
-              <Text className="text-2xl font-bold text-purple-700">
+              <Text className="text-2xl font-bold text-orange-700">
                 {getThisMonthEvents()}
               </Text>
-              <Text className="text-purple-500 text-xs">sự kiện</Text>
+              <Text className="text-orange-500 text-xs">sự kiện</Text>
             </View>
           </View>
 
