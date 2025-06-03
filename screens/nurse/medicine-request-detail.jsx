@@ -208,7 +208,7 @@ export default function MedicineRequestDetailScreen() {
           <Text className="text-gray-500">Không tìm thấy yêu cầu</Text>
           <TouchableOpacity
             className="mt-4 bg-blue-500 px-6 py-3 rounded-lg"
-            onPress={() => router.back()}
+            onPress={() => router.navigate("(nurse)/medicine-request")}
           >
             <Text className="text-white font-semibold">Quay lại</Text>
           </TouchableOpacity>

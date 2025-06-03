@@ -223,7 +223,7 @@ export default function AccidentDetailScreen() {
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center gap-4">
               <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={() => router.push("/(nurse)/accident")}
                 className="p-2 rounded-full bg-gray-100 active:bg-gray-200"
               >
                 <ArrowLeft size={20} color="#6B7280" />

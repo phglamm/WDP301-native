@@ -92,19 +92,19 @@ export default function ProfileScreen() {
           </View>
 
           {/* Contact Info */}
-          <View className="flex-row justify-around">
-            <View className="items-center">
+          <View className="flex-row justify-between items-center ">
+            <View className="items-center w-[33%]">
               <View className="w-10 h-10 rounded-full bg-blue-50 items-center justify-center mb-2">
                 <Phone size={20} color="#3B82F6" />
               </View>
               <Text className="text-sm text-gray-600">{user?.phone}</Text>
             </View>
-            <View className="items-center">
+            <View className="items-center  w-[33%]">
               <View className="w-10 h-10 rounded-full bg-blue-50 items-center justify-center mb-2">
                 <ThemeToggle />
               </View>
             </View>
-            <View className="items-center">
+            <View className="items-center w-[33%]">
               <View className="w-10 h-10 rounded-full bg-blue-50 items-center justify-center mb-2">
                 <Mail size={20} color="#3B82F6" />
               </View>
