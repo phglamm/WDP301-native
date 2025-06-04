@@ -260,3 +260,26 @@ export const getAllStudent = async () => {
     throw error.response?.data || error.message;
   }
 };
+
+export const getMedicine = async () => {
+  try {
+    const response = await axiosInstance.get(`/medicine`);
+    return response;
+  } catch (error) {
+    console.log("Error at getStudentById: ", error);
+    throw error.response?.data || error.message;
+  }
+};
+
+export const createAccidentMedicine = async (requestData) => {
+  try {
+    const response = await axiosInstance.post(
+      `/accident-medicine`,
+      requestData
+    );
+    return response;
+  } catch (error) {
+    console.log("Error at createMedicineRequest: ", error);
+    throw error.response?.data || error.message;
+  }
+};

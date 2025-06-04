@@ -8,6 +8,9 @@ import {
   ActivityIndicator,
   Platform,
   KeyboardAvoidingView,
+  Button,
+  Modal,
+  TextInput,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -25,88 +28,109 @@ import {
   AlertCircle,
   Clock,
   Pill,
+  Plus,
+  X,
+  ChevronDown,
 } from "lucide-react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { getAccidentById } from "../../services/nurseService";
+import {
+  createAccidentMedicine,
+  getAccidentById,
+  getMedicine,
+} from "../../services/nurseService";
+import { create } from "zustand";
 
 export default function AccidentDetailScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const [accident, setAccident] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [medicines, setMedicines] = useState([]);
+  const [loadingMedicines, setLoadingMedicines] = useState(false);
 
-  useEffect(() => {
-    const fetchAccidentDetails = async () => {
-      if (params.accidentId) {
-        try {
-          setLoading(true);
-          const response = await getAccidentById(params.accidentId);
+  // Modal and form states
+  const [showModal, setShowModal] = useState(false);
+  const [selectedMedicines, setSelectedMedicines] = useState([]);
+  const [showMedicineDropdown, setShowMedicineDropdown] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-          // Handle the API response structure
-          if (
-            response.status &&
-            response.data &&
-            Array.isArray(response.data) &&
-            response.data.length > 0
-          ) {
-            // Since API returns an array, take the first element
-            const accidentData = response.data[0];
+  const loadMedicine = async () => {
+    setLoadingMedicines(true);
+    try {
+      const response = await getMedicine();
+      setMedicines(response.data);
+      console.log("Medicines loaded successfully:", response.data);
+    } catch (error) {
+      Alert.alert("Lỗi", "Không thể tải danh sách Thuốc");
+      console.error("Load Thuốc error:", error);
+    } finally {
+      setLoadingMedicines(false);
+    }
+  };
+  const fetchAccidentDetails = async () => {
+    if (params.accidentId) {
+      try {
+        setLoading(true);
+        const response = await getAccidentById(params.accidentId);
 
-            // Map the API response to match your screen's expected structure
-            const mappedAccident = {
-              id: accidentData.id,
-              summary: accidentData.summary || "",
-              type: accidentData.type || "",
-              // Handle null date - use current date as fallback or leave as null
-              date: accidentData.date || new Date().toISOString(),
-              student: {
-                fullName: accidentData.student?.fullName || "Không xác định",
-                studentCode: accidentData.student?.studentCode || "N/A",
-                address: accidentData.student?.address || "",
-              },
-              nurse: {
-                id: accidentData.nurse?.id,
-                fullName: accidentData.nurse?.fullName || "Không xác định",
-                phone: accidentData.nurse?.phone || "",
-                email: accidentData.nurse?.email || "",
-                role: accidentData.nurse?.role || "nurse",
-              },
-              accidentMedicines: accidentData.accidentMedicines || [],
-            };
+        // Handle the API response structure
 
-            setAccident(mappedAccident);
-          } else {
-            throw new Error("No accident data found");
-          }
-        } catch (error) {
-          console.error("Error fetching accident details:", error);
-          Alert.alert("Lỗi", "Không thể tải thông tin tai nạn.", [
-            { text: "OK", onPress: () => router.push("/(nurse)/accident") },
-          ]);
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        // Fallback: create basic accident object from params for immediate display
-        setAccident({
-          id: params.accidentId,
-          summary: params.summary || "",
-          type: params.type || "",
-          date: new Date().toISOString(),
-          student: { fullName: "Đang tải...", studentCode: "", address: "" },
-          nurse: {
-            fullName: "Đang tải...",
-            phone: "",
-            email: "",
-            role: "nurse",
+        // Since API returns an array, take the first element
+        const accidentData = response.data;
+
+        // Map the API response to match your screen's expected structure
+        const mappedAccident = {
+          id: accidentData.id,
+          summary: accidentData.summary || "",
+          type: accidentData.type || "",
+          // Handle null date - use current date as fallback or leave as null
+          date: accidentData.date || new Date().toISOString(),
+          student: {
+            fullName: accidentData.student?.fullName || "Không xác định",
+            studentCode: accidentData.student?.studentCode || "N/A",
+            address: accidentData.student?.address || "",
           },
-          accidentMedicines: [],
-        });
+          nurse: {
+            id: accidentData.nurse?.id,
+            fullName: accidentData.nurse?.fullName || "Không xác định",
+            phone: accidentData.nurse?.phone || "",
+            email: accidentData.nurse?.email || "",
+            role: accidentData.nurse?.role || "nurse",
+          },
+          accidentMedicines: accidentData.accidentMedicines || [],
+        };
+
+        setAccident(mappedAccident);
+      } catch (error) {
+        console.error("Error fetching accident details:", error);
+        Alert.alert("Lỗi", "Không thể tải thông tin tai nạn.", [
+          { text: "OK", onPress: () => router.push("/(nurse)/accident") },
+        ]);
+      } finally {
         setLoading(false);
       }
-    };
-
+    } else {
+      // Fallback: create basic accident object from params for immediate display
+      setAccident({
+        id: params.accidentId,
+        summary: params.summary || "",
+        type: params.type || "",
+        date: new Date().toISOString(),
+        student: { fullName: "Đang tải...", studentCode: "", address: "" },
+        nurse: {
+          fullName: "Đang tải...",
+          phone: "",
+          email: "",
+          role: "nurse",
+        },
+        accidentMedicines: [],
+      });
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchAccidentDetails();
+    loadMedicine();
   }, [params.accidentId]);
 
   const formatDate = (dateString) => {
@@ -196,6 +220,86 @@ export default function AccidentDetailScreen() {
     }
   };
 
+  // Medicine form functions
+  const addMedicine = () => {
+    setSelectedMedicines([
+      ...selectedMedicines,
+      { medicineId: "", quantity: 1 },
+    ]);
+  };
+
+  const removeMedicine = (index) => {
+    const updated = selectedMedicines.filter((_, i) => i !== index);
+    setSelectedMedicines(updated);
+  };
+
+  const updateMedicine = (index, field, value) => {
+    const updated = [...selectedMedicines];
+    updated[index][field] = value;
+    setSelectedMedicines(updated);
+  };
+
+  const selectMedicine = (index, medicineId) => {
+    updateMedicine(index, "medicineId", medicineId);
+    setShowMedicineDropdown(false);
+  };
+
+  const handleSubmitMedicines = async () => {
+    if (selectedMedicines.length === 0) {
+      Alert.alert("Lỗi", "Vui lòng thêm ít nhất một loại thuốc");
+      return;
+    }
+
+    // Validate all medicines have been selected and have quantity
+    const invalidMedicines = selectedMedicines.filter(
+      (med) => !med.medicineId || med.quantity < 1
+    );
+
+    if (invalidMedicines.length > 0) {
+      Alert.alert(
+        "Lỗi",
+        "Vui lòng chọn thuốc và nhập số lượng hợp lệ cho tất cả các mục"
+      );
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const requestBody = {
+        accidentId: accident.id.toString(),
+        medicines: selectedMedicines.map((med) => ({
+          medicineId: med.medicineId.toString(),
+          quantity: parseInt(med.quantity),
+        })),
+      };
+
+      const response = await createAccidentMedicine(requestBody);
+      console.log("Accident medicine created:", response);
+
+      Alert.alert("Thành công", "Đã thêm thuốc cho tai nạn", [
+        {
+          text: "OK",
+          onPress: () => {
+            setShowModal(false);
+            setSelectedMedicines([]);
+            // Refresh accident details to show new medicines
+            fetchAccidentDetails();
+          },
+        },
+      ]);
+    } catch (error) {
+      console.error("Error creating accident medicine:", error);
+      Alert.alert("Lỗi", "Không thể thêm thuốc cho tai nạn này");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const resetForm = () => {
+    setSelectedMedicines([]);
+    setShowModal(false);
+  };
+
   if (!accident || loading) {
     return (
       <SafeAreaView className="flex-1 bg-white">
@@ -239,11 +343,13 @@ export default function AccidentDetailScreen() {
             </View>
           </View>
         </View>
+
         <ScrollView
           className="flex-1 bg-white"
           contentContainerStyle={{ padding: 24, paddingBottom: 40 }}
           showsVerticalScrollIndicator={false}
         >
+          {/* Accident Details */}
           <View className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-100">
             <View className="flex-row items-start justify-between mb-4">
               <View
@@ -270,6 +376,7 @@ export default function AccidentDetailScreen() {
             </View>
           </View>
 
+          {/* Student Info */}
           <View className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-100">
             <View className="flex-row items-center mb-4">
               <View className="bg-blue-100 p-2 rounded-full mr-3">
@@ -315,6 +422,7 @@ export default function AccidentDetailScreen() {
             </View>
           </View>
 
+          {/* Nurse Info */}
           <View className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-100">
             <View className="flex-row items-center mb-4">
               <View className="bg-green-100 p-2 rounded-full mr-3">
@@ -378,6 +486,7 @@ export default function AccidentDetailScreen() {
             </View>
           </View>
 
+          {/* Medicines Section */}
           <View className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <View className="flex-row items-center mb-4">
               <View className="bg-purple-100 p-2 rounded-full mr-3">
@@ -390,23 +499,23 @@ export default function AccidentDetailScreen() {
 
             {accident.accidentMedicines &&
             accident.accidentMedicines.length > 0 ? (
-              <View className="space-y-3">
+              <View className="space-y-4">
                 {accident.accidentMedicines.map((medicine, index) => (
                   <View
                     key={index}
-                    className="bg-gray-50 p-4 rounded-xl border border-gray-200"
+                    className="bg-gray-50 p-4 rounded-xl border border-gray-200 mt-5"
                   >
                     <Text className="font-montserratSemiBold text-gray-800">
-                      {medicine.name || `Thuốc ${index + 1}`}
+                      {medicine?.medicine.name || `Thuốc ${index + 1}`}
                     </Text>
-                    {medicine.dosage && (
+                    {medicine?.quantity && (
                       <Text className="text-gray-600 text-sm mt-1">
-                        Liều lượng: {medicine.dosage}
+                        Liều lượng: {medicine?.quantity}
                       </Text>
                     )}
-                    {medicine.notes && (
+                    {medicine?.notes && (
                       <Text className="text-gray-600 text-sm mt-1">
-                        Ghi chú: {medicine.notes}
+                        Ghi chú: {medicine?.notes}
                       </Text>
                     )}
                   </View>
@@ -417,16 +526,197 @@ export default function AccidentDetailScreen() {
                 <View className="bg-gray-100 p-4 rounded-full mb-3">
                   <Pill size={24} color="#6B7280" />
                 </View>
-                <Text className="text-gray-500 font-montserratMedium">
+                <Text className="text-gray-500 font-montserratMedium mb-2">
                   Chưa sử dụng thuốc nào
                 </Text>
-                <Text className="text-gray-400 text-sm mt-1 text-center">
+                <Text className="text-gray-400 text-sm mb-6 text-center">
                   Thông tin về thuốc sẽ hiển thị ở đây
                 </Text>
+
+                {/* Add Medicine Button */}
+                <TouchableOpacity
+                  onPress={() => setShowModal(true)}
+                  className="bg-purple-600 px-6 py-3 rounded-xl flex-row items-center"
+                >
+                  <Plus size={20} color="white" />
+                  <Text className="text-white font-montserratSemiBold ml-2">
+                    Thêm thuốc
+                  </Text>
+                </TouchableOpacity>
               </View>
             )}
           </View>
         </ScrollView>
+
+        {/* Medicine Modal */}
+        <Modal
+          visible={showModal}
+          animationType="slide"
+          presentationStyle="pageSheet"
+          onRequestClose={() => setShowModal(false)}
+        >
+          <SafeAreaView className="flex-1 bg-white">
+            {/* Modal Header */}
+            <View className="bg-white shadow-sm border-b border-gray-100 p-6">
+              <View className="flex-row items-center justify-between">
+                <Text className="text-xl font-montserratBold text-gray-800">
+                  Thêm thuốc cho tai nạn
+                </Text>
+                <TouchableOpacity
+                  onPress={resetForm}
+                  className="p-2 rounded-full bg-gray-100"
+                >
+                  <X size={20} color="#6B7280" />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <ScrollView className="flex-1 p-6">
+              {/* Medicine Form */}
+              <View className="space-y-4">
+                {selectedMedicines.map((medicine, index) => (
+                  <View
+                    key={index}
+                    className="bg-gray-50 p-4 rounded-xl border border-gray-200"
+                  >
+                    <View className="flex-row items-center justify-between mb-3">
+                      <Text className="font-montserratSemiBold text-gray-800">
+                        Thuốc #{index + 1}
+                      </Text>
+                      {selectedMedicines.length > 1 && (
+                        <TouchableOpacity
+                          onPress={() => removeMedicine(index)}
+                          className="p-1 rounded-full bg-red-100"
+                        >
+                          <X size={16} color="#EF4444" />
+                        </TouchableOpacity>
+                      )}
+                    </View>
+
+                    {/* Medicine Selector */}
+                    <View className="mb-3">
+                      <Text className="text-gray-600 font-montserratMedium text-sm mb-2">
+                        Chọn thuốc
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          setShowMedicineDropdown(
+                            showMedicineDropdown === index ? false : index
+                          )
+                        }
+                        className="border border-gray-300 rounded-lg p-3 flex-row items-center justify-between bg-white"
+                      >
+                        <Text
+                          className={
+                            medicine.medicineId
+                              ? "text-gray-800"
+                              : "text-gray-400"
+                          }
+                        >
+                          {medicine.medicineId
+                            ? medicines.find(
+                                (m) => m.id.toString() === medicine.medicineId
+                              )?.name || "Chọn thuốc"
+                            : "Chọn thuốc"}
+                        </Text>
+                        <ChevronDown size={20} color="#6B7280" />
+                      </TouchableOpacity>
+
+                      {/* Dropdown */}
+                      {showMedicineDropdown === index && (
+                        <View className="border border-gray-300 rounded-lg mt-1 bg-white max-h-40">
+                          <ScrollView>
+                            {medicines.map((med) => (
+                              <TouchableOpacity
+                                key={med.id}
+                                onPress={() =>
+                                  selectMedicine(index, med.id.toString())
+                                }
+                                className="p-3 border-b border-gray-100"
+                              >
+                                <Text className="text-gray-800">
+                                  {med.name}
+                                </Text>
+                                {med.description && (
+                                  <Text className="text-gray-500 text-sm mt-1">
+                                    {med.description}
+                                  </Text>
+                                )}
+                              </TouchableOpacity>
+                            ))}
+                          </ScrollView>
+                        </View>
+                      )}
+                    </View>
+
+                    {/* Quantity Input */}
+                    <View>
+                      <Text className="text-gray-600 font-montserratMedium text-sm mb-2">
+                        Số lượng
+                      </Text>
+                      <TextInput
+                        value={medicine.quantity.toString()}
+                        onChangeText={(text) =>
+                          updateMedicine(
+                            index,
+                            "quantity",
+                            parseInt(text) || ""
+                          )
+                        }
+                        keyboardType="numeric"
+                        className="border border-gray-300 rounded-lg p-3 bg-white"
+                        placeholder="Nhập số lượng"
+                      />
+                    </View>
+                  </View>
+                ))}
+
+                {/* Add More Medicine Button */}
+                <TouchableOpacity
+                  onPress={addMedicine}
+                  className="border-2 border-dashed border-purple-300 rounded-xl p-4 items-center"
+                >
+                  <Plus size={24} color="#8B5CF6" />
+                  <Text className="text-purple-600 font-montserratMedium mt-2">
+                    Thêm thuốc khác
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+
+            {/* Modal Footer */}
+            <View className="p-6 border-t border-gray-100">
+              <View className="flex-row justify-between gap-5">
+                <TouchableOpacity
+                  onPress={resetForm}
+                  className="flex-1 bg-gray-100 py-3 rounded-xl items-center"
+                >
+                  <Text className="text-gray-600 font-montserratSemiBold">
+                    Hủy
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={handleSubmitMedicines}
+                  disabled={submitting || selectedMedicines.length === 0}
+                  className={`flex-1 py-3 rounded-xl items-center ${
+                    submitting || selectedMedicines.length === 0
+                      ? "bg-gray-300"
+                      : "bg-purple-600"
+                  }`}
+                >
+                  {submitting ? (
+                    <ActivityIndicator size="small" color="white" />
+                  ) : (
+                    <Text className="text-white font-montserratSemiBold">
+                      Lưu thuốc
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          </SafeAreaView>
+        </Modal>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

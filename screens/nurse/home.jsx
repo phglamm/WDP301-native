@@ -51,6 +51,7 @@ export default function HomeScreen() {
           <TouchableOpacity
             className="bg-blue-100 rounded-xl p-4 py-6 mb-8 flex-row justify-between items-center  border-2 border-blue-200"
             activeOpacity={0.7}
+            onPress={() => router.push("/(nurse)/medicine")}
           >
             <View className="flex-1 flex-col items-start justify-between gap-4">
               <Text className="text-2xl font-semibold max-w-52">

@@ -24,7 +24,11 @@ import {
   ChevronRight,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import { getAvailableEvent, getVaccination } from "../../services/nurseService";
+import {
+  getAvailableEvent,
+  getMedicine,
+  getVaccination,
+} from "../../services/nurseService";
 import InjectionEventForm from "../../components/nurse/InjectionEventForm";
 
 export default function InjectionScreen() {
@@ -34,6 +38,7 @@ export default function InjectionScreen() {
   const [currentView, setCurrentView] = useState("main");
   const [availableEvents, setAvailableEvents] = useState([]);
   const [vaccinations, setVaccinations] = useState([]);
+
   const [loading, setLoading] = useState({
     events: false,
     creating: false,
