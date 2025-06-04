@@ -42,6 +42,18 @@ const NurseLayout = () => {
         }}
       />
       <Tabs.Screen
+        name="notification"
+        options={{
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "notifications" : "notifications-outline"}
+              color={color}
+              size={28}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: "Hồ sơ",

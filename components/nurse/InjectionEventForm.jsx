@@ -465,7 +465,7 @@ export default function InjectionEventForm({
           mode="datetime"
           display={Platform.OS === "ios" ? "spinner" : "default"}
           onChange={handleDateChange}
-          minimumDate={new Date()}
+          // minimumDate={new Date()}
         />
       )}
 
