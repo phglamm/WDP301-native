@@ -72,11 +72,6 @@ export default function MedicineScreen() {
     }
   };
 
-  const handleAddMedicine = () => {
-    // Navigate to add medicine screen or show form
-    Alert.alert("Thông báo", "Chức năng thêm thuốc đang phát triển");
-  };
-
   const handleViewMedicineDetail = (medicine) => {
     // Navigate to medicine detail screen
     Alert.alert(
@@ -223,24 +218,7 @@ export default function MedicineScreen() {
         {/* Enhanced Action Buttons */}
         <View className="px-6 py-4">
           <View className="flex-row gap-4">
-            <TouchableOpacity
-              onPress={handleAddMedicine}
-              className="flex-1 bg-blue-500 py-4 rounded-2xl flex-row items-center justify-center shadow-lg active:scale-95"
-              style={{
-                shadowColor: "#3B82F6",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 8,
-                elevation: 8,
-              }}
-            >
-              <Plus size={22} color="white" />
-              <Text className="text-white font-bold ml-2 text-base">
-                Thêm thuốc
-              </Text>
-            </TouchableOpacity>
-
-            <View className="flex-1 bg-white border border-gray-300 rounded-2xl flex-row items-center px-4 py-3 focus:border-blue-500 focus:shadow-lg transition-all duration-200">
+            <View className="flex-1 bg-white border border-gray-300 rounded-2xl flex-row items-center px-4 py-1 focus:border-blue-500 focus:shadow-lg transition-all duration-200">
               <Search size={20} color="#9CA3AF" />
               <TextInput
                 className="flex-1 text-gray-800 text-base font-medium ml-3"
