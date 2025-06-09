@@ -8,7 +8,6 @@ import {
   Alert,
   ActivityIndicator,
   RefreshControl,
-  SafeAreaView,
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
@@ -27,6 +26,7 @@ import {
 import { useRouter } from "expo-router";
 import { getMedicineRequestToday } from "../../services/nurseService";
 import MedicineRequestCard from "../../components/nurse/MedicineRequestCard";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function MedicineRequestScreen() {
   const router = useRouter();

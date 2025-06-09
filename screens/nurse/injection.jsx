@@ -8,7 +8,6 @@ import {
   Alert,
   ActivityIndicator,
   RefreshControl,
-  SafeAreaView,
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
@@ -30,6 +29,7 @@ import {
   getVaccination,
 } from "../../services/nurseService";
 import InjectionEventForm from "../../components/nurse/InjectionEventForm";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function InjectionScreen() {
   const router = useRouter();
