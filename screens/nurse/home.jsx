@@ -115,7 +115,7 @@ export default function HomeScreen() {
       color: "#8B5CF6",
       bgColor: "#F5F3FF",
       borderColor: "#DDD6FE",
-      route: "/(nurse)/health-check",
+      route: "/(nurse)/health-event",
     },
   ];
   const getTodayAccidents = () => {

@@ -24,9 +24,13 @@ import {
   AlertCircle,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import { getMedicineRequestToday } from "../../services/nurseService";
+import {
+  getMedicineRequestToday,
+  getMedicineRequestHistory,
+} from "../../services/nurseService";
 import MedicineRequestCard from "../../components/nurse/MedicineRequestCard";
 import { SafeAreaView } from "react-native-safe-area-context";
+import MedicineRequestHistory from "../../components/nurse/MedicineRequestHistory";
 
 export default function MedicineRequestScreen() {
   const router = useRouter();
@@ -34,9 +38,11 @@ export default function MedicineRequestScreen() {
   // State management
   const [currentView, setCurrentView] = useState("main");
   const [medicineRequests, setMedicineRequests] = useState([]);
+  const [allMedicineRequests, setAllMedicineRequests] = useState([]);
   const [loading, setLoading] = useState({
     requests: false,
     refreshing: false,
+    history: false,
   });
 
   // Load data on component mount
@@ -77,9 +83,28 @@ export default function MedicineRequestScreen() {
     }
   };
 
+  const loadMedicineRequestHistory = async () => {
+    setLoading((prev) => ({ ...prev, history: true }));
+    try {
+      const response = await getMedicineRequestHistory();
+      if (response && response.data) {
+        setAllMedicineRequests(response.data);
+      }
+    } catch (error) {
+      Alert.alert("Lỗi", "Không thể tải lịch sử yêu cầu thuốc");
+      console.error("Load medicine request history error:", error);
+    } finally {
+      setLoading((prev) => ({ ...prev, history: false }));
+    }
+  };
+
   const onRefresh = async () => {
     setLoading((prev) => ({ ...prev, refreshing: true }));
-    await loadMedicineRequests();
+    if (currentView === "main") {
+      await loadMedicineRequests();
+    } else if (currentView === "history") {
+      await loadMedicineRequestHistory();
+    }
     setLoading((prev) => ({ ...prev, refreshing: false }));
   };
 
@@ -89,6 +114,13 @@ export default function MedicineRequestScreen() {
       pathname: "/medicine-request-detail",
       params: { requestId: request.id },
     });
+  };
+
+  const handleViewHistory = async () => {
+    setCurrentView("history");
+    if (allMedicineRequests.length === 0) {
+      await loadMedicineRequestHistory();
+    }
   };
 
   const formatDateTime = (dateString) => {
@@ -101,6 +133,63 @@ export default function MedicineRequestScreen() {
       minute: "2-digit",
     });
   };
+
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case "pending":
+      case "chờ xử lý":
+        return {
+          bg: "bg-yellow-100",
+          text: "text-yellow-700",
+          border: "border-yellow-200",
+        };
+      case "approved":
+      case "đã duyệt":
+        return {
+          bg: "bg-green-100",
+          text: "text-green-700",
+          border: "border-green-200",
+        };
+      case "rejected":
+      case "từ chối":
+        return {
+          bg: "bg-red-100",
+          text: "text-red-700",
+          border: "border-red-200",
+        };
+      case "completed":
+      case "hoàn thành":
+        return {
+          bg: "bg-blue-100",
+          text: "text-blue-700",
+          border: "border-blue-200",
+        };
+      default:
+        return {
+          bg: "bg-gray-100",
+          text: "text-gray-700",
+          border: "border-gray-200",
+        };
+    }
+  };
+
+  // History view
+  if (currentView === "history") {
+    return (
+      <SafeAreaView className="flex-1 bg-white">
+        <MedicineRequestHistory
+          medicineRequests={allMedicineRequests}
+          setCurrentView={setCurrentView}
+          handleViewRequestDetail={handleRequestPress}
+          refreshing={loading.refreshing}
+          handleRefresh={onRefresh}
+          formatDateTime={formatDateTime}
+          getStatusColor={getStatusColor}
+          loading={loading.history}
+        />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-white">
@@ -154,6 +243,21 @@ export default function MedicineRequestScreen() {
               </Text>
               <Text className="text-green-500 text-xs">yêu cầu</Text>
             </View>
+          </View>
+        </View>
+
+        {/* Action Buttons */}
+        <View className="px-6 py-4">
+          <View className="flex-row gap-4">
+            <TouchableOpacity
+              onPress={handleViewHistory}
+              className="flex-1 bg-white border-2 border-gray-200 py-4 rounded-2xl flex-row items-center justify-center active:scale-95"
+            >
+              <Clock size={22} color="#6B7280" />
+              <Text className="text-gray-700 font-bold ml-2 text-base">
+                Lịch sử ({allMedicineRequests.length})
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
 

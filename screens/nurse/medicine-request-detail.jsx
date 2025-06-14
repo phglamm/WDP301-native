@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
-  SafeAreaView,
   Platform,
   KeyboardAvoidingView,
   Image,
@@ -31,6 +30,7 @@ import {
 } from "lucide-react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { getMedicineRequestDetail } from "../../services/nurseService";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -52,36 +52,11 @@ export default function MedicineRequestDetailScreen() {
     setLoading(true);
     try {
       // Simulate API call - replace with actual API call
-      //   const response = await getMedicineRequestDetail(requestId);
+      const response = await getMedicineRequestDetail(requestId);
 
       // Mock data for demonstration
-      const mockRequest = {
-        id: 15,
-        date: "2025-06-03 17:18:00",
-        image:
-          "https://campus-medix.s3.ap-southeast-1.amazonaws.com/images/1748945879359-r5w1dgb.jpeg",
-        note: "Xin chao Viet nam",
-        status: "pending", // pending, approved, rejected
-        student: {
-          id: 11,
-          studentCode: "SE444444",
-          fullName: "Nguyễn Quốc Huy",
-          address:
-            "1 Nguyễn Huệ, phường Bến Nghé, Quận 1, thành phố Hồ Chí Minh",
-          gender: "Nam",
-          dateOfBirth: "2010-05-15",
-        },
-        parent: {
-          id: 9,
-          fullName: "Nguyễn Khánh Ba",
-          password: "12345",
-          phone: "0123456789",
-          email: "tungnkss160730@fpt.edu.vn",
-          role: "parent",
-        },
-      };
 
-      setRequest(mockRequest);
+      setRequest(response.data);
     } catch (error) {
       Alert.alert("Lỗi", "Không thể tải chi tiết yêu cầu");
       console.error("Load request detail error:", error.response.data.message);

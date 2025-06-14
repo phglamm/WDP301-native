@@ -97,14 +97,6 @@ export default function MedicineRequestCard({
       )}
 
       {/* Student Address */}
-      {request.student?.address && (
-        <View className="flex-row items-start mt-3 pt-3 border-t border-gray-100">
-          <MapPin size={14} color="#6B7280" className="mt-1" />
-          <Text className="text-gray-500 ml-2 text-sm flex-1">
-            {request.student.address}
-          </Text>
-        </View>
-      )}
     </TouchableOpacity>
   );
 }

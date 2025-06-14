@@ -283,3 +283,32 @@ export const createAccidentMedicine = async (requestData) => {
     throw error.response?.data || error.message;
   }
 };
+export const getHealthEvents = async () => {
+  try {
+    const response = await axiosInstance.get(`/health-event`);
+    return response;
+  } catch (error) {
+    console.log("Error at getStudentById: ", error);
+    throw error.response?.data || error.message;
+  }
+};
+
+export const createHealthEvent = async (data) => {
+  try {
+    const response = await axiosInstance.post(`/health-event`, data);
+    return response;
+  } catch (error) {
+    console.log("Error at create health event: ", error);
+    throw error.response?.data || error.message;
+  }
+};
+
+export const getMedicineRequestHistory = async () => {
+  try {
+    const response = await axiosInstance.get(`/medicine-request`);
+    return response;
+  } catch (error) {
+    console.log("Error at getMedicineRequestHistory: ", error);
+    throw error.response?.data || error.message;
+  }
+};
