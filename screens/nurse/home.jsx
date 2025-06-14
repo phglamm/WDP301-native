@@ -285,53 +285,6 @@ export default function HomeScreen() {
               ))}
             </View>
           </View>
-
-          {/* Recent Activity */}
-          <View className="mt-4">
-            <Text className="text-xl font-bold text-gray-900 dark:text-white mb-4">
-              Hoạt động gần đây
-            </Text>
-            <View className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
-              {[
-                {
-                  time: "10:30",
-                  action: "Tiêm vaccine cho Nguyễn Văn A",
-                  status: "completed",
-                },
-                {
-                  time: "11:15",
-                  action: "Xử lý tai nạn - Trầy xước",
-                  status: "completed",
-                },
-                {
-                  time: "14:20",
-                  action: "Yêu cầu thuốc cảm cúm",
-                  status: "pending",
-                },
-              ].map((activity, index) => (
-                <View
-                  key={index}
-                  className={`flex-row items-center p-4 ${index !== 2 ? "border-b border-gray-100 dark:border-gray-700" : ""}`}
-                >
-                  <View
-                    className={`w-3 h-3 rounded-full mr-4 ${
-                      activity.status === "completed"
-                        ? "bg-green-500"
-                        : "bg-orange-500"
-                    }`}
-                  />
-                  <View className="flex-1">
-                    <Text className="text-gray-900 dark:text-white font-medium text-sm">
-                      {activity.action}
-                    </Text>
-                    <Text className="text-gray-500 dark:text-gray-400 text-xs mt-1">
-                      {activity.time}
-                    </Text>
-                  </View>
-                </View>
-              ))}
-            </View>
-          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
