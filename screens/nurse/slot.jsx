@@ -92,6 +92,13 @@ export default function SlotScreen() {
   const handleSlotPress = (slot) => {
     // Open modal instead of direct confirmation
     setSelectedSlot(slot);
+    if (slot.status === true) {
+      Alert.alert(
+        "Thông báo",
+        "Phân công này đã được xác nhận phát thuốc trước đó."
+      );
+      return;
+    }
     setModalVisible(true);
     setUploadedImage(null);
   };
