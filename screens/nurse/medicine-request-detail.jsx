@@ -29,7 +29,11 @@ import {
   Clock,
 } from "lucide-react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { getMedicineRequestDetail } from "../../services/nurseService";
+import {
+  approveMedicineRequest,
+  getMedicineRequestDetail,
+  rejectMedicineRequest,
+} from "../../services/nurseService";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -130,7 +134,9 @@ export default function MedicineRequestDetailScreen() {
           try {
             // API call to approve request
             // await approveMedicineRequest(requestId);
-            setRequest((prev) => ({ ...prev, status: "approved" }));
+            const response = await approveMedicineRequest(requestId);
+            console.log("Approve response:", response);
+            loadRequestDetail(requestId);
             Alert.alert("Thành công", "Yêu cầu đã được phê duyệt");
           } catch (error) {
             Alert.alert("Lỗi", "Không thể phê duyệt yêu cầu");
@@ -152,8 +158,9 @@ export default function MedicineRequestDetailScreen() {
           setProcessingAction(true);
           try {
             // API call to reject request
-            // await rejectMedicineRequest(requestId);
-            setRequest((prev) => ({ ...prev, status: "rejected" }));
+            const response = await rejectMedicineRequest(requestId);
+            console.log("Rejected response:", response);
+            loadRequestDetail(requestId);
             Alert.alert("Thành công", "Yêu cầu đã được từ chối");
           } catch (error) {
             Alert.alert("Lỗi", "Không thể từ chối yêu cầu");

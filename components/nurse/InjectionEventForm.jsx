@@ -13,6 +13,8 @@ import {
   ActionSheetIOS,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
+
 import {
   ArrowRight,
   Calendar,
@@ -112,23 +114,10 @@ export default function InjectionEventForm({
   };
 
   const showDateActionSheet = (dateType) => {
-    const getDateTypeTitle = (type) => {
-      switch (type) {
-        case "registrationOpenDate":
-          return "Ngày mở đăng ký";
-        case "registrationCloseDate":
-          return "Ngày đóng đăng ký";
-        case "date":
-          return "Ngày tiêm";
-        default:
-          return "Chọn ngày";
-      }
-    };
-
     if (Platform.OS === "ios") {
       ActionSheetIOS.showActionSheetWithOptions(
         {
-          title: getDateTypeTitle(dateType),
+          title: "Chọn ngày và giờ",
           options: ["Hủy", "Chọn ngày giờ"],
           cancelButtonIndex: 0,
           userInterfaceStyle: "light",
@@ -140,19 +129,34 @@ export default function InjectionEventForm({
         }
       );
     } else {
-      // For Android, directly show date picker
-      setShowDatePicker({ type: dateType, visible: true });
+      DateTimePickerAndroid.open({
+        value: formData[dateType],
+        mode: "datetime",
+        is24Hour: true,
+        onChange: (event, selectedDate) => {
+          if (selectedDate) {
+            setFormData((prev) => ({
+              ...prev,
+              [dateType]: selectedDate,
+            }));
+          }
+        },
+      });
     }
   };
 
   const handleDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || formData[showDatePicker.type];
+    // Store the current picker type before resetting state
+    const currentPickerType = showDatePicker.type;
+
+    // Hide the picker first
     setShowDatePicker({ type: null, visible: false });
 
-    if (selectedDate) {
+    // Only update if user selected a date (didn't cancel)
+    if (selectedDate && currentPickerType) {
       setFormData((prev) => ({
         ...prev,
-        [showDatePicker.type]: currentDate,
+        [currentPickerType]: selectedDate,
       }));
     }
   };
@@ -465,7 +469,6 @@ export default function InjectionEventForm({
           mode="datetime"
           display={Platform.OS === "ios" ? "spinner" : "default"}
           onChange={handleDateChange}
-          // minimumDate={new Date()}
         />
       )}
 

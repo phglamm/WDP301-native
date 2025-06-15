@@ -1,4 +1,4 @@
-// Enhanced HealthEventForm Component - Fixed DateTimePicker Issue
+// Enhanced HealthEventForm Component - Fixed Android DateTimePicker Issue
 import React, { useState } from "react";
 import {
   View,
@@ -36,9 +36,11 @@ export default function HealthEventForm({
     date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Default to 1 week from now
   });
 
-  // UI state - Fixed: Initialize with proper platform-specific behavior
+  // UI state - Fixed: Better state management for Android
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [tempDate, setTempDate] = useState(null); // For iOS date picker handling
+  const [datePickerMode, setDatePickerMode] = useState("date"); // 'date' or 'time'
 
   const handleSubmit = async () => {
     if (!formData.name || !formData.date) {
@@ -101,29 +103,60 @@ export default function HealthEventForm({
         },
         (buttonIndex) => {
           if (buttonIndex === 1) {
-            setTempDate(formData.date); // Set temp date for iOS
+            setTempDate(formData.date);
+            setDatePickerMode("datetime");
             setShowDatePicker(true);
           }
         }
       );
     } else {
-      // For Android, directly show date picker
+      // For Android, show date picker first, then time picker
+      setDatePickerMode("date");
       setShowDatePicker(true);
     }
   };
 
-  // Fixed: Improved date change handler with proper platform handling
+  // Fixed: Improved date change handler with proper error handling
   const handleDateChange = (event, selectedDate) => {
+    console.log("Date change event:", event.type, selectedDate);
+
     if (Platform.OS === "android") {
-      // Android behavior: always hide picker after selection/dismissal
-      setShowDatePicker(false);
+      // Android behavior: always hide current picker after selection/dismissal
+      if (datePickerMode === "date") {
+        setShowDatePicker(false);
+      } else {
+        setShowTimePicker(false);
+      }
 
       if (event.type === "set" && selectedDate) {
-        // User selected a date
-        setFormData((prev) => ({
-          ...prev,
-          date: selectedDate,
-        }));
+        if (datePickerMode === "date") {
+          // User selected a date, now show time picker
+          const newDate = new Date(formData.date);
+          newDate.setFullYear(selectedDate.getFullYear());
+          newDate.setMonth(selectedDate.getMonth());
+          newDate.setDate(selectedDate.getDate());
+
+          setFormData((prev) => ({
+            ...prev,
+            date: newDate,
+          }));
+
+          // Show time picker after a short delay to prevent conflicts
+          setTimeout(() => {
+            setDatePickerMode("time");
+            setShowTimePicker(true);
+          }, 100);
+        } else {
+          // User selected a time
+          const newDate = new Date(formData.date);
+          newDate.setHours(selectedDate.getHours());
+          newDate.setMinutes(selectedDate.getMinutes());
+
+          setFormData((prev) => ({
+            ...prev,
+            date: newDate,
+          }));
+        }
       }
       // If event.type === "dismissed", do nothing (user cancelled)
     } else {
@@ -292,7 +325,9 @@ export default function HealthEventForm({
               </View>
             </View>
             <Text className="text-gray-500 text-sm mt-2">
-              Chọn ngày và giờ thực hiện khám sức khỏe
+              {Platform.OS === "android"
+                ? "Chọn ngày trước, sau đó chọn giờ khám sức khỏe"
+                : "Chọn ngày và giờ thực hiện khám sức khỏe"}
             </Text>
           </View>
 
@@ -370,14 +405,23 @@ export default function HealthEventForm({
         </View>
       </ScrollView>
 
-      {/* Fixed: Platform-specific Date Picker rendering */}
+      {/* Fixed: Separate Date and Time Pickers for Android to prevent conflicts */}
       {showDatePicker && Platform.OS === "android" && (
         <DateTimePicker
           value={formData.date}
-          mode="datetime"
+          mode="date"
           display="default"
           onChange={handleDateChange}
           minimumDate={new Date()}
+        />
+      )}
+
+      {showTimePicker && Platform.OS === "android" && (
+        <DateTimePicker
+          value={formData.date}
+          mode="time"
+          display="default"
+          onChange={handleDateChange}
         />
       )}
 

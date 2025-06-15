@@ -342,3 +342,26 @@ export const completeSlotAPI = async (slotId, formData) => {
     throw error.response?.data || error.message;
   }
 };
+
+export const approveMedicineRequest = async (requestId) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/medicine-request/${requestId}`
+    );
+    return response;
+  } catch (error) {
+    console.log("Error at approveMedicineRequest: ", error);
+    throw error.response?.data || error.message;
+  }
+};
+export const rejectMedicineRequest = async (requestId) => {
+  try {
+    const response = await axiosInstance.delete(
+      `/medicine-request/${requestId}`
+    );
+    return response;
+  } catch (error) {
+    console.log("Error at rejectMedicineRequest: ", error);
+    throw error.response?.data || error.message;
+  }
+};
