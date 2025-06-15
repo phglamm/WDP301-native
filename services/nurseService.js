@@ -312,3 +312,33 @@ export const getMedicineRequestHistory = async () => {
     throw error.response?.data || error.message;
   }
 };
+
+export const getSlotsAPI = async (session) => {
+  try {
+    const response = await axiosInstance.get(`/slot/today`, {
+      params: { session: session },
+    });
+    return response;
+  } catch (error) {
+    console.log("Error at getSlotsAPI: ", error);
+    throw error.response?.data || error.message;
+  }
+};
+
+export const completeSlotAPI = async (slotId, formData) => {
+  try {
+    const response = await axiosInstance.patch(
+      `/slot/${slotId}/check`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log("Error at completeSlotAPI: ", error);
+    throw error.response?.data || error.message;
+  }
+};

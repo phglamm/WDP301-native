@@ -29,6 +29,7 @@ const NurseLayout = () => {
       <Tabs.Screen name="medicine-request-detail" options={{ href: null }} />
       <Tabs.Screen name="medicine" options={{ href: null }} />
       <Tabs.Screen name="health-event" options={{ href: null }} />
+      <Tabs.Screen name="slot" options={{ href: null }} />
 
       <Tabs.Screen
         name="home"
