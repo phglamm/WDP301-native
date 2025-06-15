@@ -377,23 +377,7 @@ export default function SlotScreen() {
         )}
       </View>
 
-      {slot.medicineRequest.image && (
-        <View className="mb-3">
-          <Text className="text-gray-600 text-sm mb-2">
-            Hình ảnh đơn thuốc:
-          </Text>
-          <Image
-            source={{ uri: slot.medicineRequest.image }}
-            className="w-full h-32 rounded-lg"
-            resizeMode="cover"
-          />
-        </View>
-      )}
-
       <View className="flex-row items-center justify-between pt-2 border-t border-gray-100">
-        <Text className="text-gray-500 text-xs">
-          Ngày tạo: {formatDateTime(slot.medicineRequest.date)}
-        </Text>
         <Text className="text-blue-600 text-sm font-semibold">
           ID: #{slot.id}
         </Text>

@@ -240,7 +240,7 @@ export default function InjectionScreen() {
         </View>
 
         {/* Action Button */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           className="bg-green-500 rounded-xl py-3 flex-row items-center justify-center active:bg-green-600"
           onPress={() => downloadStudentsList(event.id)}
           disabled={loading.downloading}
@@ -249,7 +249,7 @@ export default function InjectionScreen() {
           <Text className="text-white font-semibold ml-2">
             {loading.downloading ? "Đang tải..." : "Tải xuống danh sách"}
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     );
   };
