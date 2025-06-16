@@ -373,9 +373,39 @@ export default function SlotScreen() {
             Ca: {slot.session}
           </Text>
         </View>
-        <Text className="text-gray-800 font-medium">{slot.note}</Text>
+
+        {/* Medicine List */}
+        <View className="mb-2">
+          <Text className="text-gray-700 font-semibold text-sm mb-1">
+            Danh sách thuốc:
+          </Text>
+          {slot.medicines && slot.medicines.length > 0 ? (
+            slot.medicines.map((medicine, index) => (
+              <View key={medicine.id} className="flex-row items-start mb-1">
+                <Text className="text-gray-600 text-sm mr-2">•</Text>
+                <View className="flex-1">
+                  <Text className="text-gray-800 text-sm font-medium">
+                    {medicine.name}
+                  </Text>
+                  <Text className="text-gray-500 text-xs">
+                    Số lượng: {medicine.quantity}
+                  </Text>
+                </View>
+              </View>
+            ))
+          ) : (
+            <Text className="text-gray-500 text-sm italic">
+              Chưa có thông tin thuốc
+            </Text>
+          )}
+        </View>
+
+        {/* Notes */}
+        {slot.note && (
+          <Text className="text-gray-800 font-medium mb-1">{slot.note}</Text>
+        )}
         {slot.medicineRequest.note && (
-          <Text className="text-gray-600 text-sm mt-1">
+          <Text className="text-gray-600 text-sm">
             Ghi chú: {slot.medicineRequest.note}
           </Text>
         )}
@@ -384,6 +414,9 @@ export default function SlotScreen() {
       <View className="flex-row items-center justify-between pt-2 border-t border-gray-100">
         <Text className="text-blue-600 text-sm font-semibold">
           ID: #{slot.id}
+        </Text>
+        <Text className="text-gray-500 text-xs">
+          {slot.medicines?.length || 0} loại thuốc
         </Text>
       </View>
     </TouchableOpacity>

@@ -27,6 +27,9 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  Pill,
+  Sun,
+  Moon,
 } from "lucide-react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import {
@@ -123,6 +126,32 @@ export default function MedicineRequestDetailScreen() {
     }
   };
 
+  const getSessionIcon = (session) => {
+    switch (session.toLowerCase()) {
+      case "sáng":
+        return Sun;
+      case "chiều":
+        return Sun;
+      case "tối":
+        return Moon;
+      default:
+        return Clock;
+    }
+  };
+
+  const getSessionColor = (session) => {
+    switch (session.toLowerCase()) {
+      case "sáng":
+        return "#F59E0B"; // Yellow for morning
+      case "chiều":
+        return "#EF4444"; // Red for afternoon
+      case "tối":
+        return "#6366F1"; // Indigo for evening
+      default:
+        return "#6B7280"; // Gray for default
+    }
+  };
+
   const handleApprove = async () => {
     Alert.alert("Xác nhận", "Bạn có chắc chắn muốn phê duyệt yêu cầu này?", [
       { text: "Hủy", style: "cancel" },
@@ -170,6 +199,139 @@ export default function MedicineRequestDetailScreen() {
         },
       },
     ]);
+  };
+
+  const renderMedicineSlots = () => {
+    if (!request.slots || request.slots.length === 0) {
+      return null;
+    }
+
+    return (
+      <View className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm mb-6">
+        <View className="flex-row items-center mb-4">
+          <Pill size={20} color="#10B981" />
+          <Text className="text-lg font-bold text-gray-800 ml-2">
+            Lịch uống thuốc
+          </Text>
+        </View>
+
+        <View className="space-y-4">
+          {request?.slots?.map((slot, index) => {
+            const SessionIcon = getSessionIcon(slot.session);
+            const sessionColor = getSessionColor(slot.session);
+
+            return (
+              <View
+                key={slot.id || index}
+                className="bg-gray-50 rounded-xl p-4 border border-gray-100"
+              >
+                {/* Session Header */}
+                <View className="flex-row items-center mb-3">
+                  <View
+                    className="p-2 rounded-full"
+                    style={{ backgroundColor: `${sessionColor}20` }}
+                  >
+                    <SessionIcon size={16} color={sessionColor} />
+                  </View>
+                  <Text
+                    className="text-base font-bold ml-3"
+                    style={{ color: sessionColor }}
+                  >
+                    Buổi {slot.session}
+                  </Text>
+                  <View className="flex-1" />
+                  <View
+                    className={`px-2 py-1 rounded-full ${
+                      slot.status ? "bg-green-100" : "bg-yellow-100"
+                    }`}
+                  >
+                    <Text
+                      className={`text-xs font-semibold ${
+                        slot.status ? "text-green-700" : "text-yellow-700"
+                      }`}
+                    >
+                      {slot.status ? "Đã uống" : "Chưa uống"}
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Medicines List */}
+                <View className="space-y-3">
+                  {slot?.medicines?.map((medicine, medIndex) => (
+                    <View
+                      key={medicine.id || medIndex}
+                      className="bg-white rounded-lg p-3 border border-gray-200"
+                    >
+                      <View className="flex-row items-start">
+                        <View className="bg-blue-100 p-2 rounded-lg">
+                          <Pill size={14} color="#3B82F6" />
+                        </View>
+                        <View className="flex-1 ml-3">
+                          <Text className="text-gray-800 font-semibold text-sm leading-5">
+                            {medicine.name}
+                          </Text>
+                          {medicine.description && (
+                            <Text className="text-gray-500 text-xs mt-1">
+                              {medicine.description}
+                            </Text>
+                          )}
+                          <View className="flex-row items-center mt-2">
+                            <Text className="text-blue-600 text-xs font-semibold">
+                              Số lượng: {medicine.quantity}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+
+                {/* Slot Note */}
+                {slot.note && (
+                  <View className="mt-3 bg-blue-50 p-3 rounded-lg">
+                    <Text className="text-blue-600 text-xs font-semibold mb-1">
+                      Ghi chú buổi uống:
+                    </Text>
+                    <Text className="text-blue-800 text-sm">{slot.note}</Text>
+                  </View>
+                )}
+
+                {/* Slot Image */}
+                {slot.image && (
+                  <View className="mt-3">
+                    <Text className="text-gray-500 text-xs mb-2">
+                      Hình ảnh xác nhận:
+                    </Text>
+                    <Image
+                      source={{ uri: slot.image }}
+                      className="w-20 h-20 rounded-lg border border-gray-200"
+                      resizeMode="cover"
+                    />
+                  </View>
+                )}
+              </View>
+            );
+          })}
+        </View>
+
+        {/* Summary */}
+        <View className="mt-4 bg-blue-50 p-4 rounded-xl">
+          <Text className="text-blue-600 font-semibold text-sm mb-2">
+            Tổng quan lịch uống thuốc
+          </Text>
+          <View className="flex-row justify-between">
+            <Text className="text-blue-800 text-sm">
+              Tổng số buổi: {request.slots.length}
+            </Text>
+            <Text className="text-blue-800 text-sm">
+              Đã hoàn thành:{" "}
+              {request.slots.filter((slot) => slot.status).length}/
+              {request.slots.length}
+            </Text>
+          </View>
+        </View>
+      </View>
+    );
   };
 
   if (loading) {
@@ -288,6 +450,15 @@ export default function MedicineRequestDetailScreen() {
                   </Text>
                 </View>
 
+                {request.student.class && (
+                  <View>
+                    <Text className="text-gray-500 text-sm mb-1">Lớp</Text>
+                    <Text className="text-gray-800 font-semibold">
+                      {request.student.class}
+                    </Text>
+                  </View>
+                )}
+
                 {request.student.gender && (
                   <View>
                     <Text className="text-gray-500 text-sm mb-1">
@@ -299,13 +470,13 @@ export default function MedicineRequestDetailScreen() {
                   </View>
                 )}
 
-                {request.student.dateOfBirth && (
+                {request.student.dob && (
                   <View>
                     <Text className="text-gray-500 text-sm mb-1">
                       Ngày sinh
                     </Text>
                     <Text className="text-gray-800 font-semibold">
-                      {formatDate(request.student.dateOfBirth)}
+                      {formatDate(request.student.dob)}
                     </Text>
                   </View>
                 )}
@@ -364,6 +535,9 @@ export default function MedicineRequestDetailScreen() {
                 </View>
               </View>
             </View>
+
+            {/* Medicine Slots Section */}
+            {renderMedicineSlots()}
 
             {/* Request Note */}
             {request.note && (
