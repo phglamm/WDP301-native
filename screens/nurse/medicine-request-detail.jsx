@@ -12,6 +12,7 @@ import {
   Image,
   Dimensions,
   Modal,
+  RefreshControl,
 } from "react-native";
 import {
   ArrowLeft,
@@ -47,6 +48,7 @@ export default function MedicineRequestDetailScreen() {
   // State management
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [processingAction, setProcessingAction] = useState(false);
 
@@ -62,13 +64,25 @@ export default function MedicineRequestDetailScreen() {
       const response = await getMedicineRequestDetail(requestId);
 
       // Mock data for demonstration
-
       setRequest(response.data);
     } catch (error) {
       Alert.alert("Lỗi", "Không thể tải chi tiết yêu cầu");
       console.error("Load request detail error:", error.response.data.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const response = await getMedicineRequestDetail(requestId);
+      setRequest(response.data);
+    } catch (error) {
+      Alert.alert("Lỗi", "Không thể làm mới dữ liệu");
+      console.error("Refresh error:", error);
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -403,6 +417,16 @@ export default function MedicineRequestDetailScreen() {
           className="flex-1"
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 30 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["#3B82F6"]} // Android
+              tintColor="#3B82F6" // iOS
+              title="Đang làm mới..." // iOS
+              titleColor="#6B7280" // iOS
+            />
+          }
         >
           {/* Request Information */}
           <View className="p-6">
