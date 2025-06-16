@@ -48,11 +48,12 @@ export default function MedicineRequestScreen() {
   // Load data on component mount
   useEffect(() => {
     loadMedicineRequests();
+    loadMedicineRequestHistory();
   }, []);
 
   // Statistics calculations
   const getTotalRequests = () => {
-    return medicineRequests.length;
+    return allMedicineRequests.length;
   };
 
   const getTodayRequests = () => {
@@ -61,10 +62,6 @@ export default function MedicineRequestScreen() {
       const requestDate = new Date(request.date).toDateString();
       return requestDate === today;
     }).length;
-  };
-
-  const getRequestsWithImages = () => {
-    return medicineRequests.filter((request) => request.image).length;
   };
 
   // API Functions
@@ -251,10 +248,10 @@ export default function MedicineRequestScreen() {
           <View className="flex-row gap-4">
             <TouchableOpacity
               onPress={() => router.push("/(nurse)/slot")}
-              className="flex-1 bg-white border-2 border-gray-200 py-4 rounded-2xl flex-row items-center justify-center active:scale-95"
+              className="flex-1 bg-blue-500 border-2 border-gray-200 py-4 rounded-2xl flex-row items-center justify-center active:scale-95"
             >
-              <Clock size={22} color="#6B7280" />
-              <Text className="text-gray-700 font-bold ml-2 text-base">
+              <Calendar size={22} color="white" />
+              <Text className="text-white font-bold ml-2 text-base">
                 Phát thuốc
               </Text>
             </TouchableOpacity>

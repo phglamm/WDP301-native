@@ -268,24 +268,28 @@ export default function SlotScreen() {
           bg: "bg-orange-100",
           text: "text-orange-600",
           border: "border-orange-200",
+          iconColor: "#F59E0B",
         };
       case "Trưa":
         return {
           bg: "bg-yellow-100",
           text: "text-yellow-600",
           border: "border-yellow-200",
+          iconColor: "#D97706",
         };
       case "Chiều":
         return {
           bg: "bg-purple-100",
           text: "text-purple-600",
           border: "border-purple-200",
+          iconColor: "#9333EA",
         };
       default:
         return {
           bg: "bg-blue-100",
           text: "text-blue-600",
           border: "border-blue-200",
+          iconColor: "#3B82F6",
         };
     }
   };
@@ -305,7 +309,7 @@ export default function SlotScreen() {
       >
         <IconComponent
           size={18}
-          color={isActive ? colors.text.replace("text-", "#") : "#9CA3AF"}
+          color={isActive ? colors.iconColor : "#9CA3AF"}
         />
         <Text
           className={`ml-2 font-semibold ${
@@ -556,7 +560,7 @@ export default function SlotScreen() {
           visible={modalVisible}
           onRequestClose={closeModal}
         >
-          <View className="flex-1 justify-end bg-black bg-opacity-50">
+          <View className="flex-1 justify-end  bg-opacity-50">
             <View className="bg-white rounded-t-3xl p-6 max-h-4/5">
               {/* Modal Header */}
               <View className="flex-row items-center justify-between mb-6">
