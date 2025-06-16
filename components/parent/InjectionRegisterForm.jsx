@@ -70,8 +70,8 @@ export default function InjectionRegisterForm({ selectedSon, onBack }) {
     fetchEventHadRegistered();
   }, []);
 
-  // Hàm xử lý đăng ký event
-  const handleRegisterEvent = async (eventId) => {
+  // Hàm xử lý đăng ký event (logic thực tế)
+  const processEventRegistration = async (eventId) => {
     try {
       const response = await registerInjectionEventService(
         userId,
@@ -93,6 +93,32 @@ export default function InjectionRegisterForm({ selectedSon, onBack }) {
       console.error('Error registering event:', error);
       Alert.alert('Lỗi', 'Đã xảy ra lỗi khi đăng ký');
     }
+  };
+
+  // Hàm hiển thị confirmation alert
+  const handleRegisterEvent = (eventId) => {
+    const selectedEvent = eventAvailable.find((event) => event.id === eventId);
+
+    Alert.alert(
+      'Xác nhận đăng ký',
+      `Bạn có chắc chắn muốn đăng ký sự kiện tiêm vaccine "${
+        selectedEvent?.vaccination?.name
+      }" cho ${selectedSon.fullName}?\n\nChi phí: ${formatCurrency(
+        selectedEvent?.price || 0
+      )}`,
+      [
+        {
+          text: 'Hủy',
+          style: 'cancel',
+        },
+        {
+          text: 'Đăng ký',
+          style: 'default',
+          onPress: () => processEventRegistration(eventId),
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   // Hàm xử lý thanh toán
