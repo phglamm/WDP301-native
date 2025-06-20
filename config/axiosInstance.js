@@ -7,25 +7,21 @@ let TOKEN_KEY = envConfig.EXPO_PUBLIC_TOKEN_KEY;
 
 const axiosInstance = axios.create({
   baseURL: API_URL,
-  timeout: 15000,
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-  },
+  timeout: 100000,
+  // Bỏ default Content-Type để tránh xung đột với multipart/form-data
+  // headers: {
+  //   'Content-Type': 'application/json',
+  // },
 });
 
 // Request interceptor
 axiosInstance.interceptors.request.use(
   async (config) => {
-    try {
-      const access_token = await SecureStore.getItemAsync(TOKEN_KEY);
-      if (access_token) {
-        config.headers['Authorization'] = `Bearer ${access_token}`;
-      }
-      return config;
-    } catch (error) {
-      return Promise.reject(error);
+    const token = await SecureStore.getItemAsync(TOKEN_KEY);
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+    return config;
   },
   (error) => Promise.reject(error)
 );

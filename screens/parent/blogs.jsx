@@ -255,7 +255,7 @@ export default function Blogs() {
         >
           {/* Featured Posts Section */}
           {activeTab === 'all' && searchQuery.length === 0 && (
-            <View className='mt-4 mb-6 '>
+            <View className='mt-4 mb-6'>
               <Text className='mb-2 text-xl font-bold text-gray-800'>
                 Bài viết nổi bật ⭐
               </Text>
@@ -267,7 +267,7 @@ export default function Blogs() {
                 {featuredPosts.map((post, index) => (
                   <TouchableOpacity
                     key={post.id}
-                    className='mr-4 overflow-hidden bg-white border border-gray-200 rounded-3xl'
+                    className='overflow-hidden mr-4 bg-white rounded-3xl border border-gray-200'
                     style={{
                       width: width * 0.75,
                     }}
@@ -298,7 +298,7 @@ export default function Blogs() {
                       >
                         {post.description}
                       </Text>
-                      <View className='flex-row items-center justify-between'>
+                      <View className='flex-row justify-between items-center'>
                         <Text className='text-xs font-medium text-blue-600'>
                           {post.author}
                         </Text>
@@ -318,7 +318,7 @@ export default function Blogs() {
 
           {/* Main Posts Grid */}
           <View>
-            <View className='flex-row items-center justify-between mb-4'>
+            <View className='flex-row justify-between items-center mb-4'>
               <Text className='text-xl font-bold text-gray-800'>
                 {activeTab === 'all'
                   ? 'Tất cả bài viết'
@@ -354,7 +354,7 @@ export default function Blogs() {
                   return (
                     <TouchableOpacity
                       key={post.id}
-                      className='mb-4 overflow-hidden bg-white rounded-2xl'
+                      className='overflow-hidden mb-4 bg-white rounded-2xl'
                       style={{
                         width: (width - 48) / 2 - 8,
                         marginRight: index % 2 === 0 ? 16 : 0,
@@ -374,7 +374,7 @@ export default function Blogs() {
 
                       <View className='p-4'>
                         {/* Date and Save Button */}
-                        <View className='flex-row items-center justify-between mb-2'>
+                        <View className='flex-row justify-between items-center mb-2'>
                           <View className='flex-row items-center'>
                             <Calendar size={12} color='#9CA3AF' />
                             <Text className='ml-1 text-xs text-gray-500'>
@@ -410,7 +410,7 @@ export default function Blogs() {
                           {post.tags.slice(0, 2).map((tag, tagIndex) => (
                             <View
                               key={tagIndex}
-                              className='px-2 py-1 mb-1 mr-1 rounded-full bg-blue-50'
+                              className='px-2 py-1 mr-1 mb-1 bg-blue-50 rounded-full'
                             >
                               <Text className='text-xs font-medium text-blue-600'>
                                 {tag}
@@ -420,7 +420,7 @@ export default function Blogs() {
                         </View>
 
                         {/* Likes and Views */}
-                        <View className='flex-row items-center justify-between'>
+                        <View className='flex-row justify-between items-center'>
                           <TouchableOpacity
                             className='flex-row items-center'
                             onPress={() => handleToggleLike(post.id)}

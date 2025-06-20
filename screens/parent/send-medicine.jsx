@@ -29,6 +29,8 @@ export default function SendMedicine() {
   const [showStudentDropdown, setShowStudentDropdown] = useState(false);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [selectedImageUri, setSelectedImageUri] = useState(null);
+  const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
+  const [selectedDetail, setSelectedDetail] = useState(null);
 
   const handleToggleForm = () => {
     setShowForm(!showForm);
@@ -42,6 +44,16 @@ export default function SendMedicine() {
   const handleCloseImageModal = () => {
     setIsImageModalVisible(false);
     setSelectedImageUri(null);
+  };
+
+  const handleShowDetailModal = (item) => {
+    setSelectedDetail(item);
+    setIsDetailModalVisible(true);
+  };
+
+  const handleCloseDetailModal = () => {
+    setIsDetailModalVisible(false);
+    setSelectedDetail(null);
   };
 
   const fetchMedicineHistory = async () => {
@@ -145,14 +157,15 @@ export default function SendMedicine() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className='flex-1'
       >
-        <View className='bg-white dark:bg-gray-800 px-4 py-6 shadow-sm border-b border-gray-200 dark:border-gray-700'>
+        {/* Header */}
+        <View className='px-4 py-6 bg-white border-b border-gray-200 shadow-sm dark:bg-gray-800 dark:border-gray-700'>
           {/* Header */}
-          <View className='flex-row items-center justify-start gap-4 mb-6'>
+          <View className='flex-row gap-4 justify-start items-center mb-6'>
             <TouchableOpacity onPress={() => router.push('/home')}>
               <ArrowLeft size={24} color='#6B7280' />
             </TouchableOpacity>
             <View>
-              <Text className='text-2xl font-montserratBold text-gray-800'>
+              <Text className='text-2xl text-gray-800 font-montserratBold'>
                 Gửi thuốc cho con 💊
               </Text>
               <Text className='text-gray-500 font-montserratRegular'>
@@ -160,32 +173,30 @@ export default function SendMedicine() {
               </Text>
             </View>
           </View>
-
           {/* Create Request Button */}
           <TouchableOpacity
             onPress={handleToggleForm}
-            className='bg-blue-500 active:bg-blue-600 py-4 px-6 rounded-xl shadow-lg mb-4'
+            className='px-6 py-4 mb-4 bg-blue-500 rounded-xl shadow-lg active:bg-blue-600'
             accessibilityLabel='Tạo yêu cầu thuốc mới'
             accessibilityRole='button'
           >
-            <View className='flex-row items-center justify-center gap-4'>
+            <View className='flex-row gap-4 justify-center items-center'>
               <Send size={20} color='white' />
-              <Text className='text-white text-lg font-semibold text-center'>
+              <Text className='text-lg font-semibold text-center text-white'>
                 Tạo Yêu Cầu Mới
               </Text>
             </View>
           </TouchableOpacity>
-
           {/* Filter Bar */}
-          <View className='flex-row items-center justify-between mb-4'>
+          <View className='flex-row justify-between items-center mb-4'>
             {/* Student Filter Button */}
             <View className='flex-1 mr-4'>
               <TouchableOpacity
                 onPress={() => setShowStudentDropdown(true)}
-                className='flex-row items-center justify-between bg-gray-100 dark:bg-gray-700 px-4 py-3 rounded-lg'
+                className='flex-row justify-between items-center px-4 py-3 bg-gray-100 rounded-lg dark:bg-gray-700'
               >
                 <Text
-                  className='text-gray-700 dark:text-gray-300 flex-1'
+                  className='flex-1 text-gray-700 dark:text-gray-300'
                   numberOfLines={1}
                 >
                   🔍 {getSelectedStudentName()}
@@ -198,9 +209,9 @@ export default function SendMedicine() {
               {hasActiveFilters && (
                 <TouchableOpacity
                   onPress={clearAllFilters}
-                  className='bg-red-100 dark:bg-red-900 px-3 py-1 rounded-lg mr-2'
+                  className='px-3 py-1 mr-2 bg-red-100 rounded-lg dark:bg-red-900'
                 >
-                  <Text className='text-red-600 dark:text-red-400 text-sm'>
+                  <Text className='text-sm text-red-600 dark:text-red-400'>
                     Xóa lọc
                   </Text>
                 </TouchableOpacity>
@@ -215,9 +226,9 @@ export default function SendMedicine() {
         {/* Content */}
         <View className='flex-1 px-4 pt-4'>
           {isLoading ? (
-            <View className='flex-1 items-center justify-center'>
+            <View className='flex-1 justify-center items-center'>
               <ActivityIndicator size='large' color='#3B82F6' />
-              <Text className='text-gray-500 dark:text-gray-400 mt-2'>
+              <Text className='mt-2 text-gray-500 dark:text-gray-400'>
                 Đang tải...
               </Text>
             </View>
@@ -234,19 +245,19 @@ export default function SendMedicine() {
               }
               showsVerticalScrollIndicator={false}
             >
-              <Text className='text-gray-500 dark:text-gray-400 text-lg font-montserratBold mb-2'>
+              <Text className='mb-2 text-lg text-gray-500 dark:text-gray-400 font-montserratBold'>
                 Lịch sử gửi thuốc ( {filteredHistory.length} )
               </Text>
               {filteredHistory.length === 0 ? (
-                <View className='flex-1 items-center justify-center p-8 bg-white dark:bg-gray-800 rounded-xl shadow-sm min-h-48'>
-                  <Text className='text-gray-500 dark:text-gray-400 text-center text-lg mb-2'>
+                <View className='flex-1 justify-center items-center p-8 bg-white rounded-xl shadow-sm dark:bg-gray-800 min-h-48'>
+                  <Text className='mb-2 text-lg text-center text-gray-500 dark:text-gray-400'>
                     {medicineHistory.length === 0
                       ? 'Chưa có yêu cầu thuốc nào'
                       : hasActiveFilters
                       ? 'Không tìm thấy yêu cầu phù hợp'
                       : 'Không có dữ liệu'}
                   </Text>
-                  <Text className='text-gray-400 dark:text-gray-500 text-center text-sm'>
+                  <Text className='text-sm text-center text-gray-400 dark:text-gray-500'>
                     {medicineHistory.length === 0
                       ? 'Nhấn "Tạo Yêu Cầu Mới" để gửi yêu cầu thuốc đầu tiên'
                       : hasActiveFilters
@@ -263,7 +274,7 @@ export default function SendMedicine() {
                     return (
                       <View
                         key={item.id || `item-${index}`}
-                        className='mb-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden'
+                        className='overflow-hidden mb-4 bg-white rounded-xl border border-gray-100 shadow-sm dark:bg-gray-800 dark:border-gray-700'
                       >
                         {/* Date Header */}
                         <View className='flex-row justify-between items-center p-4 pb-2 border-b border-gray-50 dark:border-gray-700'>
@@ -273,6 +284,13 @@ export default function SendMedicine() {
                               ? formatDate(item.date)
                               : 'Không có ngày'}
                           </Text>
+                          <TouchableOpacity
+                            onPress={() => handleShowDetailModal(item)}
+                          >
+                            <Text className='flex-row rounded-lg gap-2 items-center p-1 px-2 text-sm font-medium text-white bg-[#3B82F6] dark:text-gray-400'>
+                              Chi tiết
+                            </Text>
+                          </TouchableOpacity>
                         </View>
 
                         {/* Main Content */}
@@ -289,13 +307,13 @@ export default function SendMedicine() {
                                 >
                                   <Image
                                     source={{ uri: item.image }}
-                                    className='w-20 h-20 rounded-lg bg-gray-100 dark:bg-gray-700'
+                                    className='w-28 h-28 bg-gray-100 rounded-lg dark:bg-gray-700'
                                     resizeMode='cover'
                                   />
                                 </TouchableOpacity>
                               ) : (
-                                <View className='w-20 h-20 rounded-lg bg-gray-100 dark:bg-gray-700 items-center justify-center'>
-                                  <Text className='text-gray-400 text-xs'>
+                                <View className='justify-center items-center w-20 h-20 bg-gray-100 rounded-lg dark:bg-gray-700'>
+                                  <Text className='text-xs text-gray-400'>
                                     Không có ảnh
                                   </Text>
                                 </View>
@@ -304,19 +322,20 @@ export default function SendMedicine() {
 
                             {/* Info */}
                             <View className='flex-1'>
-                              <Text className='text-lg font-semibold text-gray-800 dark:text-white mb-1'>
-                                👤 {item.student?.fullName || 'Không rõ tên'}
+                              <Text className='mb-1 text-lg font-semibold text-gray-800 dark:text-white'>
+                                👤 {item.student?.fullName || 'Không rõ tên'} (
+                                {item.student?.class})
                               </Text>
 
-                              <View className='space-y-1 mb-2'>
+                              <View className='mb-2 space-y-1'>
                                 <Text className='text-sm text-gray-600 dark:text-gray-400'>
                                   🆔 MSSV: {item.student?.studentCode || 'N/A'}
                                 </Text>
                               </View>
 
                               {item.note && item.note.trim() && (
-                                <View className='bg-gray-50 dark:bg-gray-700 p-2 rounded-lg'>
-                                  <Text className='text-xs text-gray-500 dark:text-gray-400 mb-1'>
+                                <View className='p-2 bg-gray-50 rounded-lg dark:bg-gray-700'>
+                                  <Text className='mb-1 text-xs text-gray-500 dark:text-gray-400'>
                                     📝 Ghi chú:
                                   </Text>
                                   <Text className='text-sm text-gray-700 dark:text-gray-300'>
@@ -335,68 +354,77 @@ export default function SendMedicine() {
             </ScrollView>
           )}
         </View>
+      </KeyboardAvoidingView>
 
-        {/* Student Filter Modal */}
-        <Modal
-          visible={showStudentDropdown}
-          transparent
-          animationType='fade'
-          onRequestClose={() => setShowStudentDropdown(false)}
+      {/* Student Filter Modal */}
+      <Modal
+        visible={showStudentDropdown}
+        transparent
+        animationType='fade'
+        onRequestClose={() => setShowStudentDropdown(false)}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => setShowStudentDropdown(false)}
+          className='flex-1 justify-center items-center p-4 bg-black/50'
         >
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => setShowStudentDropdown(false)}
-            className='flex-1 bg-black/50 justify-center items-center p-4'
-          >
-            <View className='bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md max-h-96'>
-              {/* Header */}
-              <View className='flex-row items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700'>
-                <Text className='text-lg font-bold text-gray-800 dark:text-white'>
-                  Lọc theo học sinh
-                </Text>
-                <TouchableOpacity
-                  onPress={() => setShowStudentDropdown(false)}
-                  className='p-1'
-                >
-                  <Text className='text-blue-500 text-lg'>✕</Text>
-                </TouchableOpacity>
-              </View>
-
-              {/* Options */}
-              <ScrollView
-                className='max-h-80'
-                showsVerticalScrollIndicator={false}
+          <View className='w-full max-w-md max-h-96 bg-white rounded-xl shadow-2xl dark:bg-gray-800'>
+            {/* Header */}
+            <View className='flex-row justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700'>
+              <Text className='text-lg font-bold text-gray-800 dark:text-white'>
+                Lọc theo học sinh
+              </Text>
+              <TouchableOpacity
+                onPress={() => setShowStudentDropdown(false)}
+                className='p-1'
               >
-                <TouchableOpacity
-                  onPress={() => handleStudentSelect('all')}
-                  className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 ${
+                <Text className='text-lg text-blue-500'>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Options */}
+            <ScrollView
+              className='max-h-80'
+              showsVerticalScrollIndicator={false}
+            >
+              <TouchableOpacity
+                onPress={() => handleStudentSelect('all')}
+                className={`px-4 py-3 ${
+                  selectedStudent === 'all' ? 'bg-blue-50 dark:bg-blue-900' : ''
+                }`}
+              >
+                <Text
+                  className={`${
                     selectedStudent === 'all'
-                      ? 'bg-blue-50 dark:bg-blue-900'
-                      : ''
+                      ? 'text-blue-600 dark:text-blue-300 font-medium'
+                      : 'text-gray-700 dark:text-gray-300'
                   }`}
                 >
-                  <Text
-                    className={`${
-                      selectedStudent === 'all'
-                        ? 'text-blue-600 dark:text-blue-300 font-medium'
-                        : 'text-gray-700 dark:text-gray-300'
+                  Tất cả học sinh
+                </Text>
+              </TouchableOpacity>
+
+              {uniqueStudents.length > 0 ? (
+                uniqueStudents.map((student) => (
+                  <TouchableOpacity
+                    key={student.id}
+                    onPress={() => handleStudentSelect(student.id)}
+                    className={`flex-row gap-4 px-4 py-3 ${
+                      String(selectedStudent) === String(student.id)
+                        ? 'bg-blue-50 dark:bg-blue-900'
+                        : ''
                     }`}
                   >
-                    Tất cả học sinh
-                  </Text>
-                </TouchableOpacity>
-
-                {uniqueStudents.length > 0 ? (
-                  uniqueStudents.map((student) => (
-                    <TouchableOpacity
-                      key={student.id}
-                      onPress={() => handleStudentSelect(student.id)}
-                      className={`px-4 py-3 border-b border-gray-100 dark:border-gray-700 ${
-                        String(selectedStudent) === String(student.id)
-                          ? 'bg-blue-50 dark:bg-blue-900'
-                          : ''
-                      }`}
-                    >
+                    <View>
+                      <Image
+                        source={{
+                          uri: `https://api.dicebear.com/9.x/micah/svg?seed=${student.fullName}`,
+                        }}
+                        className='w-10 h-10 bg-gray-100 rounded-lg dark:bg-gray-700'
+                        resizeMode='cover'
+                      />
+                    </View>
+                    <View>
                       <Text
                         className={`${
                           String(selectedStudent) === String(student.id)
@@ -404,62 +432,231 @@ export default function SendMedicine() {
                             : 'text-gray-700 dark:text-gray-300'
                         }`}
                       >
-                        {student.fullName || 'Không rõ tên'}
+                        {student.fullName || 'Không rõ tên'} ({student.class})
                       </Text>
-                      <Text className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
+                      <Text className='mt-1 text-xs text-gray-500 dark:text-gray-400'>
                         MSSV: {student.studentCode || 'N/A'}
                       </Text>
-                    </TouchableOpacity>
-                  ))
-                ) : (
-                  <View className='p-4'>
-                    <Text className='text-gray-500 dark:text-gray-400 text-center'>
-                      Chưa có học sinh nào
-                    </Text>
-                  </View>
-                )}
-              </ScrollView>
-            </View>
-          </TouchableOpacity>
-        </Modal>
-
-        {/* Xem ảnh chi tiết */}
-        <Modal
-          visible={isImageModalVisible}
-          transparent
-          animationType='fade'
-          onRequestClose={handleCloseImageModal}
-        >
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={handleCloseImageModal}
-            className='flex-1 bg-black/80 items-center justify-center p-4'
-          >
-            <View className='bg-white dark:bg-gray-800 p-2 rounded-xl shadow-2xl w-full max-w-md'>
-              {selectedImageUri ? (
-                <Image
-                  source={{ uri: selectedImageUri }}
-                  className='w-full h-auto rounded-lg'
-                  style={{ aspectRatio: 1 }}
-                  resizeMode='contain'
-                />
+                    </View>
+                  </TouchableOpacity>
+                ))
               ) : (
-                <View className='w-full h-64 items-center justify-center'>
-                  <Text className='text-gray-500 dark:text-gray-400'>
-                    Không có ảnh để hiển thị
+                <View className='p-4'>
+                  <Text className='text-center text-gray-500 dark:text-gray-400'>
+                    Chưa có học sinh nào
                   </Text>
                 </View>
               )}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+      {/* Xem ảnh chi tiết */}
+      <Modal
+        visible={isImageModalVisible}
+        transparent
+        animationType='fade'
+        onRequestClose={handleCloseImageModal}
+      >
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={handleCloseImageModal}
+          className='flex-1 justify-center items-center p-4 bg-black/80'
+        >
+          <View className='p-2 w-full max-w-md bg-white rounded-xl shadow-2xl dark:bg-gray-800'>
+            {selectedImageUri ? (
+              <Image
+                source={{ uri: selectedImageUri }}
+                className='w-full h-auto rounded-lg'
+                style={{ aspectRatio: 1 }}
+                resizeMode='contain'
+              />
+            ) : (
+              <View className='justify-center items-center w-full h-64'>
+                <Text className='text-gray-500 dark:text-gray-400'>
+                  Không có ảnh để hiển thị
+                </Text>
+              </View>
+            )}
+            <TouchableOpacity
+              onPress={handleCloseImageModal}
+              className='absolute top-3 right-3 z-10 p-2 rounded-full bg-gray-700/50 dark:bg-black/50'
+            >
+              <Text className='text-lg text-white'>✕</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+      {/* Xem thông tin chi tiết */}
+      <Modal
+        visible={isDetailModalVisible}
+        transparent
+        animationType='fade'
+        onRequestClose={handleCloseDetailModal}
+      >
+        <View className='flex-1 justify-center items-center p-4 bg-black/50'>
+          <View
+            className='w-full max-w-lg bg-white rounded-xl shadow-2xl dark:bg-gray-800'
+            style={{ maxHeight: '85%' }}
+          >
+            {/* Header */}
+            <View className='flex-row justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700'>
+              <Text className='text-lg font-bold text-gray-800 dark:text-white'>
+                📋 Thông tin chi tiết
+              </Text>
               <TouchableOpacity
-                onPress={handleCloseImageModal}
-                className='absolute top-3 right-3 bg-gray-700/50 dark:bg-black/50 p-2 rounded-full z-10'
+                onPress={handleCloseDetailModal}
+                className='p-2 bg-gray-100 rounded-full dark:bg-gray-700'
               >
-                <Text className='text-white text-lg'>✕</Text>
+                <Text className='text-lg text-gray-500'>✕</Text>
               </TouchableOpacity>
             </View>
-          </TouchableOpacity>
-        </Modal>
-      </KeyboardAvoidingView>
+
+            {/* Content */}
+            <ScrollView className='p-4' showsVerticalScrollIndicator={false}>
+              {selectedDetail ? (
+                <View>
+                  {/* Student Info */}
+                  <View className='p-4 mb-4 bg-blue-50 rounded-xl dark:bg-blue-900'>
+                    <Text className='mb-2 text-sm font-medium text-blue-700 dark:text-blue-300'>
+                      👤 Thông tin học sinh
+                    </Text>
+                    <Text className='mb-1 text-base font-semibold text-gray-800 dark:text-white'>
+                      {selectedDetail.student?.fullName || 'Không rõ tên'}
+                    </Text>
+                    <Text className='text-sm text-gray-600 dark:text-gray-400'>
+                      🆔 MSSV: {selectedDetail.student?.studentCode || 'N/A'}
+                    </Text>
+                    <Text className='text-sm text-gray-600 dark:text-gray-400'>
+                      🏫 Lớp: {selectedDetail.student?.class || 'N/A'}
+                    </Text>
+                  </View>
+
+                  {/* Request Info */}
+                  <View className='p-4 mb-4 bg-green-50 rounded-xl dark:bg-green-900'>
+                    <Text className='mb-2 text-sm font-medium text-green-700 dark:text-green-300'>
+                      📅 Thông tin yêu cầu
+                    </Text>
+                    <Text className='mb-1 text-sm text-gray-600 dark:text-gray-400'>
+                      Ngày gửi:{' '}
+                      {selectedDetail.date
+                        ? formatDate(selectedDetail.date)
+                        : 'Không có ngày'}
+                    </Text>
+                    <Text className='text-sm text-gray-600 dark:text-gray-400'>
+                      Trạng thái:{' '}
+                      <Text className='font-medium text-orange-600'>
+                        {selectedDetail.status === 'pending'
+                          ? 'Đang xử lý'
+                          : selectedDetail.status === 'approved'
+                          ? 'Đã phê duyệt'
+                          : selectedDetail.status === 'rejected'
+                          ? 'Đã từ chối'
+                          : 'Không xác định'}
+                      </Text>
+                    </Text>
+                  </View>
+
+                  {/* Medicine Image */}
+                  {selectedDetail.image && (
+                    <View className='mb-4'>
+                      <Text className='mb-2 text-sm font-medium text-gray-700 dark:text-gray-300'>
+                        🖼️ Hình ảnh thuốc
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() =>
+                          handleShowImageModal(selectedDetail.image)
+                        }
+                        className='overflow-hidden rounded-xl'
+                      >
+                        <Image
+                          source={{ uri: selectedDetail.image }}
+                          className='w-full h-48 bg-gray-100 dark:bg-gray-700'
+                          resizeMode='cover'
+                        />
+                        <View className='absolute inset-0 justify-center items-center'>
+                          <View className='px-3 py-1 rounded-full bg-black/50'>
+                            <Text className='text-xs text-white'>
+                              Nhấn để phóng to
+                            </Text>
+                          </View>
+                        </View>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+
+                  {/* Medicine Schedule - Slots */}
+                  {selectedDetail.slots && selectedDetail.slots.length > 0 && (
+                    <View className='mb-4'>
+                      <Text className='mb-3 text-sm font-medium text-gray-700 dark:text-gray-300'>
+                        ⏰ Lịch uống thuốc
+                      </Text>
+                      {selectedDetail.slots.map((slot, index) => (
+                        <View
+                          key={index}
+                          className='p-3 mb-3 bg-gray-50 rounded-xl dark:bg-gray-700'
+                        >
+                          <View className='flex-row items-center mb-2'>
+                            <View className='px-3 py-1 bg-blue-500 rounded-full'>
+                              <Text className='text-xs font-medium text-white'>
+                                {slot.session}
+                              </Text>
+                            </View>
+                          </View>
+                          {slot.medicines && slot.medicines.length > 0 && (
+                            <View className='space-y-2'>
+                              {slot.medicines.map((medicine, medIndex) => (
+                                <View
+                                  key={medIndex}
+                                  className='flex-row justify-between items-center p-2 bg-white rounded-lg dark:bg-gray-600'
+                                >
+                                  <View className='flex-1'>
+                                    <Text className='text-sm font-medium text-gray-800 dark:text-white'>
+                                      {medicine.name}
+                                    </Text>
+                                    {medicine.description && (
+                                      <Text className='text-xs text-gray-500 dark:text-gray-400'>
+                                        {medicine.description}
+                                      </Text>
+                                    )}
+                                  </View>
+                                  <View className='px-2 py-1 bg-green-100 rounded-lg dark:bg-green-800'>
+                                    <Text className='text-xs font-medium text-green-700 dark:text-green-300'>
+                                      {medicine.quantity} viên
+                                    </Text>
+                                  </View>
+                                </View>
+                              ))}
+                            </View>
+                          )}
+                        </View>
+                      ))}
+                    </View>
+                  )}
+
+                  {/* Note */}
+                  {selectedDetail.note && selectedDetail.note.trim() && (
+                    <View className='p-4 mb-4 bg-yellow-50 rounded-xl dark:bg-yellow-900'>
+                      <Text className='mb-2 text-sm font-medium text-yellow-700 dark:text-yellow-300'>
+                        📝 Ghi chú
+                      </Text>
+                      <Text className='text-sm text-gray-700 dark:text-gray-300'>
+                        {selectedDetail.note}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              ) : (
+                <View className='justify-center items-center p-8'>
+                  <Text className='text-gray-500 dark:text-gray-400'>
+                    Không có thông tin chi tiết
+                  </Text>
+                </View>
+              )}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }

@@ -80,7 +80,10 @@ export default function HealthDeclarationScreen() {
 
   const handleSelectSon = (student) => {
     setSelectedSon(student);
-    console.log('Selected Son: ', student);
+    console.log('Selected Son: ', {
+      student: student.fullName,
+      id: student.id,
+    });
   };
 
   const handleStartDeclaration = () => {
@@ -145,8 +148,8 @@ export default function HealthDeclarationScreen() {
   //       <View
   //         className={`p-4 rounded-2xl ${
   //           isSelected
-  //             ? 'border-2 border-blue-500 bg-blue-50'
-  //             : 'border border-gray-200 bg-white'
+  //             ? 'bg-blue-50 border-2 border-blue-500'
+  //             : 'bg-white border border-gray-200'
   //         }`}
   //         style={{
   //           shadowColor: isSelected ? '#3B82F6' : '#000',
@@ -157,7 +160,7 @@ export default function HealthDeclarationScreen() {
   //         }}
   //       >
   //         {/* Avatar và tên */}
-  //         <View className='flex-col items-center justify-center gap-2'>
+  //         <View className='flex-col gap-2 justify-center items-center'>
   //           <View
   //             className={`w-12 h-12 rounded-full items-center justify-center ${
   //               isSelected ? 'bg-blue-500' : 'bg-gray-200'
@@ -165,7 +168,7 @@ export default function HealthDeclarationScreen() {
   //           >
   //             <User size={24} color={isSelected ? '#fff' : '#6B7280'} />
   //           </View>
-  //           <View className='items-center justify-center flex-1 ml-3'>
+  //           <View className='flex-1 justify-center items-center ml-3'>
   //             <Text
   //               className={`font-bold text-base ${
   //                 isSelected ? 'text-blue-800' : 'text-gray-800'
@@ -251,45 +254,19 @@ export default function HealthDeclarationScreen() {
           onBack={() => router.push('/home')}
         />
         <View className='px-4 bg-white border-b border-gray-100 shadow-sm'>
-          {/* Stats */}
-          <View className='flex-row justify-between mx-5'>
-            <View className='items-center '>
-              <Text className='p-2 px-4 text-xl font-bold text-blue-600 bg-blue-100 rounded-md'>
-                {sonData.length}
-              </Text>
-              <Text className='text-gray-500 font-montserratMedium'>
-                Học sinh
-              </Text>
-            </View>
-            <View className='items-center'>
-              <Text className='p-2 px-4 text-xl font-bold text-green-600 bg-green-100 rounded-md'>
-                {healthProfiles.length}
-              </Text>
-              <Text className='text-gray-500 font-montserratMedium'>Hồ sơ</Text>
-            </View>
-            <View className='items-center'>
-              <Text className='p-2 px-4 text-xl font-bold text-orange-600 bg-orange-100 rounded-md'>
-                {selectedSon ? 1 : 0}
-              </Text>
-              <Text className='text-gray-500 font-montserratMedium'>
-                Đã chọn
-              </Text>
-            </View>
-          </View>
-
           {/* Action Buttons */}
           {selectedSon && (
-            <View className='flex-row gap-10 my-4'>
+            <View className='flex-row gap-10 mb-4'>
               <TouchableOpacity
                 onPress={handleStartDeclaration}
-                className='flex-row items-center justify-center flex-1 py-3 bg-blue-500 rounded-xl'
+                className='flex-row flex-1 justify-center items-center py-3 bg-blue-500 rounded-xl'
               >
                 <Plus size={20} color='white' />
                 <Text className='ml-2 font-bold text-white'>Tạo hồ sơ mới</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={handleViewHistory}
-                className='flex-row items-center justify-center flex-1 py-3 bg-gray-200 rounded-xl'
+                className='flex-row flex-1 justify-center items-center py-3 bg-gray-200 rounded-xl'
               >
                 <Clock size={20} color='#6B7280' />
                 <Text className='ml-2 font-bold text-gray-700'>Lịch sử</Text>
@@ -305,14 +282,14 @@ export default function HealthDeclarationScreen() {
           showsVerticalScrollIndicator={false}
         >
           {loading ? (
-            <View className='items-center justify-center flex-1 py-20'>
+            <View className='flex-1 justify-center items-center py-20'>
               <ActivityIndicator size='large' color='#3B82F6' />
               <Text className='mt-4 text-gray-500'>
                 Đang tải danh sách học sinh...
               </Text>
             </View>
           ) : sonData.length === 0 ? (
-            <View className='items-center justify-center flex-1 py-20'>
+            <View className='flex-1 justify-center items-center py-20'>
               <BookOpen size={64} color='#D1D5DB' />
               <Text className='mt-4 mb-2 text-lg text-gray-500'>
                 Chưa có học sinh nào

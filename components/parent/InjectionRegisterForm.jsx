@@ -19,7 +19,6 @@ import {
   CreditCard,
   Shield,
   FileText,
-  Users,
   Send,
 } from 'lucide-react-native';
 import StudentDeclareCard from './StudentDeclareCard';
@@ -37,9 +36,28 @@ export default function InjectionRegisterForm({ selectedSon, onBack }) {
   const userId = user.id;
   const selectedSonId = selectedSon.id;
   const [eventAvailable, setEventAvailable] = useState([]);
+  console.log(
+    '🚀 ~ InjectionRegisterForm ~ eventAvailable:',
+    JSON.stringify(eventAvailable, null, 2)
+  );
   const [eventHadRegistered, setEventHadRegistered] = useState([]);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentData, setPaymentData] = useState(null);
+
+  const fetchEventAvailable = async () => {
+    const response = await getAvailableInjectionEventService();
+    setEventAvailable(response.data);
+  };
+
+  const fetchEventHadRegistered = async () => {
+    const response = await getInjectionEventHadRegisteredService(selectedSonId);
+    setEventHadRegistered(response.data);
+  };
+
+  useEffect(() => {
+    fetchEventAvailable();
+    fetchEventHadRegistered();
+  }, [selectedSonId]);
 
   const isEventRegistered = (eventId) => {
     return eventHadRegistered.some(
@@ -47,48 +65,32 @@ export default function InjectionRegisterForm({ selectedSon, onBack }) {
     );
   };
 
-  const fetchEventAvailable = async () => {
-    const response = await getAvailableInjectionEventService();
-    setEventAvailable(response.data);
-    console.log(
-      '🚀 ~ fetchEventAvailable ~ response:',
-      JSON.stringify(response, null, 2)
-    );
+  // Thêm function để lấy vaccination info
+  const getVaccinationInfo = (eventId) => {
+    const availableEvent = eventAvailable.find((event) => event.id === eventId);
+    return availableEvent?.vaccination || null;
   };
-
-  const fetchEventHadRegistered = async () => {
-    const response = await getInjectionEventHadRegisteredService(selectedSonId);
-    setEventHadRegistered(response.data);
-    console.log(
-      '🚀 ~ fetchEventHadRegistered ~ response:',
-      JSON.stringify(response, null, 2)
-    );
-  };
-
-  useEffect(() => {
-    fetchEventAvailable();
-    fetchEventHadRegistered();
-  }, []);
 
   // Hàm xử lý đăng ký event (logic thực tế)
   const processEventRegistration = async (eventId) => {
     try {
       const response = await registerInjectionEventService(
-        userId,
         selectedSonId,
         eventId
       );
-
-      if (response.code === 201) {
+      if (response.code === 201 && response.data) {
         setPaymentData({
           paymentUrl: response.data,
           eventId: eventId,
         });
         setShowPaymentModal(true);
         await fetchEventHadRegistered();
+      } else if (response.code === 201) {
+        Alert.alert('Đăng ký thành công', 'Bạn đã đăng ký sự kiện thành công');
       } else {
         Alert.alert('Lỗi', 'Không thể đăng ký sự kiện');
       }
+      await fetchEventHadRegistered();
     } catch (error) {
       console.error('Error registering event:', error);
       Alert.alert('Lỗi', 'Đã xảy ra lỗi khi đăng ký');
@@ -154,8 +156,8 @@ export default function InjectionRegisterForm({ selectedSon, onBack }) {
       animationType='fade'
       onRequestClose={handleCloseModal}
     >
-      <View className='items-center justify-center flex-1 bg-black/50'>
-        <View className='w-full max-w-sm p-6 mx-4 bg-white rounded-xl'>
+      <View className='flex-1 justify-center items-center bg-black/50'>
+        <View className='p-6 mx-4 w-full max-w-sm bg-white rounded-xl'>
           <View className='items-center mb-6'>
             <CheckCircle size={64} color='#10B981' />
             <Text className='mt-4 text-xl font-bold text-center text-gray-900'>
@@ -170,7 +172,7 @@ export default function InjectionRegisterForm({ selectedSon, onBack }) {
           <View className='gap-4 space-y-3'>
             <TouchableOpacity
               onPress={handlePayment}
-              className='flex-row items-center justify-center py-4 bg-blue-500 rounded-lg'
+              className='flex-row justify-center items-center py-4 bg-blue-500 rounded-lg'
             >
               <CreditCard size={20} color='#FFFFFF' />
               <Text className='ml-2 font-semibold text-white'>
@@ -194,6 +196,9 @@ export default function InjectionRegisterForm({ selectedSon, onBack }) {
 
   // Component hiển thị một injection event
   const InjectionEventCard = ({ event, isRegistered = false }) => {
+    // Lấy vaccination info, ưu tiên từ event.vaccination, nếu không có thì tìm từ eventAvailable
+    const vaccinationInfo = event.vaccination || getVaccinationInfo(event.id);
+
     return (
       <View
         className={`mb-6 mx-1 rounded-2xl border-2 shadow-sm ${
@@ -210,7 +215,7 @@ export default function InjectionRegisterForm({ selectedSon, onBack }) {
               : 'bg-gradient-to-r from-blue-50 to-indigo-50'
           }`}
         >
-          <View className='flex-row items-center justify-between'>
+          <View className='flex-row justify-between items-center'>
             <View className='flex-row items-center'>
               <View
                 className={`p-2 rounded-full ${
@@ -235,7 +240,7 @@ export default function InjectionRegisterForm({ selectedSon, onBack }) {
                     isRegistered ? 'text-gray-500' : 'text-blue-600'
                   }`}
                 >
-                  {event.vaccination.name}
+                  {vaccinationInfo?.name || 'Đang cập nhật...'}
                 </Text>
               </View>
             </View>
@@ -253,19 +258,21 @@ export default function InjectionRegisterForm({ selectedSon, onBack }) {
         {/* Content */}
         <View className='p-4 space-y-4'>
           {/* Vaccine Description */}
-          <View className='p-3 border border-blue-100 bg-blue-50 rounded-xl'>
-            <View className='flex-row items-start'>
-              <FileText size={16} color='#3B82F6' className='mt-0.5' />
-              <View className='flex-1 ml-3'>
-                <Text className='text-sm font-medium text-blue-900'>
-                  Mô tả vaccine
-                </Text>
-                <Text className='mt-1 text-sm leading-5 text-blue-700'>
-                  {event.vaccination.description}
-                </Text>
+          {vaccinationInfo?.description && (
+            <View className='p-3 bg-blue-50 rounded-xl border border-blue-100'>
+              <View className='flex-row items-center'>
+                <FileText size={16} color='#3B82F6' className='mt-0.5' />
+                <View className='flex-1 ml-3'>
+                  <Text className='text-sm font-medium text-blue-900'>
+                    Mô tả vaccine
+                  </Text>
+                  <Text className='mt-1 text-sm leading-5 text-blue-700'>
+                    {vaccinationInfo.description}
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
+          )}
 
           {/* Event Details */}
           <View className='space-y-3'>
@@ -337,18 +344,28 @@ export default function InjectionRegisterForm({ selectedSon, onBack }) {
                   color={isRegistered ? '#9CA3AF' : '#8B5CF6'}
                 />
               </View>
-              <View className='ml-3'>
-                <Text className='text-xs font-medium tracking-wide text-gray-500 uppercase'>
-                  Chi phí
-                </Text>
-                <Text
-                  className={`text-lg font-bold ${
-                    isRegistered ? 'text-gray-600' : 'text-purple-600'
-                  }`}
-                >
-                  {formatCurrency(event.price)}
-                </Text>
-              </View>
+              {event.price > 0 ? (
+                <View className='ml-3'>
+                  <Text className='text-xs font-medium tracking-wide text-gray-500 uppercase'>
+                    Chi phí
+                  </Text>
+                  <Text
+                    className={`text-lg font-bold ${
+                      isRegistered ? 'text-gray-600' : 'text-purple-600'
+                    }`}
+                  >
+                    {formatCurrency(event.price) === '0đ'
+                      ? 'Miễn phí'
+                      : formatCurrency(event.price)}
+                  </Text>
+                </View>
+              ) : (
+                <View className='ml-3'>
+                  <Text className='font-medium tracking-wide text-gray-500 uppercase text-md'>
+                    Miễn phí
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
         </View>
@@ -358,7 +375,7 @@ export default function InjectionRegisterForm({ selectedSon, onBack }) {
           <View className='p-4 pt-0'>
             <TouchableOpacity
               onPress={() => handleRegisterEvent(event.id)}
-              className='flex-row items-center justify-center py-4 bg-blue-500 rounded-xl'
+              className='flex-row justify-center items-center py-4 bg-blue-500 rounded-xl'
             >
               <Send size={20} color='#FFFFFF' />
               <Text className='ml-2 text-base font-bold text-white'>
@@ -379,7 +396,7 @@ export default function InjectionRegisterForm({ selectedSon, onBack }) {
       >
         <View className='flex-1'>
           {/* Header */}
-          <View className='flex-row items-center justify-between p-4 bg-white border-b border-gray-200'>
+          <View className='flex-row justify-between items-center p-4 bg-white border-b border-gray-200'>
             <TouchableOpacity onPress={onBack} className='p-1'>
               <ArrowLeft size={20} color='#407CE2' />
             </TouchableOpacity>

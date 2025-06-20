@@ -37,8 +37,8 @@ export const getHealthProfileHistoryService = async (studentId) => {
   }
 };
 
-// Medicine Request - Gửi yêu cầu thuốc
-export const sendMedicineRequestService = async (imageUri, studentId, note) => {
+// Medicine Request - Gửi ảnh yêu cầu thuốc
+export const sendMedicineRequestImageService = async (imageUri) => {
   try {
     const formData = new FormData();
 
@@ -51,16 +51,26 @@ export const sendMedicineRequestService = async (imageUri, studentId, note) => {
       name: filename,
       type,
     });
+    const response = await axiosInstance.post(
+      '/medicine-request/image',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log('Error sending medicine request image: ', error);
+    throw error;
+  }
+};
 
-    formData.append('studentId', studentId);
-    if (note && note.trim()) {
-      formData.append('note', note);
-    }
-    const response = await axiosInstance.post('/medicine-request', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+// Medicine Request - Gửi yêu cầu thuốc
+export const sendMedicineRequestService = async (data) => {
+  try {
+    const response = await axiosInstance.post('/medicine-request', data);
     return response;
   } catch (error) {
     console.log('Error sending medicine request: ', error);
@@ -115,7 +125,7 @@ export const getAvailableInjectionEventService = async () => {
 export const getInjectionEventHadRegisteredService = async (studentId) => {
   try {
     const response = await axiosInstance.get(
-      `/transaction/register/${studentId}`
+      `/injection-record/student/${studentId}`
     );
     return response;
   } catch (error) {
@@ -125,23 +135,16 @@ export const getInjectionEventHadRegisteredService = async (studentId) => {
 };
 // Injection Event - Đăng ký event
 export const registerInjectionEventService = async (
-  parentId,
   studentId,
   injectionEventId
 ) => {
-  const parentIdString = parentId.toString();
   const studentIdString = studentId.toString();
   const injectionEventIdString = injectionEventId.toString();
-  console.log('🚀 ~ parentIdString:', parentIdString);
-  console.log('🚀 ~ studentIdString:', studentIdString);
-  console.log('🚀 ~ injectionEventIdString:', injectionEventIdString);
   try {
-    const response = await axiosInstance.post(`/payment/momo/create`, {
-      parentId: parentIdString,
+    const response = await axiosInstance.post(`/injection-event/register`, {
       studentId: studentIdString,
       injectionEventId: injectionEventIdString,
     });
-    console.log('🚀 ~ response:', response);
     return response;
   } catch (error) {
     console.log('Error registering injection event: ', error);

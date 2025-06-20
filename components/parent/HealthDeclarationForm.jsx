@@ -75,7 +75,7 @@ const HealthDeclarationForm = ({
       >
         <View className='flex-1'>
           {/* Header */}
-          <View className='flex-row items-center justify-between p-4 bg-white border-b border-gray-200'>
+          <View className='flex-row justify-between items-center p-4 bg-white border-b border-gray-200'>
             <TouchableOpacity onPress={onBack} className='p-1'>
               <ArrowLeft size={20} color='#407CE2' />
             </TouchableOpacity>
@@ -86,22 +86,22 @@ const HealthDeclarationForm = ({
           </View>
 
           {/* Profile */}
-          <View className='bg-white px-6 py-4 border-b border-gray-100'>
-            <View className='flex-row items-start gap-8'>
+          <View className='px-6 py-4 bg-white border-b border-gray-100'>
+            <View className='flex-row gap-8 items-start'>
               <View
-                className={`w-12 h-12 rounded-full items-center justify-center bg-blue-500`}
+                className={`justify-center items-center w-12 h-12 bg-blue-500 rounded-full`}
               >
                 <User size={24} color={'#fff'} />
               </View>
-              <View className='flex-1 justify-start items-start '>
+              <View className='flex-1 justify-start items-start'>
                 <Text
-                  className={`font-montserratSemiBold text-blue-800`}
+                  className={`text-blue-800 font-montserratSemiBold`}
                   numberOfLines={1}
                 >
                   {selectedSon.fullName || 'Học sinh'}
                 </Text>
 
-                <Text className='text-gray-500 font-montserratSemiBold text-sm'>
+                <Text className='text-sm text-gray-500 font-montserratSemiBold'>
                   MSSV: {selectedSon.studentCode || 'Mã HS'}
                 </Text>
               </View>
@@ -110,16 +110,16 @@ const HealthDeclarationForm = ({
 
           {/* Form */}
           <ScrollView className='flex-1 px-6'>
-            <Text className='text-2xl text-center font-montserratSemiBold py-6 mb-2'>
+            <Text className='py-6 mb-2 text-2xl text-center font-montserratSemiBold'>
               📝 Khai báo hồ sơ
             </Text>
             {/* Cân nặng */}
             <View className='mb-6'>
-              <Text className='text-lg font-semibold text-gray-800 mb-3'>
+              <Text className='mb-3 text-lg font-semibold text-gray-800'>
                 <Scale size={18} color='#3B82F6' /> Cân nặng (kg) *
               </Text>
               <TextInput
-                className='border border-gray-300 rounded-xl px-4 py-3 text-base'
+                className='px-4 py-3 text-base rounded-xl border border-gray-300'
                 placeholder='Ví dụ: 60'
                 value={formData.weight}
                 onChangeText={(text) =>
@@ -132,11 +132,11 @@ const HealthDeclarationForm = ({
 
             {/* Chiều cao */}
             <View className='mb-6'>
-              <Text className='text-lg font-semibold text-gray-800 mb-3'>
+              <Text className='mb-3 text-lg font-semibold text-gray-800'>
                 <Ruler size={18} color='#10B981' /> Chiều cao (cm) *
               </Text>
               <TextInput
-                className='border border-gray-300 rounded-xl px-4 py-3 text-base'
+                className='px-4 py-3 text-base rounded-xl border border-gray-300'
                 placeholder='Ví dụ: 160'
                 value={formData.height}
                 onChangeText={(text) =>
@@ -149,7 +149,7 @@ const HealthDeclarationForm = ({
 
             {/* Nhóm máu */}
             <View className='mb-6'>
-              <Text className='text-lg font-semibold text-gray-800 mb-3'>
+              <Text className='mb-3 text-lg font-semibold text-gray-800'>
                 <Droplet size={18} color='#EF4444' /> Nhóm máu *
               </Text>
               <View className='flex-row flex-wrap'>
@@ -183,11 +183,11 @@ const HealthDeclarationForm = ({
 
             {/* Thị lực */}
             <View className='mb-6'>
-              <Text className='text-lg font-semibold text-gray-800 mb-3'>
+              <Text className='mb-3 text-lg font-semibold text-gray-800'>
                 <Eye size={18} color='#8B5CF6' /> Thị lực (0-10) *
               </Text>
               <TextInput
-                className='border border-gray-300 rounded-xl px-4 py-3 text-base'
+                className='px-4 py-3 text-base rounded-xl border border-gray-300'
                 placeholder='Ví dụ: 10 (10 = tốt nhất)'
                 value={formData.vision}
                 onChangeText={(text) =>
@@ -196,18 +196,18 @@ const HealthDeclarationForm = ({
                 keyboardType='numeric'
                 placeholderTextColor='#9CA3AF'
               />
-              <Text className='text-gray-500 text-sm mt-2'>
+              <Text className='mt-2 text-sm text-gray-500'>
                 Thang điểm từ 0 (kém nhất) đến 10 (tốt nhất)
               </Text>
             </View>
 
             {/* Thính giác */}
             <View className='mb-6'>
-              <Text className='text-lg font-semibold text-gray-800 mb-3'>
+              <Text className='mb-3 text-lg font-semibold text-gray-800'>
                 <Ear size={18} color='#F59E0B' /> Thính giác (0-10) *
               </Text>
               <TextInput
-                className='border border-gray-300 rounded-xl px-4 py-3 text-base'
+                className='px-4 py-3 text-base rounded-xl border border-gray-300'
                 placeholder='Ví dụ: 10 (10 = tốt nhất)'
                 value={formData.hearing}
                 onChangeText={(text) =>
@@ -216,18 +216,18 @@ const HealthDeclarationForm = ({
                 keyboardType='numeric'
                 placeholderTextColor='#9CA3AF'
               />
-              <Text className='text-gray-500 text-sm mt-2'>
+              <Text className='mt-2 text-sm text-gray-500'>
                 Thang điểm từ 0 (kém nhất) đến 10 (tốt nhất)
               </Text>
             </View>
 
             {/* Dị ứng */}
             <View className='mb-6'>
-              <Text className='text-lg font-bold text-gray-800 mb-3'>
+              <Text className='mb-3 text-lg font-bold text-gray-800'>
                 <AlertTriangle size={18} color='#EF4444' /> Dị ứng (nếu có)
               </Text>
               <TextInput
-                className='border border-gray-300 rounded-xl px-4 py-3 text-base'
+                className='px-4 py-3 text-base rounded-xl border border-gray-300'
                 placeholder='Ví dụ: Hải sản, phấn hoa, thuốc...'
                 value={formData.allergies}
                 onChangeText={(text) =>
@@ -239,11 +239,11 @@ const HealthDeclarationForm = ({
 
             {/* Ghi chú */}
             <View className='mb-6'>
-              <Text className='text-lg font-bold text-gray-800 mb-3'>
+              <Text className='mb-3 text-lg font-bold text-gray-800'>
                 <FileText size={18} color='#6B7280' /> Ghi chú thêm
               </Text>
               <TextInput
-                className='border border-gray-300 rounded-xl px-4 py-3 text-base'
+                className='px-4 py-3 text-base rounded-xl border border-gray-300'
                 placeholder='Thông tin bổ sung về tình trạng sức khỏe...'
                 value={formData.note}
                 onChangeText={(text) =>
@@ -258,8 +258,8 @@ const HealthDeclarationForm = ({
 
             {/* BMI Calculator */}
             {formData.weight && formData.height && (
-              <View className='mb-6 p-4 bg-blue-50 rounded-2xl border border-blue-200'>
-                <Text className='text-blue-800 font-bold mb-2'>Chỉ số BMI</Text>
+              <View className='p-4 mb-6 bg-blue-50 rounded-2xl border border-blue-200'>
+                <Text className='mb-2 font-bold text-blue-800'>Chỉ số BMI</Text>
                 {(() => {
                   const weight = parseFloat(formData.weight);
                   const height = parseFloat(formData.height) / 100; // convert to meters
@@ -285,10 +285,10 @@ const HealthDeclarationForm = ({
 
                   return (
                     <View>
-                      <Text className='text-blue-600 text-lg font-bold'>
+                      <Text className='text-lg font-bold text-blue-600'>
                         {bmiRounded}
                       </Text>
-                      <Text className={`${bmiColor} font-medium`}>
+                      <Text className={`font-medium ${bmiColor}`}>
                         {bmiStatus}
                       </Text>
                     </View>
@@ -308,7 +308,7 @@ const HealthDeclarationForm = ({
               {isSubmitting ? (
                 <ActivityIndicator color='white' />
               ) : (
-                <Text className='text-white text-center font-bold text-lg'>
+                <Text className='text-lg font-bold text-center text-white'>
                   Lưu hồ sơ sức khỏe
                 </Text>
               )}

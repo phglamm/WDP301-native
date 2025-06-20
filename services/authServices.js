@@ -6,7 +6,6 @@ export const loginService = async (phone, password) => {
       phone,
       password,
     });
-    // response = { code, status, message, data }
     return response;
   } catch (error) {
     console.log('Error at authServices: ', error);

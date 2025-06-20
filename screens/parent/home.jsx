@@ -74,7 +74,7 @@ export default function HomeScreen() {
       <HeaderIcon className='mt-10' />
 
       {/* Welcome */}
-      <View className='flex-row items-center justify-between my-5'>
+      <View className='flex-row justify-between items-center my-5 mb-7'>
         <Text className='text-2xl text-black max-w-80 font-montserratSemiBold'>
           👋🏻 Welcome,{' '}
           <Text className='text-3xl font-montserratBold'>{user?.fullName}</Text>
@@ -94,13 +94,13 @@ export default function HomeScreen() {
         source={{
           uri: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDBP2RjPY-ypc10tIS6z3CNevKJHCu0AGLwNrXERzKut3ydQPuSYfSWG4C3hBQkfvMOqKeV38jkeKetJ0p0pRtdQUYitlcHUXZoKM6w-aIfVQOOgM7B1zzQlU0a360GbYwVAx1ezV_XWesSbBCvSnbTobZdUf_bil5E4XU1xW_DGNz1GhJlR8rBO77RDu_sXWW26htwoumjaA1nNQgQG_-dmd1B70CtmScC9hQpvBsY9j0PGGv8L3CA9e8KI9Cg18rHKSBrr6p2y0w',
         }}
-        className='justify-start w-full overflow-hidden h-52 rounded-xl'
+        className='overflow-hidden justify-start w-full h-52 rounded-xl'
         resizeMode='cover'
       />
 
       {/* News */}
       <View className='mt-10'>
-        <View className='flex-row items-center justify-between mb-3'>
+        <View className='flex-row justify-between items-center mb-3'>
           <Text className='text-xl text-black font-montserratBold'>
             🗞️ Bài viết mới
           </Text>
@@ -109,7 +109,7 @@ export default function HomeScreen() {
               router.push('/blogs');
             }}
           >
-            <ChartNoAxesGantt size={28} color='#407CE2' />
+            <ChartNoAxesGantt size={24} color='#000' />
           </TouchableOpacity>
         </View>
 
