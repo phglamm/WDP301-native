@@ -27,7 +27,7 @@ export default function InjectionRegister() {
 
   const handleSelectSon = (son) => {
     setSelectedSon(son);
-    console.log('Selected son: ', son);
+    console.log('Selected son: ', { son: son.fullName, id: son.id });
   };
 
   const handleContinue = () => {
@@ -94,7 +94,7 @@ export default function InjectionRegister() {
           {selectedSon && (
             <View className='px-4 py-4 bg-white border-t border-gray-100'>
               {/* Title */}
-              <View className='flex-row items-center justify-between mb-3'>
+              <View className='flex-row justify-between items-center mb-3'>
                 <View className='flex-1'>
                   <Text className='text-sm text-gray-600'>Đã chọn:</Text>
                   <Text className='text-lg font-semibold text-gray-900'>
@@ -104,7 +104,7 @@ export default function InjectionRegister() {
               </View>
               {/* Continue */}
               <TouchableOpacity
-                className='flex-row items-center justify-center p-4 bg-blue-500 rounded-xl'
+                className='flex-row justify-center items-center p-4 bg-blue-500 rounded-xl'
                 onPress={handleContinue}
               >
                 <Text className='mr-2 text-lg font-semibold text-white'>

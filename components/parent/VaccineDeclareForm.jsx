@@ -114,6 +114,7 @@ export default function VaccineDeclareForm({ selectedSon, onBack }) {
 
       if (response.code === 201) {
         setCurrentStep('success');
+        fetchVaccineHadDeclared();
       } else {
         Alert.alert('Lỗi', 'Không thể khai báo tiêm chủng');
       }
@@ -168,7 +169,7 @@ export default function VaccineDeclareForm({ selectedSon, onBack }) {
           </View>
 
           <View className='flex-1'>
-            <View className='flex-row items-center justify-between mb-2'>
+            <View className='flex-row justify-between items-center mb-2'>
               <Text
                 className={`text-lg font-bold ${
                   isDeclared ? 'text-gray-500' : 'text-gray-900'
@@ -193,7 +194,7 @@ export default function VaccineDeclareForm({ selectedSon, onBack }) {
               {vaccine.description}
             </Text>
 
-            <View className='flex-row items-center justify-between'>
+            <View className='flex-row justify-between items-center'>
               <View className='flex-row items-center'>
                 <Syringe size={16} color={isDeclared ? '#9CA3AF' : '#6B7280'} />
                 <Text
@@ -247,7 +248,7 @@ export default function VaccineDeclareForm({ selectedSon, onBack }) {
           {/* Student Info */}
           <View className='p-4 mb-6 bg-blue-50 rounded-2xl'>
             <View className='flex-row items-center'>
-              <View className='items-center justify-center w-12 h-12 mr-3 bg-blue-500 rounded-full'>
+              <View className='justify-center items-center mr-3 w-12 h-12 bg-blue-500 rounded-full'>
                 <User size={24} color='#fff' />
               </View>
               <View className='flex-1'>
@@ -263,13 +264,13 @@ export default function VaccineDeclareForm({ selectedSon, onBack }) {
           </View>
 
           {/* Selected Vaccine */}
-          <View className='p-4 mb-6 bg-white border border-gray-200 rounded-2xl'>
+          <View className='p-4 mb-6 bg-white rounded-2xl border border-gray-200'>
             <Text className='mb-3 text-lg font-bold text-gray-900'>
               Vaccine được chọn
             </Text>
 
             <View className='flex-row items-start'>
-              <View className='items-center justify-center w-10 h-10 mr-3 bg-green-100 rounded-full'>
+              <View className='justify-center items-center mr-3 w-10 h-10 bg-green-100 rounded-full'>
                 <Syringe size={20} color='#10B981' />
               </View>
               <View className='flex-1'>
@@ -287,7 +288,7 @@ export default function VaccineDeclareForm({ selectedSon, onBack }) {
           </View>
 
           {/* Doses Input */}
-          <View className='p-4 mb-6 bg-white border border-gray-200 rounded-2xl'>
+          <View className='p-4 mb-6 bg-white rounded-2xl border border-gray-200'>
             <Text className='mb-3 text-lg font-bold text-gray-900'>
               Số liều đã tiêm
             </Text>
@@ -301,12 +302,12 @@ export default function VaccineDeclareForm({ selectedSon, onBack }) {
                 onChangeText={setDoses}
                 keyboardType='numeric'
                 placeholder='Ví dụ: 1'
-                className='px-4 py-3 text-base border border-gray-300 rounded-xl'
+                className='px-4 py-3 text-base rounded-xl border border-gray-300'
                 style={{ fontSize: 16 }}
               />
             </View>
 
-            <View className='p-3 border border-yellow-200 bg-yellow-50 rounded-xl'>
+            <View className='p-3 bg-yellow-50 rounded-xl border border-yellow-200'>
               <View className='flex-row items-start'>
                 <AlertCircle size={16} color='#F59E0B' className='mt-0.5' />
                 <Text className='flex-1 ml-2 text-sm text-yellow-800'>
@@ -373,7 +374,7 @@ export default function VaccineDeclareForm({ selectedSon, onBack }) {
                 chưa khai báo
               </Text>
               {vaccineHadDeclared.length > 0 && (
-                <Text className='ml-2 text-sm text-green-600'>
+                <Text className='p-2 ml-2 text-sm text-green-600 bg-green-50 rounded-lg'>
                   • {vaccineHadDeclared.length} đã khai báo
                 </Text>
               )}
@@ -411,15 +412,15 @@ export default function VaccineDeclareForm({ selectedSon, onBack }) {
                 {vaccineHadDeclared.map((declared) => (
                   <View
                     key={declared.id}
-                    className='p-4 bg-white border-2 border-green-300 rounded-2xl'
+                    className='p-4 bg-white rounded-2xl border-2 border-green-300'
                   >
                     <View className='flex-row items-start'>
-                      <View className='items-center justify-center w-12 h-12 mr-4 bg-green-100 rounded-full'>
+                      <View className='justify-center items-center mr-4 w-12 h-12 bg-green-100 rounded-full'>
                         <CheckCircle size={24} color='#10B981' />
                       </View>
 
                       <View className='flex-1'>
-                        <View className='flex-row items-center justify-between mb-2'>
+                        <View className='flex-row justify-between items-center mb-2'>
                           <Text className='text-lg font-bold text-gray-900'>
                             {declared.vaccination.name}
                           </Text>
@@ -434,7 +435,7 @@ export default function VaccineDeclareForm({ selectedSon, onBack }) {
                           {declared.vaccination.description}
                         </Text>
 
-                        <View className='flex-row items-center justify-between'>
+                        <View className='flex-row justify-between items-center'>
                           <View className='flex-row items-center'>
                             <Syringe size={16} color='#6B7280' />
                             <Text className='ml-2 text-sm text-gray-500'>

@@ -6,6 +6,7 @@ import {
   View,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import {
   ArrowRight,
@@ -23,13 +24,20 @@ import {
   Activity,
   AlertTriangleIcon,
   ArrowLeft,
+  School,
+  User2,
+  UserCircle,
+  UserCheck2,
+  UserCircle2,
 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import StudentDeclareCard from './StudentDeclareCard';
 
 const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
   const studentProfiles = healthProfiles.filter(
     (p) => String(p.student.id) === String(selectedSon?.id)
   );
+
   const getBMI = (weight, height) => {
     if (!weight || !height) return null;
     const heightInMeters = height / 100;
@@ -59,7 +67,7 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
       >
         <View className='flex-1'>
           {/* Header */}
-          <View className='flex-row items-center justify-between p-4 bg-white border-b border-gray-200'>
+          <View className='flex-row justify-between items-center p-4 bg-white border-b border-gray-200'>
             <TouchableOpacity onPress={onBack} className='p-1'>
               <ArrowLeft size={20} color='#407CE2' />
             </TouchableOpacity>
@@ -68,7 +76,27 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
             </Text>
             <View className='w-8' />
           </View>
+          <View className='px-6 py-4 bg-white border-b border-gray-100'>
+            <View className='flex-row gap-8 items-start'>
+              <View
+                className={`justify-center items-center w-12 h-12 bg-blue-500 rounded-full`}
+              >
+                <User size={24} color={'#fff'} />
+              </View>
+              <View className='flex-1 justify-start items-start'>
+                <Text
+                  className={`text-blue-800 font-montserratSemiBold`}
+                  numberOfLines={1}
+                >
+                  {studentProfiles[0].student.fullName || 'Học sinh'}
+                </Text>
 
+                <Text className='text-sm text-gray-500 font-montserratSemiBold'>
+                  MSSV: {studentProfiles[0].student.studentCode || 'Mã HS'}
+                </Text>
+              </View>
+            </View>
+          </View>
           <ScrollView className='flex-1 px-6 py-4'>
             {studentProfiles.length === 0 ? (
               <View className='items-center py-20'>
@@ -84,8 +112,8 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
               <>
                 {/* Latest Profile Summary */}
                 {studentProfiles.length > 0 && (
-                  <View className='p-4 mb-6 border border-gray-200 bg-blue-50 rounded-2xl'>
-                    <Text className='mb-3 text-lg text-gray-800 font-montserratBold'>
+                  <View className='p-4 mb-6 bg-blue-50 rounded-2xl border border-gray-200'>
+                    <Text className='mb-1 text-lg text-gray-800 font-montserratBold'>
                       📃 Hồ sơ mới nhất
                     </Text>
                     {(() => {
@@ -149,10 +177,10 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
                   return (
                     <View
                       key={profile.id}
-                      className='p-4 mb-4 bg-white border-2 border-gray-200 rounded-2xl'
+                      className='p-4 mb-4 bg-white rounded-2xl border-2 border-gray-200'
                     >
                       {/* Header */}
-                      <View className='flex-row items-center justify-between mb-3'>
+                      <View className='flex-row justify-between items-center mb-3'>
                         <View className='flex-row items-center'>
                           <User size={20} color='#3B82F6' />
                           <Text className='ml-2 text-lg font-bold text-gray-800'>
@@ -214,7 +242,7 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
 
                       {/* Health Metrics */}
                       <View className='flex-row justify-between mb-4'>
-                        <View className='flex-row items-center gap-1'>
+                        <View className='flex-row gap-1 items-center'>
                           <Eye size={16} color='#8B5CF6' />
                           <Text className='text-gray-600'>
                             Thị lực: {profile.vision}/10
@@ -226,9 +254,9 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
                           )}
                         </View>
 
-                        <View className='flex-row items-center gap-1'>
+                        <View className='flex-row gap-1 items-center'>
                           <Ear size={16} color='#F59E0B' />
-                          <Text className='text-gray-600 '>
+                          <Text className='text-gray-600'>
                             Thính giác: {profile.hearing}/10
                           </Text>
                           {profile.hearing >= 8 ? (
@@ -242,7 +270,7 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
                       {/* Health Score */}
                       {healthScore && (
                         <View className='p-3 mb-3 bg-green-50 rounded-xl'>
-                          <View className='flex-row items-center justify-between'>
+                          <View className='flex-row justify-between items-center'>
                             <View className='flex-row items-center'>
                               <Activity size={16} color='#10B981' />
                               <Text className='ml-2 font-medium text-green-800'>
@@ -258,20 +286,26 @@ const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
 
                       {/* Allergies */}
                       {profile.allergies && (
-                        <View className='flex-row items-start'>
-                          <AlertTriangle
-                            size={16}
-                            color='#EF4444'
-                            style={{ marginTop: 2 }}
-                          />
-                          <View className='flex-1 ml-2'>
-                            <Text className='mb-1 font-medium text-red-600'>
-                              Dị ứng:
+                        <View className='flex-col items-start'>
+                          <View className='flex-row gap-2 items-center mb-1'>
+                            <AlertTriangle
+                              size={16}
+                              color='#EF4444'
+                              style={{ marginTop: 2 }}
+                            />
+                            <Text className='font-medium text-red-600'>
+                              Dị ứng
                             </Text>
-                            <View className='p-2 bg-red-50 rounded-xl'>
-                              <Text className='text-sm text-red-700'>
-                                {profile.allergies}
-                              </Text>
+                          </View>
+                          <View className='flex-1 w-full'>
+                            <View className='p-3 mb-3 bg-red-50 rounded-xl'>
+                              <View className='flex-row justify-between items-center'>
+                                <View className='flex-row items-center'>
+                                  <Text className='ml-2 font-medium text-red-800'>
+                                    {profile.allergies}
+                                  </Text>
+                                </View>
+                              </View>
                             </View>
                           </View>
                         </View>
