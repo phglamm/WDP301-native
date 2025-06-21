@@ -365,3 +365,53 @@ export const rejectMedicineRequest = async (requestId) => {
     throw error.response?.data || error.message;
   }
 };
+
+export const getAllParents = async () => {
+  try {
+    const response = await axiosInstance.get(`/user/parents`);
+    return response;
+  } catch (error) {
+    console.log("Error at getAllParents: ", error);
+    throw error.response?.data || error.message;
+  }
+};
+
+export const createAppointment = async (appointmentData) => {
+  try {
+    const response = await axiosInstance.post(`/appointment`, appointmentData);
+    return response;
+  } catch (error) {
+    console.log("Error at createAppointment: ", error);
+    throw error.response?.data || error.message;
+  }
+};
+
+export const getAppointmentToday = async () => {
+  try {
+    const response = await axiosInstance.get(`/appointment/today`);
+    return response;
+  } catch (error) {
+    console.log("Error at getAppointmentHistory: ", error);
+    throw error.response?.data || error.message;
+  }
+};
+
+export const getAppointmentById = async (appointmentId) => {
+  try {
+    const response = await axiosInstance.get(`/appointment/${appointmentId}`);
+    return response;
+  } catch (error) {
+    console.log("Error at getAppointmentById: ", error);
+    throw error.response?.data || error.message;
+  }
+};
+
+export const getAppointmentHistory = async () => {
+  try {
+    const response = await axiosInstance.get(`/appointment/user`);
+    return response;
+  } catch (error) {
+    console.log("Error at getAppointmentHistory: ", error);
+    throw error.response?.data || error.message;
+  }
+};

@@ -15,6 +15,7 @@ import {
   Syringe,
   ShieldAlert,
   Activity,
+  Calendar,
 } from "lucide-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuthStore } from "../../stores/useAuthStore";
@@ -249,7 +250,9 @@ export default function HomeScreen() {
             <Text className="text-xl font-bold text-gray-900 dark:text-white mb-4">
               Chức năng chính
             </Text>
-            <View className="flex-row flex-wrap justify-between">
+
+            {/* 4 widgets in 2x2 grid */}
+            <View className="flex-row flex-wrap justify-between mb-4">
               {menuItems.map((item, index) => (
                 <TouchableOpacity
                   key={index}
@@ -284,6 +287,49 @@ export default function HomeScreen() {
                 </TouchableOpacity>
               ))}
             </View>
+
+            {/* Big Lịch hẹn widget - Full width */}
+            <TouchableOpacity
+              className="w-full"
+              activeOpacity={0.8}
+              onPress={() => router.push("/(nurse)/appointment")}
+            >
+              <View className="rounded-2xl p-6 shadow-sm border bg-indigo-50 border-indigo-200">
+                <View className="flex-row items-center justify-between">
+                  <View className="flex-1">
+                    <View className="flex-row items-center mb-3">
+                      <View className="w-12 h-12 rounded-full bg-indigo-100 items-center justify-center mr-4">
+                        <Calendar size={24} color="#6366F1" strokeWidth={1.5} />
+                      </View>
+                      <View>
+                        <Text className="text-lg font-semibold text-indigo-900">
+                          Lịch hẹn
+                        </Text>
+                        <Text className="text-sm text-indigo-600">
+                          Quản lý lịch hẹn với phụ huynh
+                        </Text>
+                      </View>
+                    </View>
+                    <View className="flex-row items-center justify-between">
+                      <View className="flex-row items-center">
+                        <Text className="text-2xl font-bold text-indigo-700 mr-2">
+                          12
+                        </Text>
+                        <Text className="text-sm text-indigo-600">
+                          lịch hẹn hôm nay
+                        </Text>
+                      </View>
+                      <View className="flex-row items-center">
+                        <Text className="text-sm text-indigo-600 mr-2">
+                          Xem chi tiết
+                        </Text>
+                        <ArrowRight size={20} color="#6366F1" />
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
