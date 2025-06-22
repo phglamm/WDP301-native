@@ -43,6 +43,7 @@ export default function InjectionEventForm({
   // UI state
   const [showVaccinationModal, setShowVaccinationModal] = useState(false);
 
+  const [selectedVaccination, setSelectedVaccination] = useState(null);
   const handleSubmit = async () => {
     if (!formData.vaccinationId || !formData.date || !formData.price) {
       Alert.alert("Thông báo", "Vui lòng điền đầy đủ thông tin bắt buộc.");
@@ -85,6 +86,8 @@ export default function InjectionEventForm({
     }
   };
   const selectVaccination = (vaccination) => {
+    setSelectedVaccination(vaccination);
+    console.log("Selected vaccination:", vaccination);
     setFormData((prev) => ({
       ...prev,
       vaccinationId: vaccination.id.toString(),
@@ -272,37 +275,42 @@ export default function InjectionEventForm({
             />
           </View>
           {/* Price */}
-          <View className="mb-6">
-            <View className="flex-row items-center mb-3">
-              <DollarSign size={20} color="#6B7280" />
-              <Text className="text-lg font-semibold text-gray-800 ml-2">
-                Giá tiền (VND) *
+
+          {selectedVaccination?.type === "paid" && (
+            <View className="mb-6">
+              <View className="flex-row items-center mb-3">
+                <DollarSign size={20} color="#6B7280" />
+                <Text className="text-lg font-semibold text-gray-800 ml-2">
+                  Giá tiền (VND) *
+                </Text>
+              </View>
+              <View className="relative">
+                <View className="border-2 border-gray-200 rounded-2xl px-4 py-4 bg-white focus:border-blue-500 flex-row items-center">
+                  <DollarSign size={20} color="#6B7280" />
+                  <TextInput
+                    className="text-base text-gray-800 ml-3 flex-1"
+                    value={formData.price}
+                    onChangeText={(text) =>
+                      setFormData((prev) => ({ ...prev, price: text }))
+                    }
+                    editable={selectedVaccination?.type === "paid"}
+                    placeholder="Nhập giá tiền"
+                    keyboardType="numeric"
+                    placeholderTextColor="#9CA3AF"
+                  />
+                </View>
+                {formData.price && (
+                  <View className="absolute right-4 top-4">
+                    <CheckCircle size={20} color="#22C55E" />
+                  </View>
+                )}
+              </View>
+              <Text className="text-gray-500 text-sm mt-2">
+                Nhập số tiền không bao gồm dấu phẩy
               </Text>
             </View>
-            <View className="relative">
-              <View className="border-2 border-gray-200 rounded-2xl px-4 py-4 bg-white focus:border-blue-500 flex-row items-center">
-                <DollarSign size={20} color="#6B7280" />
-                <TextInput
-                  className="text-base text-gray-800 ml-3 flex-1"
-                  value={formData.price}
-                  onChangeText={(text) =>
-                    setFormData((prev) => ({ ...prev, price: text }))
-                  }
-                  placeholder="Nhập giá tiền"
-                  keyboardType="numeric"
-                  placeholderTextColor="#9CA3AF"
-                />
-              </View>
-              {formData.price && (
-                <View className="absolute right-4 top-4">
-                  <CheckCircle size={20} color="#22C55E" />
-                </View>
-              )}
-            </View>
-            <Text className="text-gray-500 text-sm mt-2">
-              Nhập số tiền không bao gồm dấu phẩy
-            </Text>
-          </View>
+          )}
+
           {/* Form Summary */}
           {formData.vaccinationName && formData.price && (
             <View className="bg-blue-50 p-4 rounded-2xl border border-blue-200 mb-6">
@@ -313,7 +321,13 @@ export default function InjectionEventForm({
                 • Vaccine: {formData.vaccinationName}
               </Text>
               <Text className="text-blue-700">
-                • Giá: {parseInt(formData.price || 0).toLocaleString()} VND
+                {selectedVaccination?.type === "paid" ? (
+                  <>
+                    • Giá: {parseInt(formData.price || 0).toLocaleString()} VND
+                  </>
+                ) : (
+                  "• Miễn phí"
+                )}
               </Text>
               <Text className="text-blue-700">
                 • Ngày tiêm:

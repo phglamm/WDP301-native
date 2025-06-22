@@ -30,10 +30,11 @@ import {
 } from "../../services/nurseService";
 import AppointmentHistory from "../../components/nurse/AppointmentHistory";
 import AppointmentDeclareForm from "../../components/nurse/AppointmentDeclareForm ";
+import AppointmentCalendar from "../../components/nurse/AppointmentCalendar";
 
 export default function AppointmentScreen() {
   const router = useRouter();
-  const [currentView, setCurrentView] = useState("select");
+  const [currentView, setCurrentView] = useState("calendar"); // Changed default to calendar
   const [appointments, setAppointments] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -63,10 +64,10 @@ export default function AppointmentScreen() {
       return appointmentDate >= oneWeekAgo;
     }).length;
   };
-
   const fetchAppointments = async () => {
     try {
-      const response = await getAppointmentToday();
+      // Fetch all appointments for calendar view
+      const response = await getAppointmentHistory();
       setAppointments(response.data || []);
       console.log(response.data);
     } catch (error) {
@@ -95,7 +96,7 @@ export default function AppointmentScreen() {
           {
             text: "OK",
             onPress: () => {
-              setCurrentView("select");
+              setCurrentView("calendar");
               // Reset form data
               setFormData({
                 appointmentTime: "",
@@ -139,11 +140,10 @@ export default function AppointmentScreen() {
     });
     console.log("appointmentId", appointment.id);
   };
-
   const handleRefresh = async () => {
     setRefreshing(true);
     try {
-      const response = await getAppointmentToday();
+      const response = await getAppointmentHistory();
       setAppointments(response.data || []);
     } catch (error) {
       console.error("Error refreshing appointments:", error);
@@ -224,8 +224,7 @@ export default function AppointmentScreen() {
         </KeyboardAvoidingView>
       </SafeAreaView>
     );
-  }
-  // History view
+  } // History view
   if (currentView === "history") {
     return (
       <SafeAreaView className="flex-1 bg-white">
@@ -239,13 +238,11 @@ export default function AppointmentScreen() {
     );
   }
 
-  return (
-    <SafeAreaView className="flex-1 bg-white">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        className="flex-1"
-      >
-        {/* Enhanced Header */}
+  // Calendar view
+  if (currentView === "calendar") {
+    return (
+      <SafeAreaView className="flex-1 bg-white">
+        {/* Header */}
         <View className="bg-white shadow-sm border-b border-gray-100 p-6">
           <View className="flex-row items-center justify-start gap-4 mb-4">
             <TouchableOpacity
@@ -256,10 +253,10 @@ export default function AppointmentScreen() {
             </TouchableOpacity>
             <View className="flex-1">
               <Text className="text-2xl font-montserratBold text-gray-800">
-                Quản lý cuộc hẹn
+                Lịch cuộc hẹn
               </Text>
               <Text className="text-gray-500 font-montserratRegular mt-1">
-                Tạo và theo dõi các cuộc hẹn với phụ huynh
+                Xem cuộc hẹn theo lịch
               </Text>
             </View>
           </View>
@@ -291,138 +288,50 @@ export default function AppointmentScreen() {
               <Text className="text-green-500 text-xs">cuộc hẹn</Text>
             </View>
           </View>
-        </View>
 
-        {/* Enhanced Action Buttons */}
-        <View className="px-6 py-4">
-          <View className="flex-row gap-4">
+          {/* Action Buttons */}
+          <View className="flex-row gap-4 mt-4">
             <TouchableOpacity
               onPress={handleStartDeclarationAppointment}
-              className="flex-1 bg-green-500 py-4 rounded-2xl flex-row items-center justify-center shadow-lg active:scale-95"
-              style={{
-                shadowColor: "#22C55E",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 8,
-                elevation: 8,
-              }}
+              className="flex-1 bg-green-500 py-3 rounded-xl flex-row items-center justify-center"
             >
-              <Plus size={22} color="white" />
-              <Text className="text-white font-bold ml-2 text-base">
-                Tạo cuộc hẹn mới
+              <Plus size={18} color="white" />
+              <Text className="text-white font-bold ml-2 text-sm">
+                Tạo cuộc hẹn
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={handleViewHistory}
-              className="flex-1 bg-white border-2 border-gray-200 py-4 rounded-2xl flex-row items-center justify-center active:scale-95"
+              className="flex-1 bg-white border border-gray-200 py-3 rounded-xl flex-row items-center justify-center"
             >
-              <Clock size={22} color="#6B7280" />
-              <Text className="text-gray-700 font-bold ml-2 text-base">
-                Lịch sử ({appointments.length})
+              <Clock size={18} color="#6B7280" />
+              <Text className="text-gray-700 font-bold ml-2 text-sm">
+                Lịch sử
               </Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Content Area */}
-        <View className="flex-1">
-          <ScrollView
-            className="flex-1 px-6"
-            contentContainerStyle={{ paddingTop: 10, paddingBottom: 30 }}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={handleRefresh}
-              />
-            }
-            showsVerticalScrollIndicator={false}
-          >
-            {/* Recent Activity Section */}
-            <View className="mb-6">
-              <Text className="text-lg font-montserratSemiBold text-gray-800 mb-4">
-                Cuộc hẹn sắp tới
-              </Text>
-
-              {appointments.length === 0 ? (
-                <View className="bg-white p-6 rounded-xl border border-gray-200">
-                  <View className="items-center">
-                    <View className="bg-gray-100 p-4 rounded-full mb-3">
-                      <Calendar size={24} color="#6B7280" />
-                    </View>
-                    <Text className="text-gray-500 font-medium">
-                      Chưa có cuộc hẹn nào
-                    </Text>
-                    <Text className="text-gray-400 text-sm mt-1 text-center">
-                      Các cuộc hẹn với phụ huynh sẽ hiển thị ở đây
-                    </Text>
-                  </View>
-                </View>
-              ) : (
-                <View className="space-y-3">
-                  {appointments.slice(0, 3).map((appointment, index) => {
-                    const statusColors = getAppointmentStatusColor(
-                      appointment.status
-                    );
-                    return (
-                      <TouchableOpacity
-                        key={appointment.id || index}
-                        onPress={() => handleViewAppointmentDetail(appointment)}
-                        className="bg-white p-4 rounded-xl border border-gray-200 active:bg-gray-50"
-                      >
-                        <View className="flex-row items-center justify-between">
-                          <View className="flex-1">
-                            <View className="flex-row items-center justify-between mb-2">
-                              <View
-                                className={`self-start px-3 py-1 rounded-full ${statusColors.bg}`}
-                              >
-                                <Text
-                                  className={`text-sm font-semibold ${statusColors.text}`}
-                                >
-                                  {appointment.status === "scheduled"
-                                    ? "Đã lên lịch"
-                                    : appointment.status === "completed"
-                                      ? "Hoàn thành"
-                                      : appointment.status === "cancelled"
-                                        ? "Đã hủy"
-                                        : appointment.status === "in-progress"
-                                          ? "Đang diễn ra"
-                                          : appointment.status}
-                                </Text>
-                              </View>
-                              {appointment.googleMeetLink && (
-                                <TouchableOpacity className="bg-blue-100 p-1 rounded-full">
-                                  <Video size={16} color="#3B82F6" />
-                                </TouchableOpacity>
-                              )}
-                            </View>
-                            <Text className="font-semibold text-gray-800">
-                              {appointment.purpose}
-                            </Text>
-                            <Text className="text-sm text-gray-500 mt-1">
-                              {formatDate(appointment.appointmentTime)}
-                            </Text>
-                          </View>
-                          <ChevronRight size={16} color="#9CA3AF" />
-                        </View>
-                      </TouchableOpacity>
-                    );
-                  })}
-
-                  {appointments.length > 3 && (
-                    <TouchableOpacity
-                      onPress={handleViewHistory}
-                      className="bg-green-50 p-3 rounded-xl border border-green-100 active:bg-green-100"
-                    >
-                      <Text className="text-green-600 font-semibold text-center">
-                        Xem tất cả {appointments.length} cuộc hẹn
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              )}
-            </View>
-          </ScrollView>
+        {/* Calendar Component */}
+        <AppointmentCalendar
+          appointments={appointments}
+          onAppointmentPress={handleViewAppointmentDetail}
+          getAppointmentStatusColor={getAppointmentStatusColor}
+          formatDate={formatDate}
+        />
+      </SafeAreaView>
+    );
+  }
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        className="flex-1"
+      >
+        {/* This is a fallback view - should not be reached */}
+        <View className="flex-1 items-center justify-center">
+          <Text className="text-gray-500">Unknown view state</Text>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

@@ -97,7 +97,7 @@ export default function AppointmentHistory({
       <View className="bg-white shadow-sm border-b border-gray-100 p-6">
         <View className="flex-row items-center justify-between mb-4">
           <TouchableOpacity
-            onPress={() => setCurrentView("select")}
+            onPress={() => setCurrentView("calendar")}
             className="p-2 rounded-full bg-gray-100 active:bg-gray-200"
           >
             <ArrowLeft size={20} color="#6B7280" />
