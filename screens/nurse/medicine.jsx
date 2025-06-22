@@ -325,7 +325,7 @@ export default function MedicineScreen() {
                             <View className="flex-row items-center">
                               <Package size={14} color="#6B7280" />
                               <Text className="text-sm font-semibold text-gray-700 ml-1">
-                                Còn lại: {medicine.quantity}{" "}
+                                Còn lại: {medicine.quantity}
                                 {medicine.type.toLowerCase()}
                               </Text>
                             </View>

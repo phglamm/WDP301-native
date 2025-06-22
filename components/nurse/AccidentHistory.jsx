@@ -124,7 +124,7 @@ export default function AccidentHistory({
                       <View className="flex-row items-center mt-2">
                         <Activity size={16} color="#6B7280" />
                         <Text className="text-gray-500 ml-2">
-                          Xử lý bởi:{" "}
+                          Xử lý bởi:
                           {accident.nurse?.fullName || "Không xác định"}
                         </Text>
                       </View>

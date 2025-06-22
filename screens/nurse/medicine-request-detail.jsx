@@ -338,7 +338,7 @@ export default function MedicineRequestDetailScreen() {
               Tổng số buổi: {request.slots.length}
             </Text>
             <Text className="text-blue-800 text-sm">
-              Đã hoàn thành:{" "}
+              Đã hoàn thành:
               {request.slots.filter((slot) => slot.status).length}/
               {request.slots.length}
             </Text>

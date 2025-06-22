@@ -428,7 +428,7 @@ export default function AccidentScreen() {
                               {accident.summary}
                             </Text>
                             <Text className="text-sm text-gray-500 mt-1">
-                              {accident.student?.fullName} •{" "}
+                              {accident.student?.fullName} •
                               {formatDate(accident.date)}
                             </Text>
                           </View>

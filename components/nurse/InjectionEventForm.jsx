@@ -9,12 +9,7 @@ import {
   Alert,
   ActivityIndicator,
   Modal,
-  Platform,
-  ActionSheetIOS,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-
 import {
   ArrowRight,
   Calendar,
@@ -27,6 +22,7 @@ import {
   AlertTriangle,
 } from "lucide-react-native";
 import { createInjectionEvent } from "../../services/nurseService";
+import DateTimePickerCustom from "../common/DateTimePickerCustom";
 
 export default function InjectionEventForm({
   vaccinations,
@@ -44,13 +40,8 @@ export default function InjectionEventForm({
     date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
     price: "",
   });
-
   // UI state
   const [showVaccinationModal, setShowVaccinationModal] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState({
-    type: null,
-    visible: false,
-  });
 
   const handleSubmit = async () => {
     if (!formData.vaccinationId || !formData.date || !formData.price) {
@@ -93,7 +84,6 @@ export default function InjectionEventForm({
       setLoading((prev) => ({ ...prev, creating: false }));
     }
   };
-
   const selectVaccination = (vaccination) => {
     setFormData((prev) => ({
       ...prev,
@@ -101,64 +91,6 @@ export default function InjectionEventForm({
       vaccinationName: vaccination.name,
     }));
     setShowVaccinationModal(false);
-  };
-
-  const formatDisplayDate = (date) => {
-    return date.toLocaleDateString("vi-VN", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  const showDateActionSheet = (dateType) => {
-    if (Platform.OS === "ios") {
-      ActionSheetIOS.showActionSheetWithOptions(
-        {
-          title: "Chọn ngày và giờ",
-          options: ["Hủy", "Chọn ngày giờ"],
-          cancelButtonIndex: 0,
-          userInterfaceStyle: "light",
-        },
-        (buttonIndex) => {
-          if (buttonIndex === 1) {
-            setShowDatePicker({ type: dateType, visible: true });
-          }
-        }
-      );
-    } else {
-      DateTimePickerAndroid.open({
-        value: formData[dateType],
-        mode: "datetime",
-        is24Hour: true,
-        onChange: (event, selectedDate) => {
-          if (selectedDate) {
-            setFormData((prev) => ({
-              ...prev,
-              [dateType]: selectedDate,
-            }));
-          }
-        },
-      });
-    }
-  };
-
-  const handleDateChange = (event, selectedDate) => {
-    // Store the current picker type before resetting state
-    const currentPickerType = showDatePicker.type;
-
-    // Hide the picker first
-    setShowDatePicker({ type: null, visible: false });
-
-    // Only update if user selected a date (didn't cancel)
-    if (selectedDate && currentPickerType) {
-      setFormData((prev) => ({
-        ...prev,
-        [currentPickerType]: selectedDate,
-      }));
-    }
   };
 
   const renderVaccinationModal = () => (
@@ -293,70 +225,52 @@ export default function InjectionEventForm({
               )}
             </View>
           </View>
-
           {/* Registration Open Date */}
           <View className="mb-6">
-            <View className="flex-row items-center mb-3">
-              <Calendar size={20} color="#6B7280" />
-              <Text className="text-lg font-semibold text-gray-800 ml-2">
-                Ngày mở đăng ký
-              </Text>
-            </View>
-            <View className="relative">
-              <TouchableOpacity
-                className="border-2 border-gray-200 rounded-2xl px-4 py-4 bg-white focus:border-blue-500 flex-row items-center"
-                onPress={() => showDateActionSheet("registrationOpenDate")}
-              >
-                <Calendar size={20} color="#6B7280" />
-                <Text className="text-base text-gray-800 ml-3 flex-1">
-                  {formatDisplayDate(formData.registrationOpenDate)}
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <DateTimePickerCustom
+              value={formData.registrationOpenDate}
+              onChange={(selectedDate) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  registrationOpenDate: selectedDate,
+                }))
+              }
+              mode="datetime"
+              label="Ngày mở đăng ký"
+              placeholder="Chọn ngày mở đăng ký"
+              minimumDate={new Date()}
+            />
           </View>
-
           {/* Registration Close Date */}
           <View className="mb-6">
-            <View className="flex-row items-center mb-3">
-              <Calendar size={20} color="#6B7280" />
-              <Text className="text-lg font-semibold text-gray-800 ml-2">
-                Ngày đóng đăng ký
-              </Text>
-            </View>
-            <View className="relative">
-              <TouchableOpacity
-                className="border-2 border-gray-200 rounded-2xl px-4 py-4 bg-white focus:border-blue-500 flex-row items-center"
-                onPress={() => showDateActionSheet("registrationCloseDate")}
-              >
-                <Calendar size={20} color="#6B7280" />
-                <Text className="text-base text-gray-800 ml-3 flex-1">
-                  {formatDisplayDate(formData.registrationCloseDate)}
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <DateTimePickerCustom
+              value={formData.registrationCloseDate}
+              onChange={(selectedDate) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  registrationCloseDate: selectedDate,
+                }))
+              }
+              mode="datetime"
+              label="Ngày đóng đăng ký"
+              placeholder="Chọn ngày đóng đăng ký"
+              minimumDate={formData.registrationOpenDate}
+            />
           </View>
-
           {/* Injection Date */}
           <View className="mb-6">
-            <View className="flex-row items-center mb-3">
-              <Clock size={20} color="#6B7280" />
-              <Text className="text-lg font-semibold text-gray-800 ml-2">
-                Ngày tiêm *
-              </Text>
-            </View>
-            <View className="relative">
-              <TouchableOpacity
-                className="border-2 border-gray-200 rounded-2xl px-4 py-4 bg-white focus:border-blue-500 flex-row items-center"
-                onPress={() => showDateActionSheet("date")}
-              >
-                <Clock size={20} color="#6B7280" />
-                <Text className="text-base text-gray-800 ml-3 flex-1">
-                  {formatDisplayDate(formData.date)}
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <DateTimePickerCustom
+              value={formData.date}
+              onChange={(selectedDate) =>
+                setFormData((prev) => ({ ...prev, date: selectedDate }))
+              }
+              mode="datetime"
+              label="Ngày tiêm"
+              placeholder="Chọn ngày tiêm"
+              required={true}
+              minimumDate={formData.registrationCloseDate}
+            />
           </View>
-
           {/* Price */}
           <View className="mb-6">
             <View className="flex-row items-center mb-3">
@@ -389,7 +303,6 @@ export default function InjectionEventForm({
               Nhập số tiền không bao gồm dấu phẩy
             </Text>
           </View>
-
           {/* Form Summary */}
           {formData.vaccinationName && formData.price && (
             <View className="bg-blue-50 p-4 rounded-2xl border border-blue-200 mb-6">
@@ -403,11 +316,18 @@ export default function InjectionEventForm({
                 • Giá: {parseInt(formData.price || 0).toLocaleString()} VND
               </Text>
               <Text className="text-blue-700">
-                • Ngày tiêm: {formatDisplayDate(formData.date)}
+                • Ngày tiêm:
+                {formData.date.toLocaleDateString("vi-VN", {
+                  weekday: "long",
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </Text>
             </View>
           )}
-
           {/* Submit Button */}
           <View className="mb-6">
             <TouchableOpacity
@@ -447,7 +367,6 @@ export default function InjectionEventForm({
               )}
             </TouchableOpacity>
           </View>
-
           {/* Help Text */}
           <View className="bg-green-50 p-4 rounded-2xl border border-green-200">
             <Text className="text-green-800 font-semibold mb-2">
@@ -461,16 +380,6 @@ export default function InjectionEventForm({
           </View>
         </View>
       </ScrollView>
-
-      {/* Date Picker */}
-      {showDatePicker.visible && (
-        <DateTimePicker
-          value={formData[showDatePicker.type]}
-          mode="datetime"
-          display={Platform.OS === "ios" ? "spinner" : "default"}
-          onChange={handleDateChange}
-        />
-      )}
 
       {renderVaccinationModal()}
     </View>

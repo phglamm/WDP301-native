@@ -11,7 +11,6 @@ import {
   FlatList,
   Platform,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import {
   ArrowRight,
   User,
@@ -25,6 +24,7 @@ import {
   X,
 } from "lucide-react-native";
 import { getAllParents } from "../../services/nurseService";
+import DateTimePickerCustom from "../common/DateTimePickerCustom";
 
 const AppointmentDeclareForm = ({
   formData,
@@ -37,9 +37,6 @@ const AppointmentDeclareForm = ({
   const [showParentModal, setShowParentModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedParent, setSelectedParent] = useState(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
-  const [tempDate, setTempDate] = useState(new Date());
 
   useEffect(() => {
     const fetchParentData = async () => {
@@ -68,35 +65,31 @@ const AppointmentDeclareForm = ({
     setSearchQuery("");
   };
 
-  const handleDateTimeChange = (event, selectedDate) => {
-    if (Platform.OS === "android") {
-      setShowDatePicker(false);
-      setShowTimePicker(false);
-    }
-
+  // Simplified date-time handling
+  const handleDateTimeChange = (selectedDate) => {
     if (selectedDate) {
-      if (showDatePicker) {
-        setTempDate(selectedDate);
-        if (Platform.OS === "ios") {
-          const formattedDateTime = formatDateTimeForAPI(selectedDate);
-          setFormData((prev) => ({
-            ...prev,
-            appointmentTime: formattedDateTime,
-          }));
-        } else {
-          setShowTimePicker(true);
-        }
-      } else if (showTimePicker) {
-        const combinedDateTime = new Date(tempDate);
-        combinedDateTime.setHours(selectedDate.getHours());
-        combinedDateTime.setMinutes(selectedDate.getMinutes());
+      const formattedDateTime = formatDateTimeForAPI(selectedDate);
+      setFormData((prev) => ({
+        ...prev,
+        appointmentTime: formattedDateTime,
+      }));
+    }
+  };
 
-        const formattedDateTime = formatDateTimeForAPI(combinedDateTime);
-        setFormData((prev) => ({
-          ...prev,
-          appointmentTime: formattedDateTime,
-        }));
-      }
+  // Parse date-time string back to Date object for the custom picker
+  const getDateTimeValue = () => {
+    if (!formData.appointmentTime) return null;
+
+    try {
+      // Parse the format "27-06-2025 12:00:00"
+      const [datePart, timePart] = formData.appointmentTime.split(" ");
+      const [day, month, year] = datePart.split("-");
+      const [hours, minutes] = timePart.split(":");
+
+      return new Date(year, month - 1, day, hours, minutes);
+    } catch (error) {
+      console.error("Error parsing date string:", error);
+      return null;
     }
   };
 
@@ -190,7 +183,6 @@ const AppointmentDeclareForm = ({
           </View>
         </View>
       </View>
-
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 30 }}
@@ -253,35 +245,19 @@ const AppointmentDeclareForm = ({
               </View>
             </TouchableOpacity>
           </View>
-
           {/* Date Time Selection */}
           <View className="mb-6">
-            <View className="flex-row items-center mb-3">
-              <Calendar size={20} color="#6B7280" />
-              <Text className="text-lg font-semibold text-gray-800 ml-2">
-                Ngày và Giờ *
-              </Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => setShowDatePicker(true)}
-              className="border-2 border-gray-200 rounded-2xl px-4 py-4 bg-white flex-row items-center justify-between focus:border-green-500"
-            >
-              <View className="flex-1">
-                <Text
-                  className={`text-base ${formData.appointmentTime ? "text-gray-800 font-semibold" : "text-gray-400"}`}
-                >
-                  {formatDisplayDateTime(formData.appointmentTime)}
-                </Text>
-              </View>
-              <View className="flex-row items-center">
-                {formData.appointmentTime && (
-                  <CheckCircle size={20} color="#22C55E" className="mr-2" />
-                )}
-                <Clock size={20} color="#6B7280" />
-              </View>
-            </TouchableOpacity>
+            <DateTimePickerCustom
+              value={getDateTimeValue()}
+              onChange={handleDateTimeChange}
+              mode="datetime"
+              label="Ngày và Giờ"
+              placeholder="Chọn ngày và giờ cuộc hẹn"
+              required={true}
+              minimumDate={new Date()}
+              maximumDate={new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)} // 90 days from now
+            />
           </View>
-
           {/* Duration Selection */}
           <View className="mb-6">
             <View className="flex-row items-center mb-4">
@@ -321,7 +297,6 @@ const AppointmentDeclareForm = ({
               })}
             </View>
           </View>
-
           {/* Purpose Field */}
           <View className="mb-6">
             <View className="flex-row items-center mb-3">
@@ -353,7 +328,6 @@ const AppointmentDeclareForm = ({
               {formData.purpose?.length || 0}/500 ký tự
             </Text>
           </View>
-
           {/* Submit Button */}
           <View className="mb-6">
             <TouchableOpacity
@@ -395,7 +369,6 @@ const AppointmentDeclareForm = ({
           </View>
         </View>
       </ScrollView>
-
       {/* Parent Selection Modal */}
       <Modal
         visible={showParentModal}
@@ -456,28 +429,6 @@ const AppointmentDeclareForm = ({
           />
         </View>
       </Modal>
-
-      {/* Date Time Picker */}
-      {showDatePicker && (
-        <DateTimePicker
-          value={tempDate}
-          mode="date"
-          display={Platform.OS === "ios" ? "spinner" : "default"}
-          onChange={handleDateTimeChange}
-          minimumDate={new Date()}
-          maximumDate={new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)} // 90 days from now
-        />
-      )}
-
-      {showTimePicker && (
-        <DateTimePicker
-          value={tempDate}
-          mode="time"
-          display={Platform.OS === "ios" ? "spinner" : "default"}
-          onChange={handleDateTimeChange}
-          is24Hour={true}
-        />
-      )}
     </View>
   );
 };

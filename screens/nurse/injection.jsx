@@ -233,7 +233,7 @@ export default function InjectionScreen() {
           <View className="flex-row items-center">
             <Clock size={16} color="#6B7280" />
             <Text className="text-gray-600 ml-2">
-              Đăng ký: {formatDate(event.registrationOpenDate)} -{" "}
+              Đăng ký: {formatDate(event.registrationOpenDate)} -
               {formatDate(event.registrationCloseDate)}
             </Text>
           </View>
