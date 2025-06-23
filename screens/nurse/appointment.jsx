@@ -315,6 +315,8 @@ export default function AppointmentScreen() {
 
         {/* Calendar Component */}
         <AppointmentCalendar
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
           appointments={appointments}
           onAppointmentPress={handleViewAppointmentDetail}
           getAppointmentStatusColor={getAppointmentStatusColor}

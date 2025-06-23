@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  RefreshControl,
 } from "react-native";
 import {
   ChevronLeft,
@@ -21,6 +22,8 @@ const AppointmentCalendar = ({
   onAppointmentPress,
   getAppointmentStatusColor,
   formatDate,
+  refreshing = false,
+  onRefresh = () => {},
 }) => {
   // Get today's date in local timezone
   const getToday = () => {
@@ -211,7 +214,12 @@ const AppointmentCalendar = ({
       </View>
 
       {/* Calendar Grid */}
-      <ScrollView className="flex-1">
+      <ScrollView
+        className="flex-1"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View className="px-4 py-2">
           {/* Render calendar in rows of 7 */}
           {Array.from(
@@ -265,9 +273,9 @@ const AppointmentCalendar = ({
 
                       {/* Appointment indicator */}
                       {dayData.appointments.length > 0 && (
-                        <View className="absolute bottom-1 flex-row">
+                        <View className="justify-center items-center flex-row">
                           <View
-                            className="w-1.5 h-1.5 rounded-full"
+                            className="w-1 h-1.5 rounded-full"
                             style={{ backgroundColor: dotColor }}
                           />
                           {dayData.appointments.length > 1 && (
