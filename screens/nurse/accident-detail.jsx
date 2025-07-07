@@ -59,7 +59,7 @@ export default function AccidentDetailScreen() {
     try {
       const response = await getMedicine();
       setMedicines(response.data);
-      console.log("Medicines loaded successfully:", response.data);
+      // console.log("Medicines loaded successfully:", response.data);
     } catch (error) {
       Alert.alert("Lỗi", "Không thể tải danh sách Thuốc");
       console.error("Load Thuốc error:", error);

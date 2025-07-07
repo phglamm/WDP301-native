@@ -71,13 +71,13 @@ const AppointmentCalendar = ({
     const daysInMonth = lastDay.getDate();
     const startingDayOfWeek = firstDay.getDay();
 
-    console.log("Calendar Debug:", {
-      year,
-      month: month + 1, // Add 1 for human readable month
-      daysInMonth,
-      startingDayOfWeek,
-      firstDayDate: firstDay.toDateString(),
-    });
+    // console.log("Calendar Debug:", {
+    //   year,
+    //   month: month + 1, // Add 1 for human readable month
+    //   daysInMonth,
+    //   startingDayOfWeek,
+    //   firstDayDate: firstDay.toDateString(),
+    // });
 
     const days = [];
 
@@ -111,8 +111,8 @@ const AppointmentCalendar = ({
       }
     }
 
-    console.log("Total calendar cells:", days.length);
-    console.log("Days with data:", days.filter((d) => d !== null).length);
+    // console.log("Total calendar cells:", days.length);
+    // console.log("Days with data:", days.filter((d) => d !== null).length);
 
     return days;
   };

@@ -97,7 +97,7 @@ const DateTimePickerCustom = ({
   };
 
   const handleDateTimeChange = (event, selectedDate) => {
-    console.log("DateTimePicker change:", event.type, selectedDate);
+    // console.log("DateTimePicker change:", event.type, selectedDate);
 
     if (Platform.OS === "android") {
       if (event.type === "dismissed") {

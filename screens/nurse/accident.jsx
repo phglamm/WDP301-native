@@ -64,7 +64,7 @@ export default function AccidentScreen() {
     try {
       const response = await getAccidentHistory();
       setAccidents(response.data || []);
-      console.log(response.data);
+      // console.log(response.data);
     } catch (error) {
       console.error("Error fetching accidents:", error);
       Alert.alert("Lỗi", "Không thể tải dữ liệu tai nạn.");
@@ -84,6 +84,7 @@ export default function AccidentScreen() {
       };
 
       const response = await createAccidentEvent(accidentData);
+      console.log(response);
       if (response.code === 201 && response.status) {
         Alert.alert("Thành công", "Sự kiện đã được lưu thành công!", [
           {

@@ -87,7 +87,7 @@ export default function InjectionEventForm({
   };
   const selectVaccination = (vaccination) => {
     setSelectedVaccination(vaccination);
-    console.log("Selected vaccination:", vaccination);
+    // console.log("Selected vaccination:", vaccination);
     setFormData((prev) => ({
       ...prev,
       vaccinationId: vaccination.id.toString(),
