@@ -151,6 +151,43 @@ export const registerInjectionEventService = async (
     throw error;
   }
 };
+// Injection Event - Kết quả tiêm
+export const getInjectionEventResultService = async (studentId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/injection-record/student/${studentId}`
+    );
+    return response;
+  } catch (error) {
+    console.log('Error getting injection event result: ', error);
+    throw error;
+  }
+};
+// Injection Event Report History - Lịch sử báo cáo sau tiêm
+export const getInjectionEventReportHistoryService = async (injectionId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/post-injection-report/injection-record/${injectionId}`
+    );
+    return response;
+  } catch (error) {
+    console.log('Error getting injection event report history: ', error);
+    throw error;
+  }
+};
+// Injection Event Report - Báo cáo sau tiêm
+export const createInjectionEventReportService = async (reportData) => {
+  try {
+    const response = await axiosInstance.post(
+      `/post-injection-report`,
+      reportData
+    );
+    return response;
+  } catch (error) {
+    console.log('Error creating injection event report: ', error);
+    throw error;
+  }
+};
 
 // Vaccine Declaration - Danh sách all vaccine
 export const getVaccinationsService = async () => {
@@ -184,6 +221,42 @@ export const declareVaccinationService = async (vaccinationData) => {
     return response;
   } catch (error) {
     console.log('Error creating vaccination record: ', error);
+    throw error;
+  }
+};
+
+// Appoinment - Danh sách lịch hẹn
+export const getAppointmentService = async () => {
+  try {
+    const response = await axiosInstance.get('/appointment/user');
+    return response;
+  } catch (error) {
+    console.log('Error getting appointment: ', error);
+    throw error;
+  }
+};
+// Appoinment - Chi tiết lịch hẹn
+export const getAppointmentDetailService = async (appointmentId) => {
+  try {
+    const response = await axiosInstance.get(`/appointment/${appointmentId}`);
+    return response;
+  } catch (error) {
+    console.log('Error getting appointment detail: ', error);
+    throw error;
+  }
+};
+// Appoinment - Cập nhật lịch hẹn
+export const updateAppointmentDateService = async (
+  appointmentId,
+  appointmentDate
+) => {
+  try {
+    const response = await axiosInstance.put(`/appointment/${appointmentId}`, {
+      appointmentTime: appointmentDate,
+    });
+    return response;
+  } catch (error) {
+    console.log('Error updating appointment: ', error);
     throw error;
   }
 };

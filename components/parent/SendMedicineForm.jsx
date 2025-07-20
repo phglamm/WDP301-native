@@ -349,7 +349,7 @@ export default function SendMedicineForm({ onClose }) {
               accessibilityRole='button'
             >
               <Text className='text-lg font-semibold text-center text-white'>
-                {selectedImage ? '📷 Thay đổi ảnh' : '📷 Tải hóa đơn thuốc'}
+                {selectedImage ? '📂 Thay đổi ảnh' : '📂 Tải hoá đơn thuốc'}
               </Text>
             </TouchableOpacity>
 
@@ -426,7 +426,7 @@ export default function SendMedicineForm({ onClose }) {
                     <View className='flex-1 justify-center items-center px-4'>
                       <View className='w-full max-w-sm bg-white rounded-xl shadow-lg dark:bg-gray-800'>
                         <View className='p-4 border-b border-gray-200 dark:border-gray-700'>
-                          <Text className='text-lg font-semibold text-center text-gray-900 dark:text-white'>
+                          <Text className='text-md text-center text-gray-900 dark:text-white'>
                             Chọn học sinh
                           </Text>
                         </View>
@@ -449,7 +449,7 @@ export default function SendMedicineForm({ onClose }) {
                               }`}
                             >
                               <Text
-                                className={`text-base font-medium text-center ${
+                                className={`text-lg font-semibold text-center ${
                                   studentId === son.id
                                     ? 'text-blue-600 dark:text-blue-300'
                                     : 'text-gray-800 dark:text-gray-200'
@@ -494,7 +494,7 @@ export default function SendMedicineForm({ onClose }) {
                 {/* Session Header */}
                 <View className='flex-row items-center mb-3'>
                   <View className='px-4 py-2 bg-blue-500 rounded-lg'>
-                    <Text className='text-lg font-semibold text-white'>
+                    <Text className='text-md font-semibold text-white'>
                       {slot.session}
                     </Text>
                   </View>
@@ -631,13 +631,13 @@ export default function SendMedicineForm({ onClose }) {
           </View>
 
           {/* Action Buttons */}
-          <View className='pb-5'>
+          <View className='pb-5 flex-row justify-between items-center gap-2'>
             <TouchableOpacity
               onPress={handleSubmit}
               disabled={isLoading}
               className={`${
                 isLoading ? 'bg-gray-400' : 'bg-green-500 active:bg-green-600'
-              } py-4 px-6 rounded-xl shadow-lg mb-3`}
+              } p-4 px-20 rounded-xl shadow-lg`}
               accessibilityLabel='Gửi yêu cầu thuốc'
               accessibilityRole='button'
             >
@@ -650,37 +650,21 @@ export default function SendMedicineForm({ onClose }) {
                 </View>
               ) : (
                 <Text className='text-lg font-semibold text-center text-white'>
-                  ✓ Gửi Yêu Cầu Thuốc
+                  ✓ Gửi Yêu Cầu
                 </Text>
               )}
             </TouchableOpacity>
-
-            {/* Reset Button */}
             <TouchableOpacity
               onPress={handleReset}
               disabled={isLoading}
-              className='px-6 py-4 mb-3 bg-orange-500 rounded-xl shadow-lg active:bg-orange-600'
+              className='p-4 px-10 bg-blue-500 rounded-xl shadow-lg active:bg-blue-600'
               accessibilityLabel='Reset form để nhập lại'
               accessibilityRole='button'
             >
               <Text className='text-lg font-semibold text-center text-white'>
-                🔄 Reset Form
+                Khôi phục
               </Text>
             </TouchableOpacity>
-
-            {onClose && (
-              <TouchableOpacity
-                onPress={onClose}
-                disabled={isLoading}
-                className='px-6 py-4 bg-gray-500 rounded-xl shadow-lg active:bg-gray-600'
-                accessibilityLabel='Hủy và quay lại'
-                accessibilityRole='button'
-              >
-                <Text className='text-lg font-semibold text-center text-white'>
-                  ← Quay lại
-                </Text>
-              </TouchableOpacity>
-            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

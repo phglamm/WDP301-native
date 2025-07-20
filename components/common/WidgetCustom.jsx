@@ -11,7 +11,8 @@ export default function WidgetCustom({
 }) {
   return (
     <TouchableOpacity
-      className={`${backgroundColor} rounded-xl p-4 w-[48%] items-center shadow-md border-2 ${borderColor}`}
+      className={`${backgroundColor} rounded-xl p-4 items-center shadow-md border-2 ${borderColor} mb-4`}
+      style={{ width: '48%' }}
       activeOpacity={0.7}
       onPress={onPress}
     >

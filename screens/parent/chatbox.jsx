@@ -262,13 +262,14 @@ export default function Chatbox() {
             </TouchableOpacity>
             <View>
               <Text className='text-2xl font-montserratBold text-gray-800'>
-                Trợ lý AI 🤖
+                Trợ lý AI
               </Text>
               <Text className='text-gray-500 font-montserratRegular'>
                 Hỗ trợ tư vấn y tế
               </Text>
             </View>
           </View>
+
           <View className='flex-row items-center gap-4'>
             <TouchableOpacity onPress={handleShowHistory}>
               <Ionicons name='time' size={20} color='#407CE2' />
@@ -323,7 +324,7 @@ export default function Chatbox() {
         <View className='bg-white px-4 pt-6 border-t border-gray-200'>
           <View className='flex-row items-center bg-gray-100 rounded-2xl px-4 py-2'>
             <TextInput
-              className='flex-1 text-base text-gray-900 max-h-25'
+              className='flex-1 text-gray-900 max-h-20 text-lg'
               value={inputText}
               onChangeText={setInputText}
               placeholder='Nhập thắc mắc của bạn ...'
@@ -332,7 +333,7 @@ export default function Chatbox() {
               maxLength={500}
             />
             <TouchableOpacity
-              className={`w-8 h-8 rounded-2xl items-center justify-center ml-2 ${
+              className={`w-8 h-8 rounded-full items-center justify-center ${
                 inputText.trim() ? 'bg-primary' : 'bg-transparent'
               }`}
               onPress={handleSendMessage}
@@ -340,7 +341,7 @@ export default function Chatbox() {
             >
               <Ionicons
                 name='send'
-                size={20}
+                size={16}
                 color={inputText.trim() ? '#FFFFFF' : '#C7C7CC'}
               />
             </TouchableOpacity>

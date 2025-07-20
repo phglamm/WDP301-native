@@ -6,12 +6,10 @@ import {
   View,
   KeyboardAvoidingView,
   Platform,
-  Image,
 } from 'react-native';
 import {
   ArrowRight,
   CheckCircle,
-  AlertCircle,
   Scale,
   Ruler,
   Droplet,
@@ -24,14 +22,8 @@ import {
   Activity,
   AlertTriangleIcon,
   ArrowLeft,
-  School,
-  User2,
-  UserCircle,
-  UserCheck2,
-  UserCircle2,
 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import StudentDeclareCard from './StudentDeclareCard';
 
 const HealthDeclarationHistory = ({ selectedSon, healthProfiles, onBack }) => {
   const studentProfiles = healthProfiles.filter(

@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   View,
   ActivityIndicator,
-  Dimensions,
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -80,10 +79,6 @@ export default function HealthDeclarationScreen() {
 
   const handleSelectSon = (student) => {
     setSelectedSon(student);
-    console.log('Selected Son: ', {
-      student: student.fullName,
-      id: student.id,
-    });
   };
 
   const handleStartDeclaration = () => {

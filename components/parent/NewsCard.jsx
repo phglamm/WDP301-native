@@ -8,7 +8,7 @@ const NewsCard = ({ item }) => {
         <View className='flex-col flex-1 justify-between p-4'>
           <View>
             <View className='self-start px-2 py-1 mb-2 bg-green-500 rounded-full'>
-              <Text className='text-xs font-medium text-white'>New</Text>
+              <Text className='text-xs font-medium text-white'>Mới</Text>
             </View>
             <Text className='mb-1 text-lg font-bold'>{item.title}</Text>
           </View>

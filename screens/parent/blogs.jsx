@@ -3,34 +3,23 @@ import {
   View,
   Text,
   ScrollView,
-  TextInput,
   TouchableOpacity,
   Image,
   RefreshControl,
-  StatusBar,
   Dimensions,
   Platform,
   KeyboardAvoidingView,
 } from 'react-native';
 import {
-  Search,
   BookOpen,
   Heart,
-  Clock,
   TrendingUp,
   Bookmark,
-  Share2,
-  MessageCircle,
-  Filter,
-  Star,
   Eye,
   Calendar,
-  ArrowLeft,
 } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import HeaderIcon from '../../components/layouts/HeaderIcon';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import ParentHeader from '../../components/layouts/ParentHeader';
 
 const { width } = Dimensions.get('window');
@@ -47,7 +36,7 @@ const DUMMY_POSTS = [
     views: 1234,
     likes: 89,
     comments: 23,
-    tags: ['Sức khỏe học đường', 'Mùa thi', 'Stress'],
+    tags: ['Sức khỏe', 'Mùa thi', 'Stress'],
     category: 'study',
     author: 'BS. Nguyễn Thị Lan',
     isFeatured: true,
@@ -180,7 +169,6 @@ export default function Blogs() {
           )
       );
     }
-
     return filtered;
   };
 
@@ -200,7 +188,7 @@ export default function Blogs() {
           onBack={() => router.push('/home')}
         />
         {/* Tabs */}
-        <View className='p-4 bg-white border-b border-gray-100'>
+        <View className='px-4 pb-4 bg-white border-b border-gray-100'>
           {/* Tabs */}
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {TABS.map((tab) => {
@@ -245,6 +233,7 @@ export default function Blogs() {
             })}
           </ScrollView>
         </View>
+
         {/* Main Content */}
         <ScrollView
           className='flex-1 px-4'
@@ -356,7 +345,7 @@ export default function Blogs() {
                       key={post.id}
                       className='overflow-hidden mb-4 bg-white rounded-2xl'
                       style={{
-                        width: (width - 48) / 2 - 8,
+                        width: (width - 48) / 2,
                         marginRight: index % 2 === 0 ? 16 : 0,
                         shadowColor: '#000',
                         shadowOffset: { width: 0, height: 2 },
@@ -398,11 +387,6 @@ export default function Blogs() {
                           numberOfLines={2}
                         >
                           {post.title}
-                        </Text>
-
-                        {/* Doctor */}
-                        <Text className='mb-3 text-xs font-medium text-blue-600'>
-                          {post.author}
                         </Text>
 
                         {/* Tags */}

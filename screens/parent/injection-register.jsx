@@ -14,6 +14,7 @@ import { useParentStore } from '../../stores/useParentStore';
 import StudentCard from '../../components/parent/StudentCard';
 import InjectionRegisterForm from '../../components/parent/InjectionRegisterForm';
 import ParentHeader from '../../components/layouts/ParentHeader';
+import InjectionRegisterResult from '../../components/parent/InjectionRegisterResult';
 
 export default function InjectionRegister() {
   const router = useRouter();
@@ -27,7 +28,6 @@ export default function InjectionRegister() {
 
   const handleSelectSon = (son) => {
     setSelectedSon(son);
-    console.log('Selected son: ', { son: son.fullName, id: son.id });
   };
 
   const handleContinue = () => {
@@ -35,7 +35,11 @@ export default function InjectionRegister() {
       setCurrentView('form');
     }
   };
-
+  const handleResult = () => {
+    if (selectedSon) {
+      setCurrentView('result');
+    }
+  };
   if (currentView === 'form') {
     return (
       <InjectionRegisterForm
@@ -44,7 +48,14 @@ export default function InjectionRegister() {
       />
     );
   }
-
+  if (currentView === 'result') {
+    return (
+      <InjectionRegisterResult
+        selectedSon={selectedSon}
+        onBack={() => setCurrentView('select')}
+      />
+    );
+  }
   return (
     <SafeAreaView className='flex-1 bg-white dark:bg-gray-900'>
       <KeyboardAvoidingView
@@ -108,7 +119,16 @@ export default function InjectionRegister() {
                 onPress={handleContinue}
               >
                 <Text className='mr-2 text-lg font-semibold text-white'>
-                  Tiếp tục đăng ký
+                  Đăng ký tiêm
+                </Text>
+                <ChevronRight size={20} color='#fff' />
+              </TouchableOpacity>
+              <TouchableOpacity
+                className='flex-row justify-center items-center p-4 bg-green-500 rounded-xl mt-2'
+                onPress={handleResult}
+              >
+                <Text className='mr-2 text-lg font-semibold text-white'>
+                  Kết quả tiêm
                 </Text>
                 <ChevronRight size={20} color='#fff' />
               </TouchableOpacity>
