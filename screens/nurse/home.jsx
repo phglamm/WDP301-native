@@ -229,12 +229,7 @@ export default function HomeScreen() {
                 <Text className="text-blue-100 text-sm mb-4">
                   Theo dõi tồn kho và vật tư y tế
                 </Text>
-                <View className="flex-row items-end">
-                  <Text className="text-white text-4xl font-bold">105</Text>
-                  <Text className="text-blue-200 text-lg ml-2 mb-1">
-                    loại thuốc
-                  </Text>
-                </View>
+                <View className="flex-row items-end"></View>
               </View>
               <View className="items-center">
                 <View className="w-16 h-16 rounded-full bg-white/20 items-center justify-center mb-2">
@@ -311,14 +306,7 @@ export default function HomeScreen() {
                       </View>
                     </View>
                     <View className="flex-row items-center justify-between">
-                      <View className="flex-row items-center">
-                        <Text className="text-2xl font-bold text-indigo-700 mr-2">
-                          12
-                        </Text>
-                        <Text className="text-sm text-indigo-600">
-                          lịch hẹn hôm nay
-                        </Text>
-                      </View>
+                      <View className="flex-row items-center"></View>
                       <View className="flex-row items-center">
                         <Text className="text-sm text-indigo-600 mr-2">
                           Xem chi tiết
