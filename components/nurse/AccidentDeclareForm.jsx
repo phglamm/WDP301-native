@@ -18,6 +18,7 @@ import {
   CheckCircle,
   ChevronDown,
   Search,
+  MapPin,
 } from "lucide-react-native";
 import { getAllStudent } from "../../services/nurseService";
 
@@ -61,7 +62,12 @@ const AccidentDeclareForm = ({
   };
 
   const handleSubmit = () => {
-    if (!formData.studentCode || !formData.summary || !formData.type) {
+    if (
+      !formData.studentCode ||
+      !formData.summary ||
+      !formData.type ||
+      !formData.status
+    ) {
       Alert.alert("Thông báo", "Vui lòng điền đầy đủ thông tin bắt buộc.");
       return;
     }
@@ -89,6 +95,33 @@ const AccidentDeclareForm = ({
       bgColor: "bg-blue-50",
       borderColor: "border-blue-200",
       textColor: "text-blue-600",
+    },
+  ];
+
+  const STATUS_OPTIONS = [
+    {
+      value: "medical_room",
+      label: "Đang ở phòng y tế",
+      color: "blue",
+      bgColor: "bg-blue-50",
+      borderColor: "border-blue-200",
+      textColor: "text-blue-600",
+    },
+    {
+      value: "parent_pickup",
+      label: "Ba mẹ đón về",
+      color: "green",
+      bgColor: "bg-green-50",
+      borderColor: "border-green-200",
+      textColor: "text-green-600",
+    },
+    {
+      value: "hospital",
+      label: "Đã chuyển sang bệnh viện",
+      color: "red",
+      bgColor: "bg-red-50",
+      borderColor: "border-red-200",
+      textColor: "text-red-600",
     },
   ];
 
@@ -277,6 +310,67 @@ const AccidentDeclareForm = ({
                     <CheckCircle
                       size={20}
                       color={`#${option.color === "blue" ? "3B82F6" : option.color === "red" ? "EF4444" : "8B5CF6"}`}
+                    />
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+
+          {/* Status Selection */}
+          <View className="mb-8">
+            <View className="flex-row items-center mb-4">
+              <MapPin size={20} color="#6B7280" />
+              <Text className="text-lg font-semibold text-gray-800 ml-2">
+                Tình trạng hiện tại *
+              </Text>
+            </View>
+
+            <Text className="text-gray-600 mb-4">
+              Chọn tình trạng hiện tại của học sinh:
+            </Text>
+
+            {STATUS_OPTIONS.map((option) => {
+              const isSelected = formData.status === option.value;
+
+              return (
+                <TouchableOpacity
+                  key={option.value}
+                  onPress={() =>
+                    setFormData((prev) => ({ ...prev, status: option.value }))
+                  }
+                  className={`p-4 rounded-2xl border-2 flex-row items-center justify-between mt-3 ${
+                    isSelected
+                      ? `${option.bgColor} ${option.borderColor}`
+                      : "bg-white border-gray-200"
+                  }`}
+                >
+                  <View className="flex-row items-center">
+                    <View
+                      className={`w-4 h-4 rounded-full border-2 ${
+                        isSelected
+                          ? `bg-${option.color}-500 border-${option.color}-500`
+                          : "border-gray-300"
+                      }`}
+                    ></View>
+                    <Text
+                      className={`font-semibold ml-3 ${
+                        isSelected ? option.textColor : "text-gray-600"
+                      }`}
+                    >
+                      {option.label}
+                    </Text>
+                  </View>
+                  {isSelected && (
+                    <CheckCircle
+                      size={20}
+                      color={`#${
+                        option.color === "blue"
+                          ? "3B82F6"
+                          : option.color === "green"
+                            ? "22C55E"
+                            : "EF4444"
+                      }`}
                     />
                   )}
                 </TouchableOpacity>

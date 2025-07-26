@@ -38,6 +38,7 @@ import {
   createAccidentMedicine,
   getAccidentById,
   getMedicine,
+  updateAccidentEvent,
 } from "../../services/nurseService";
 import { create } from "zustand";
 
@@ -54,6 +55,10 @@ export default function AccidentDetailScreen() {
   const [selectedMedicines, setSelectedMedicines] = useState([]);
   const [showMedicineDropdown, setShowMedicineDropdown] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Status update states
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   const loadMedicine = async () => {
     setLoadingMedicines(true);
@@ -340,6 +345,36 @@ export default function AccidentDetailScreen() {
     setShowModal(false);
   };
 
+  // Status update functions
+  const handleStatusUpdate = async (newStatus) => {
+    setUpdatingStatus(true);
+    try {
+      const response = await updateAccidentEvent(accident.id, newStatus);
+      console.log("Status updated:", response);
+
+      // Update local state
+      setAccident((prev) => ({
+        ...prev,
+        status: newStatus,
+      }));
+
+      const statusText = getStatusDisplay(newStatus).text;
+      Alert.alert("Thành công", `Đã cập nhật trạng thái thành: ${statusText}`, [
+        {
+          text: "OK",
+          onPress: () => {
+            setShowStatusModal(false);
+          },
+        },
+      ]);
+    } catch (error) {
+      console.error("Error updating status:", error);
+      Alert.alert("Lỗi", "Không thể cập nhật trạng thái tai nạn");
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
+
   if (!accident || loading) {
     return (
       <SafeAreaView className="flex-1 bg-white">
@@ -418,13 +453,27 @@ export default function AccidentDetailScreen() {
 
           {/* Current Status */}
           <View className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-100">
-            <View className="flex-row items-center mb-4">
-              <View className="bg-yellow-100 p-2 rounded-full mr-3">
-                <CheckCircle size={20} color="#F59E0B" />
+            <View className="flex-row items-center justify-between mb-4">
+              <View className="flex-row items-center">
+                <View className="bg-yellow-100 p-2 rounded-full mr-3">
+                  <CheckCircle size={20} color="#F59E0B" />
+                </View>
+                <Text className="text-lg font-montserratBold text-gray-800">
+                  Tình trạng hiện tại
+                </Text>
               </View>
-              <Text className="text-lg font-montserratBold text-gray-800">
-                Tình trạng hiện tại
-              </Text>
+
+              {accident.status === "medical_room" && (
+                <TouchableOpacity
+                  onPress={() => setShowStatusModal(true)}
+                  className="bg-blue-600 px-4 py-2 rounded-lg flex-row items-center"
+                >
+                  <Edit3 size={16} color="white" />
+                  <Text className="text-white font-montserratSemiBold ml-2 text-sm">
+                    Cập nhật
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
 
             <View
@@ -440,6 +489,18 @@ export default function AccidentDetailScreen() {
                 {getStatusDisplay(accident.status).text}
               </Text>
             </View>
+
+            {accident.status === "medical_room" && (
+              <View className="mt-4 p-4 bg-blue-50 rounded-xl border border-blue-200">
+                <Text className="text-blue-800 font-montserratSemiBold text-sm mb-1">
+                  💡 Thông tin
+                </Text>
+                <Text className="text-blue-700 text-sm">
+                  Học sinh đang được chăm sóc tại phòng y tế. Bạn có thể cập
+                  nhật trạng thái khi có thay đổi.
+                </Text>
+              </View>
+            )}
           </View>
 
           {/* Student Info */}
@@ -781,6 +842,120 @@ export default function AccidentDetailScreen() {
                 </TouchableOpacity>
               </View>
             </View>
+          </SafeAreaView>
+        </Modal>
+
+        {/* Status Update Modal */}
+        <Modal
+          visible={showStatusModal}
+          animationType="slide"
+          presentationStyle="pageSheet"
+          onRequestClose={() => setShowStatusModal(false)}
+        >
+          <SafeAreaView className="flex-1 bg-white">
+            {/* Modal Header */}
+            <View className="bg-white shadow-sm border-b border-gray-100 p-6">
+              <View className="flex-row items-center justify-between">
+                <Text className="text-xl font-montserratBold text-gray-800">
+                  Cập nhật trạng thái
+                </Text>
+                <TouchableOpacity
+                  onPress={() => setShowStatusModal(false)}
+                  className="p-2 rounded-full bg-gray-100"
+                >
+                  <X size={20} color="#6B7280" />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <ScrollView className="flex-1 p-6">
+              <View className="bg-blue-50 p-4 rounded-xl border border-blue-200 mb-6">
+                <Text className="text-blue-800 font-montserratSemiBold mb-2">
+                  📋 Trạng thái hiện tại
+                </Text>
+                <Text className="text-blue-700">
+                  {getStatusDisplay(accident.status).text}
+                </Text>
+              </View>
+
+              <Text className="text-lg font-montserratBold text-gray-800 mb-4">
+                Chọn trạng thái mới:
+              </Text>
+
+              <View className="space-y-4">
+                {/* Parent Pickup Option */}
+                <TouchableOpacity
+                  onPress={() => handleStatusUpdate("parent_pickup")}
+                  disabled={updatingStatus}
+                  className="bg-white border-2 border-green-200 rounded-xl p-4 flex-row items-center justify-between active:bg-green-50"
+                >
+                  <View className="flex-row items-center">
+                    <View className="bg-green-100 p-3 rounded-full">
+                      <User size={20} color="#22C55E" />
+                    </View>
+                    <View className="ml-4">
+                      <Text className="font-montserratBold text-gray-800">
+                        Ba mẹ đón về
+                      </Text>
+                      <Text className="text-gray-600 text-sm mt-1">
+                        Phụ huynh đã đến đón học sinh về nhà
+                      </Text>
+                    </View>
+                  </View>
+                  <ArrowLeft
+                    size={20}
+                    color="#22C55E"
+                    style={{ transform: [{ rotate: "180deg" }] }}
+                  />
+                </TouchableOpacity>
+
+                {/* Hospital Transfer Option */}
+                <TouchableOpacity
+                  onPress={() => handleStatusUpdate("hospital")}
+                  disabled={updatingStatus}
+                  className="bg-white border-2 border-red-200 rounded-xl p-4 flex-row items-center justify-between active:bg-red-50"
+                >
+                  <View className="flex-row items-center">
+                    <View className="bg-red-100 p-3 rounded-full">
+                      <Activity size={20} color="#EF4444" />
+                    </View>
+                    <View className="ml-4">
+                      <Text className="font-montserratBold text-gray-800">
+                        Chuyển đến bệnh viện
+                      </Text>
+                      <Text className="text-gray-600 text-sm mt-1">
+                        Học sinh cần chăm sóc y tế chuyên sâu
+                      </Text>
+                    </View>
+                  </View>
+                  <ArrowLeft
+                    size={20}
+                    color="#EF4444"
+                    style={{ transform: [{ rotate: "180deg" }] }}
+                  />
+                </TouchableOpacity>
+              </View>
+
+              {updatingStatus && (
+                <View className="mt-6 p-4 bg-gray-50 rounded-xl flex-row items-center justify-center">
+                  <ActivityIndicator size="small" color="#3B82F6" />
+                  <Text className="text-gray-600 font-montserratMedium ml-2">
+                    Đang cập nhật trạng thái...
+                  </Text>
+                </View>
+              )}
+
+              <View className="mt-6 p-4 bg-yellow-50 rounded-xl border border-yellow-200">
+                <Text className="text-yellow-800 font-montserratSemiBold mb-2">
+                  ⚠️ Lưu ý quan trọng
+                </Text>
+                <Text className="text-yellow-700 text-sm leading-5">
+                  • Vui lòng đảm bảo thông tin chính xác trước khi cập nhật
+                  {"\n"}• Trạng thái sẽ được ghi nhận và không thể hoàn tác
+                  {"\n"}• Thông báo sẽ được gửi đến các bên liên quan
+                </Text>
+              </View>
+            </ScrollView>
           </SafeAreaView>
         </Modal>
       </KeyboardAvoidingView>

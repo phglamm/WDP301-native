@@ -37,11 +37,10 @@ export const getAccidentById = async (accidentId) => {
   }
 };
 
-export const updateAccidentEvent = async (accidentId, accidentData) => {
+export const updateAccidentEvent = async (accidentId, newStatus) => {
   try {
-    const response = await axiosInstance.put(
-      `/accident/${accidentId}`,
-      accidentData
+    const response = await axiosInstance.patch(
+      `/accident/${accidentId}/status?status=${newStatus}`
     );
     return response;
   } catch (error) {

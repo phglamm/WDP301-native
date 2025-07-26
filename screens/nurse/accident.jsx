@@ -41,6 +41,7 @@ export default function AccidentScreen() {
     studentCode: "",
     summary: "",
     type: "",
+    status: "",
   });
 
   // Calculate statistics from accidents data
@@ -81,6 +82,7 @@ export default function AccidentScreen() {
         studentCode: formData.studentCode || "",
         summary: formData.summary || "",
         type: formData.type || "",
+        status: formData.status || "",
       };
 
       const response = await createAccidentEvent(accidentData);
@@ -96,6 +98,7 @@ export default function AccidentScreen() {
                 studentCode: "",
                 summary: "",
                 type: "",
+                status: "",
               });
               // Refresh accidents list
               fetchAccidents();
@@ -117,6 +120,7 @@ export default function AccidentScreen() {
       studentCode: "",
       summary: "",
       type: "",
+      status: "",
     });
   };
 
