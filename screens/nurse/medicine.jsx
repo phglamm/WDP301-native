@@ -188,18 +188,7 @@ export default function MedicineScreen() {
               </Text>
               <Text className="text-blue-500 text-xs">loại thuốc</Text>
             </View>
-            <View className="flex-1 bg-green-50 p-4 rounded-xl border border-green-100">
-              <View className="flex-row items-center">
-                <Activity size={20} color="#22C55E" />
-                <Text className="text-green-600 font-semibold ml-2">
-                  Tổng SL
-                </Text>
-              </View>
-              <Text className="text-2xl font-bold text-green-700 mt-1">
-                {getTotalQuantity()}
-              </Text>
-              <Text className="text-green-500 text-xs">đơn vị</Text>
-            </View>
+
             <View className="flex-1 bg-orange-50 p-4 rounded-xl border border-orange-100">
               <View className="flex-row items-center">
                 <AlertTriangle size={20} color="#F97316" />
@@ -325,7 +314,7 @@ export default function MedicineScreen() {
                             <View className="flex-row items-center">
                               <Package size={14} color="#6B7280" />
                               <Text className="text-sm font-semibold text-gray-700 ml-1">
-                                Còn lại: {medicine.quantity}
+                                Còn lại: {medicine.quantity}{" "}
                                 {medicine.type.toLowerCase()}
                               </Text>
                             </View>

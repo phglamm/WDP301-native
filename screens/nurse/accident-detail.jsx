@@ -31,6 +31,7 @@ import {
   Plus,
   X,
   ChevronDown,
+  CheckCircle,
 } from "lucide-react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import {
@@ -98,8 +99,10 @@ export default function AccidentDetailScreen() {
             role: accidentData.nurse?.role || "nurse",
           },
           accidentMedicines: accidentData.accidentMedicines || [],
+          status: accidentData.status || "pending",
         };
 
+        console.log(accidentData);
         setAccident(mappedAccident);
       } catch (error) {
         console.error("Error fetching accident details:", error);
@@ -217,6 +220,43 @@ export default function AccidentDetailScreen() {
         return { bg: "bg-red-100", text: "text-red-700" };
       default:
         return { bg: "bg-gray-100", text: "text-gray-700" };
+    }
+  };
+
+  const getStatusDisplay = (status) => {
+    switch (status?.toLowerCase()) {
+      case "medical_room":
+        return {
+          text: "Học sinh đang ở phòng y tế",
+          bg: "bg-blue-100",
+          textColor: "text-blue-700",
+          borderColor: "border-blue-200",
+          icon: "#3B82F6",
+        };
+      case "parent_pickup":
+        return {
+          text: "Phụ huynh đón về",
+          bg: "bg-green-100",
+          textColor: "text-green-700",
+          borderColor: "border-green-200",
+          icon: "#22C55E",
+        };
+      case "hospital":
+        return {
+          text: "Đã chuyển đến bệnh viện",
+          bg: "bg-red-100",
+          textColor: "text-red-700",
+          borderColor: "border-red-200",
+          icon: "#EF4444",
+        };
+      default:
+        return {
+          text: status || "Đang xử lý",
+          bg: "bg-gray-100",
+          textColor: "text-gray-700",
+          borderColor: "border-gray-200",
+          icon: "#6B7280",
+        };
     }
   };
 
@@ -372,6 +412,32 @@ export default function AccidentDetailScreen() {
               <Clock size={16} color="#6B7280" />
               <Text className="text-gray-600 ml-2 font-montserratMedium">
                 {formatDate(accident.date)}
+              </Text>
+            </View>
+          </View>
+
+          {/* Current Status */}
+          <View className="bg-white rounded-2xl p-6 mb-6 shadow-sm border border-gray-100">
+            <View className="flex-row items-center mb-4">
+              <View className="bg-yellow-100 p-2 rounded-full mr-3">
+                <CheckCircle size={20} color="#F59E0B" />
+              </View>
+              <Text className="text-lg font-montserratBold text-gray-800">
+                Tình trạng hiện tại
+              </Text>
+            </View>
+
+            <View
+              className={`px-4 py-3 rounded-xl ${
+                getStatusDisplay(accident.status).bg
+              } ${getStatusDisplay(accident.status).borderColor} border`}
+            >
+              <Text
+                className={`font-montserratSemiBold text-lg ${
+                  getStatusDisplay(accident.status).textColor
+                }`}
+              >
+                {getStatusDisplay(accident.status).text}
               </Text>
             </View>
           </View>
