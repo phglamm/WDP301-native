@@ -20,6 +20,7 @@ import {
   Syringe,
   FileText,
   AlertTriangle,
+  GraduationCap,
 } from "lucide-react-native";
 import { createInjectionEvent } from "../../services/nurseService";
 import DateTimePickerCustom from "../common/DateTimePickerCustom";
@@ -38,14 +39,20 @@ export default function InjectionEventForm({
     registrationOpenDate: new Date(),
     registrationCloseDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-    price: "",
+    price: "0",
+    grade: "",
   });
   // UI state
   const [showVaccinationModal, setShowVaccinationModal] = useState(false);
 
   const [selectedVaccination, setSelectedVaccination] = useState(null);
   const handleSubmit = async () => {
-    if (!formData.vaccinationId || !formData.date || !formData.price) {
+    if (
+      !formData.vaccinationId ||
+      !formData.date ||
+      !formData.price ||
+      !formData.grade
+    ) {
       Alert.alert("Thông báo", "Vui lòng điền đầy đủ thông tin bắt buộc.");
       return;
     }
@@ -58,20 +65,17 @@ export default function InjectionEventForm({
         registrationCloseDate: formData.registrationCloseDate.toISOString(),
         date: formData.date.toISOString(),
         price: parseInt(formData.price),
+        grade: parseInt(formData.grade),
       };
 
       const response = await createInjectionEvent(eventData);
       if (response.status) {
-        Alert.alert(
-          "Thành công",
-          response.message || "Sự kiện tiêm chủng đã được tạo thành công",
-          [
-            {
-              text: "OK",
-              onPress: onSuccess,
-            },
-          ]
-        );
+        Alert.alert("Thành công", "Sự kiện tiêm chủng đã được tạo thành công", [
+          {
+            text: "OK",
+            onPress: onSuccess,
+          },
+        ]);
       } else {
         Alert.alert(
           "Lỗi",
@@ -228,6 +232,51 @@ export default function InjectionEventForm({
               )}
             </View>
           </View>
+
+          {/* Grade Selection */}
+          <View className="mb-6">
+            <View className="flex-row items-center mb-3">
+              <GraduationCap size={20} color="#6B7280" />
+              <Text className="text-lg font-semibold text-gray-800 ml-2">
+                Chọn khối lớp *
+              </Text>
+            </View>
+            <View className="flex-row flex-wrap gap-3">
+              {[1, 2, 3, 4, 5].map((grade) => (
+                <TouchableOpacity
+                  key={grade}
+                  className={`flex-1 min-w-0 py-3 px-4 rounded-2xl border-2 items-center ${
+                    formData.grade === grade.toString()
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-200 bg-white"
+                  }`}
+                  onPress={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      grade: grade.toString(),
+                    }))
+                  }
+                >
+                  <Text
+                    className={`text-base font-semibold ${
+                      formData.grade === grade.toString()
+                        ? "text-blue-600"
+                        : "text-gray-600"
+                    }`}
+                  >
+                    Lớp {grade}
+                  </Text>
+                  {formData.grade === grade.toString() && (
+                    <CheckCircle size={16} color="#3B82F6" className="mt-1" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+            <Text className="text-gray-500 text-sm mt-2">
+              Chọn khối lớp cho sự kiện tiêm chủng này
+            </Text>
+          </View>
+
           {/* Registration Open Date */}
           <View className="mb-6">
             <DateTimePickerCustom
@@ -312,13 +361,16 @@ export default function InjectionEventForm({
           )}
 
           {/* Form Summary */}
-          {formData.vaccinationName && formData.price && (
+          {formData.vaccinationName && formData.price && formData.grade && (
             <View className="bg-blue-50 p-4 rounded-2xl border border-blue-200 mb-6">
               <Text className="text-blue-800 font-semibold mb-2">
                 📋 Tóm tắt sự kiện:
               </Text>
               <Text className="text-blue-700">
                 • Vaccine: {formData.vaccinationName}
+              </Text>
+              <Text className="text-blue-700">
+                • Khối lớp: Lớp {formData.grade}
               </Text>
               <Text className="text-blue-700">
                 {selectedVaccination?.type === "paid" ? (

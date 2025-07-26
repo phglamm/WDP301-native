@@ -21,6 +21,7 @@ import {
   Download,
   Clock,
   ChevronRight,
+  GraduationCap,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import {
@@ -225,6 +226,13 @@ export default function InjectionScreen() {
         {/* Event Details */}
         <View className="mb-4 space-y-2">
           <View className="flex-row items-center">
+            <GraduationCap size={16} color="#6B7280" />
+            <Text className="text-gray-600 ml-2">
+              Khối lớp: Lớp {event.grade}
+            </Text>
+          </View>
+
+          <View className="flex-row items-center">
             <Calendar size={16} color="#6B7280" />
             <Text className="text-gray-600 ml-2">
               Ngày tiêm: {formatDate(event.date)}
@@ -238,18 +246,6 @@ export default function InjectionScreen() {
             </Text>
           </View>
         </View>
-
-        {/* Action Button */}
-        {/* <TouchableOpacity
-          className="bg-green-500 rounded-xl py-3 flex-row items-center justify-center active:bg-green-600"
-          onPress={() => downloadStudentsList(event.id)}
-          disabled={loading.downloading}
-        >
-          <Download size={16} color="#fff" />
-          <Text className="text-white font-semibold ml-2">
-            {loading.downloading ? "Đang tải..." : "Tải xuống danh sách"}
-          </Text>
-        </TouchableOpacity> */}
       </View>
     );
   };

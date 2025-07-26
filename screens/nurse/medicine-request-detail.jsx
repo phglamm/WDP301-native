@@ -600,7 +600,7 @@ export default function MedicineRequestDetailScreen() {
                     className="w-full h-48 rounded-xl"
                     resizeMode="cover"
                   />
-                  <View className="absolute inset-0 bg-black bg-opacity-20 rounded-xl flex items-center justify-center">
+                  <View className="  rounded-xl flex items-center justify-center">
                     <View className="bg-white bg-opacity-80 p-2 rounded-full">
                       <ZoomIn size={20} color="#374151" />
                     </View>
