@@ -14,7 +14,10 @@ import {
 } from 'react-native';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import SendMedicineForm from '../../components/parent/SendMedicineForm';
-import { getSendMedicineRequestHistoryService } from '../../services/parentServices';
+import {
+  getMedicineRequestDetailService,
+  getSendMedicineRequestHistoryService,
+} from '../../services/parentServices';
 import { ArrowLeft, ChevronDown, Send } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { formatDate } from '../../lib/utils';
@@ -31,6 +34,29 @@ export default function SendMedicine() {
   const [selectedImageUri, setSelectedImageUri] = useState(null);
   const [isDetailModalVisible, setIsDetailModalVisible] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState(null);
+  const [medicineRequestDetail, setMedicineRequestDetail] = useState(null);
+  const [isLoadingDetail, setIsLoadingDetail] = useState(false);
+
+  const fetchMedicineRequestDetail = async (medicineRequestId) => {
+    try {
+      setIsLoadingDetail(true);
+      const response = await getMedicineRequestDetailService(medicineRequestId);
+
+      if (response.code === 200 && response.data) {
+        setMedicineRequestDetail(response.data);
+      } else {
+        console.error('Invalid detail API response:', response);
+        Alert.alert('Lỗi', 'Không thể tải chi tiết yêu cầu thuốc.');
+        setMedicineRequestDetail(null);
+      }
+    } catch (error) {
+      console.error('Error fetching medicine request detail:', error);
+      Alert.alert('Lỗi', 'Không thể tải chi tiết yêu cầu thuốc.');
+      setMedicineRequestDetail(null);
+    } finally {
+      setIsLoadingDetail(false);
+    }
+  };
 
   const handleToggleForm = () => {
     setShowForm(!showForm);
@@ -46,14 +72,19 @@ export default function SendMedicine() {
     setSelectedImageUri(null);
   };
 
-  const handleShowDetailModal = (item) => {
+  const handleShowDetailModal = async (item) => {
     setSelectedDetail(item);
     setIsDetailModalVisible(true);
+    // Fetch chi tiết khi mở modal
+    if (item && item.id) {
+      await fetchMedicineRequestDetail(item.id);
+    }
   };
 
   const handleCloseDetailModal = () => {
     setIsDetailModalVisible(false);
     setSelectedDetail(null);
+    setMedicineRequestDetail(null);
   };
 
   const fetchMedicineHistory = async () => {
@@ -141,6 +172,32 @@ export default function SendMedicine() {
       (s) => String(s.id) === String(selectedStudent)
     );
     return student ? student.fullName : 'Tất cả học sinh';
+  };
+
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'pending':
+        return 'Đang chờ xử lý';
+      case 'approved':
+        return 'Đã phê duyệt';
+      case 'rejected':
+        return 'Đã từ chối';
+      default:
+        return 'Không xác định';
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'pending':
+        return 'text-orange-600 bg-orange-100 dark:text-orange-300 dark:bg-orange-900';
+      case 'approved':
+        return 'text-green-600 bg-green-100 dark:text-green-300 dark:bg-green-900';
+      case 'rejected':
+        return 'text-red-600 bg-red-100 dark:text-red-300 dark:bg-red-900';
+      default:
+        return 'text-gray-600 bg-gray-100 dark:text-gray-300 dark:bg-gray-900';
+    }
   };
 
   useEffect(() => {
@@ -451,6 +508,7 @@ export default function SendMedicine() {
           </View>
         </TouchableOpacity>
       </Modal>
+
       {/* Xem ảnh chi tiết */}
       <Modal
         visible={isImageModalVisible}
@@ -487,6 +545,7 @@ export default function SendMedicine() {
           </View>
         </TouchableOpacity>
       </Modal>
+
       {/* Xem thông tin chi tiết */}
       <Modal
         visible={isDetailModalVisible}
@@ -514,7 +573,14 @@ export default function SendMedicine() {
 
             {/* Content */}
             <ScrollView className='p-4' showsVerticalScrollIndicator={false}>
-              {selectedDetail ? (
+              {isLoadingDetail ? (
+                <View className='justify-center items-center p-8'>
+                  <ActivityIndicator size='large' color='#3B82F6' />
+                  <Text className='mt-2 text-gray-500 dark:text-gray-400'>
+                    Đang tải chi tiết...
+                  </Text>
+                </View>
+              ) : medicineRequestDetail ? (
                 <View>
                   {/* Student Info */}
                   <View className='p-4 mb-4 bg-blue-50 rounded-xl dark:bg-blue-900'>
@@ -522,15 +588,44 @@ export default function SendMedicine() {
                       👤 Thông tin học sinh
                     </Text>
                     <Text className='mb-1 text-base font-semibold text-gray-800 dark:text-white'>
-                      {selectedDetail.student?.fullName || 'Không rõ tên'}
+                      {medicineRequestDetail.student?.fullName ||
+                        'Không rõ tên'}
                     </Text>
                     <Text className='text-sm text-gray-600 dark:text-gray-400'>
-                      🆔 MSSV: {selectedDetail.student?.studentCode || 'N/A'}
+                      🆔 MSSV:{' '}
+                      {medicineRequestDetail.student?.studentCode || 'N/A'}
                     </Text>
                     <Text className='text-sm text-gray-600 dark:text-gray-400'>
-                      🏫 Lớp: {selectedDetail.student?.class || 'N/A'}
+                      🏫 Lớp: {medicineRequestDetail.student?.class || 'N/A'}
                     </Text>
+                    <Text className='text-sm text-gray-600 dark:text-gray-400'>
+                      👦 Giới tính:{' '}
+                      {medicineRequestDetail.student?.gender || 'N/A'}
+                    </Text>
+                    {medicineRequestDetail.student?.address && (
+                      <Text className='text-sm text-gray-600 dark:text-gray-400'>
+                        🏠 Địa chỉ: {medicineRequestDetail.student.address}
+                      </Text>
+                    )}
                   </View>
+
+                  {/* Parent Info */}
+                  {medicineRequestDetail.parent && (
+                    <View className='p-4 mb-4 bg-purple-50 rounded-xl dark:bg-purple-900'>
+                      <Text className='mb-2 text-sm font-medium text-purple-700 dark:text-purple-300'>
+                        👨‍👩‍👧‍👦 Thông tin phụ huynh
+                      </Text>
+                      <Text className='mb-1 text-base font-semibold text-gray-800 dark:text-white'>
+                        {medicineRequestDetail.parent.fullName}
+                      </Text>
+                      <Text className='text-sm text-gray-600 dark:text-gray-400'>
+                        📞 SĐT: {medicineRequestDetail.parent.phone || 'N/A'}
+                      </Text>
+                      <Text className='text-sm text-gray-600 dark:text-gray-400'>
+                        📧 Email: {medicineRequestDetail.parent.email || 'N/A'}
+                      </Text>
+                    </View>
+                  )}
 
                   {/* Request Info */}
                   <View className='p-4 mb-4 bg-green-50 rounded-xl dark:bg-green-900'>
@@ -539,38 +634,40 @@ export default function SendMedicine() {
                     </Text>
                     <Text className='mb-1 text-sm text-gray-600 dark:text-gray-400'>
                       Ngày gửi:{' '}
-                      {selectedDetail.date
-                        ? formatDate(selectedDetail.date)
+                      {medicineRequestDetail.date
+                        ? formatDate(medicineRequestDetail.date)
                         : 'Không có ngày'}
                     </Text>
-                    <Text className='text-sm text-gray-600 dark:text-gray-400'>
-                      Trạng thái:{' '}
-                      <Text className='font-medium text-orange-600'>
-                        {selectedDetail.status === 'pending'
-                          ? 'Đang xử lý'
-                          : selectedDetail.status === 'approved'
-                          ? 'Đã phê duyệt'
-                          : selectedDetail.status === 'rejected'
-                          ? 'Đã từ chối'
-                          : 'Không xác định'}
+                    <View className='flex-row items-center'>
+                      <Text className='text-sm text-gray-600 dark:text-gray-400 mr-2'>
+                        Trạng thái:
                       </Text>
-                    </Text>
+                      <View
+                        className={`px-2 py-1 rounded-lg ${getStatusColor(
+                          medicineRequestDetail.status
+                        )}`}
+                      >
+                        <Text className='text-xs font-medium'>
+                          {getStatusText(medicineRequestDetail.status)}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
 
                   {/* Medicine Image */}
-                  {selectedDetail.image && (
+                  {medicineRequestDetail.image && (
                     <View className='mb-4'>
                       <Text className='mb-2 text-sm font-medium text-gray-700 dark:text-gray-300'>
                         🖼️ Hình ảnh thuốc
                       </Text>
                       <TouchableOpacity
                         onPress={() =>
-                          handleShowImageModal(selectedDetail.image)
+                          handleShowImageModal(medicineRequestDetail.image)
                         }
                         className='overflow-hidden rounded-xl'
                       >
                         <Image
-                          source={{ uri: selectedDetail.image }}
+                          source={{ uri: medicineRequestDetail.image }}
                           className='w-full h-48 bg-gray-100 dark:bg-gray-700'
                           resizeMode='cover'
                         />
@@ -586,65 +683,128 @@ export default function SendMedicine() {
                   )}
 
                   {/* Medicine Schedule - Slots */}
-                  {selectedDetail.slots && selectedDetail.slots.length > 0 && (
-                    <View className='mb-4'>
-                      <Text className='mb-3 text-sm font-medium text-gray-700 dark:text-gray-300'>
-                        ⏰ Lịch uống thuốc
-                      </Text>
-                      {selectedDetail.slots.map((slot, index) => (
-                        <View
-                          key={index}
-                          className='p-3 mb-3 bg-gray-50 rounded-xl dark:bg-gray-700'
-                        >
-                          <View className='flex-row items-center mb-2'>
-                            <View className='px-3 py-1 bg-blue-500 rounded-full'>
-                              <Text className='text-xs font-medium text-white'>
-                                {slot.session}
-                              </Text>
-                            </View>
-                          </View>
-                          {slot.medicines && slot.medicines.length > 0 && (
-                            <View className='space-y-2'>
-                              {slot.medicines.map((medicine, medIndex) => (
-                                <View
-                                  key={medIndex}
-                                  className='flex-row justify-between items-center p-2 bg-white rounded-lg dark:bg-gray-600'
+                  {medicineRequestDetail.slots &&
+                    medicineRequestDetail.slots.length > 0 && (
+                      <View className='mb-4'>
+                        <Text className='mb-3 text-sm font-medium text-gray-700 dark:text-gray-300'>
+                          ⏰ Lịch uống thuốc (
+                          {medicineRequestDetail.slots.length} buổi)
+                        </Text>
+                        {medicineRequestDetail.slots.map((slot, index) => (
+                          <View
+                            key={slot.id || index}
+                            className='p-3 mb-3 bg-gray-50 rounded-xl dark:bg-gray-700'
+                          >
+                            <View className='flex-row justify-between items-center mb-2'>
+                              <View className='px-3 py-1 bg-blue-500 rounded-full'>
+                                <Text className='text-xs font-medium text-white'>
+                                  {slot.session}
+                                </Text>
+                              </View>
+                              <View
+                                className={`px-2 py-1 rounded-lg ${
+                                  slot.status
+                                    ? 'bg-green-100 dark:bg-green-800'
+                                    : 'bg-red-100 dark:bg-red-800'
+                                }`}
+                              >
+                                <Text
+                                  className={`text-xs font-medium ${
+                                    slot.status
+                                      ? 'text-green-700 dark:text-green-300'
+                                      : 'text-red-700 dark:text-red-300'
+                                  }`}
                                 >
-                                  <View className='flex-1'>
-                                    <Text className='text-sm font-medium text-gray-800 dark:text-white'>
-                                      {medicine.name}
-                                    </Text>
-                                    {medicine.description && (
-                                      <Text className='text-xs text-gray-500 dark:text-gray-400'>
-                                        {medicine.description}
-                                      </Text>
-                                    )}
-                                  </View>
-                                  <View className='px-2 py-1 bg-green-100 rounded-lg dark:bg-green-800'>
-                                    <Text className='text-xs font-medium text-green-700 dark:text-green-300'>
-                                      {medicine.quantity} viên
-                                    </Text>
-                                  </View>
-                                </View>
-                              ))}
+                                  {slot.status
+                                    ? '✅ Đã thực hiện'
+                                    : '⏳ Chưa thực hiện'}
+                                </Text>
+                              </View>
                             </View>
-                          )}
-                        </View>
-                      ))}
-                    </View>
-                  )}
 
-                  {/* Note */}
-                  {selectedDetail.note && selectedDetail.note.trim() && (
-                    <View className='p-4 mb-4 bg-yellow-50 rounded-xl dark:bg-yellow-900'>
-                      <Text className='mb-2 text-sm font-medium text-yellow-700 dark:text-yellow-300'>
-                        📝 Ghi chú
-                      </Text>
-                      <Text className='text-sm text-gray-700 dark:text-gray-300'>
-                        {selectedDetail.note}
-                      </Text>
-                    </View>
-                  )}
+                            {/* Slot Note */}
+                            {slot.note && slot.note.trim() && (
+                              <View className='p-2 mb-2 bg-yellow-50 rounded-lg dark:bg-yellow-900'>
+                                <Text className='text-xs text-yellow-700 dark:text-yellow-300'>
+                                  📝 Ghi chú buổi: {slot.note}
+                                </Text>
+                              </View>
+                            )}
+
+                            {/* Slot Image */}
+                            {slot.image && (
+                              <View className='mb-2'>
+                                <TouchableOpacity
+                                  onPress={() =>
+                                    handleShowImageModal(slot.image)
+                                  }
+                                  className='overflow-hidden rounded-lg'
+                                >
+                                  <Image
+                                    source={{ uri: slot.image }}
+                                    className='w-full h-32 bg-gray-100 dark:bg-gray-600'
+                                    resizeMode='cover'
+                                  />
+                                  <View className='absolute inset-0 justify-center items-center'>
+                                    <View className='px-2 py-1 rounded-full bg-black/50'>
+                                      <Text className='text-xs text-white'>
+                                        Ảnh buổi {slot.session}
+                                      </Text>
+                                    </View>
+                                  </View>
+                                </TouchableOpacity>
+                              </View>
+                            )}
+
+                            {/* Medicines in this slot */}
+                            {slot.medicines && slot.medicines.length > 0 && (
+                              <View className='space-y-2'>
+                                <Text className='text-xs font-medium text-gray-600 dark:text-gray-400'>
+                                  💊 Danh sách thuốc ({slot.medicines.length}{' '}
+                                  loại):
+                                </Text>
+                                {slot.medicines.map((medicine, medIndex) => (
+                                  <View
+                                    key={medicine.id || medIndex}
+                                    className='flex-row justify-between items-center p-2 bg-white rounded-lg dark:bg-gray-600'
+                                  >
+                                    <View className='flex-1'>
+                                      <Text className='text-sm font-medium text-gray-800 dark:text-white'>
+                                        {medicine.name}
+                                      </Text>
+                                      {medicine.description &&
+                                        medicine.description.trim() && (
+                                          <Text className='text-xs text-gray-500 dark:text-gray-400 mt-1'>
+                                            {medicine.description}
+                                          </Text>
+                                        )}
+                                    </View>
+                                    <View className='px-2 py-1 bg-green-100 rounded-lg dark:bg-green-800'>
+                                      <Text className='text-xs font-medium text-green-700 dark:text-green-300'>
+                                        {medicine.quantity} viên
+                                      </Text>
+                                    </View>
+                                  </View>
+                                ))}
+                              </View>
+                            )}
+                          </View>
+                        ))}
+                      </View>
+                    )}
+
+                  {/* General Note */}
+                  {medicineRequestDetail.note &&
+                    medicineRequestDetail.note.trim() && (
+                      <View className='p-4 mb-10 bg-yellow-50 rounded-xl dark:bg-yellow-900'>
+                        <Text className='mb-2 text-sm font-medium text-yellow-700 dark:text-yellow-300'>
+                          📝 Ghi chú chung
+                        </Text>
+                        <Text className='text-sm text-gray-700 dark:text-gray-300'>
+                          {medicineRequestDetail.note}
+                        </Text>
+                      </View>
+                    )}
                 </View>
               ) : (
                 <View className='justify-center items-center p-8'>

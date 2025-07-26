@@ -27,7 +27,7 @@ const NEWS_DATA = [
   {
     id: '1',
     title: 'Tình hình môi trường hiện nay',
-    date: '20/10/2025',
+    date: '20/7/2025',
     image:
       'https://lh3.googleusercontent.com/aida-public/AB6AXuC0tw7pXwKQmq9hevtzuyeOqKDCKL4rJnlUz8RSwonZc656-euH_n1QYyRbx4eT7IO7LhxLWnB4BXVoYRDkwifDyxUlk4O_zRPr3PhWgqZ1kQNka8gaH3w7kfVTtCAcvq2vIIfDm0m5_GVCHQSVZ7_3ISO3MDMCqKCMs48yYtupUWkY27nJopZiAwMQaD2Mh_CaWjx8yPvzjal4gAXcARgO9JugSyiDzLEuUS5c2ye81dGe54_-Ow7ABsMPGWtl3fIx-CGDywbdicg',
     isNew: true,
@@ -35,7 +35,7 @@ const NEWS_DATA = [
   {
     id: '2',
     title: 'Sức khoẻ của trẻ em',
-    date: '15/10/2025',
+    date: '15/7/2025',
     image:
       'https://lh3.googleusercontent.com/aida-public/AB6AXuC0tw7pXwKQmq9hevtzuyeOqKDCKL4rJnlUz8RSwonZc656-euH_n1QYyRbx4eT7IO7LhxLWnB4BXVoYRDkwifDyxUlk4O_zRPr3PhWgqZ1kQNka8gaH3w7kfVTtCAcvq2vIIfDm0m5_GVCHQSVZ7_3ISO3MDMCqKCMs48yYtupUWkY27nJopZiAwMQaD2Mh_CaWjx8yPvzjal4gAXcARgO9JugSyiDzLEuUS5c2ye81dGe54_-Ow7ABsMPGWtl3fIx-CGDywbdicg',
     isNew: true,
@@ -43,7 +43,7 @@ const NEWS_DATA = [
   {
     id: '3',
     title: 'Các biện pháp phòng chống dịch',
-    date: '10/10/2025',
+    date: '10/7/2025',
     image:
       'https://lh3.googleusercontent.com/aida-public/AB6AXuC0tw7pXwKQmq9hevtzuyeOqKDCKL4rJnlUz8RSwonZc656-euH_n1QYyRbx4eT7IO7LhxLWnB4BXVoYRDkwifDyxUlk4O_zRPr3PhWgqZ1kQNka8gaH3w7kfVTtCAcvq2vIIfDm0m5_GVCHQSVZ7_3ISO3MDMCqKCMs48yYtupUWkY27nJopZiAwMQaD2Mh_CaWjx8yPvzjal4gAXcARgO9JugSyiDzLEuUS5c2ye81dGe54_-Ow7ABsMPGWtl3fIx-CGDywbdicg',
     isNew: false,

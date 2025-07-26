@@ -22,7 +22,6 @@ export default function InjectionRegisterReport({
   selectedSon,
   onBack,
 }) {
-  console.log('🚀 ~ selectedSon:', selectedSon);
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);

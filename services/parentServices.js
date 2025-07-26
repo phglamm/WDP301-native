@@ -87,6 +87,18 @@ export const getSendMedicineRequestHistoryService = async () => {
     throw error;
   }
 };
+// Medicine Request - Chi tiết yêu cầu thuốc
+export const getMedicineRequestDetailService = async (medicineRequestId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/medicine-request/${medicineRequestId}`
+    );
+    return response;
+  } catch (error) {
+    console.log('Error getting medicine request detail: ', error);
+    throw error;
+  }
+};
 
 // Chat AI - Lịch sử chat
 export const getChatHistoryService = async () => {
