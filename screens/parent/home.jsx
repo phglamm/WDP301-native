@@ -175,22 +175,19 @@ export default function HomeScreen() {
             <View className='rounded-2xl p-6 shadow-sm border bg-indigo-50 border-indigo-200'>
               <View className='flex-row items-center justify-between'>
                 <View className='flex-1 flex flex-row items-center justify-between'>
-                  <View className='flex-col items-start justify-start mb-3'>
-                    <View className='w-12 h-12 rounded-full bg-indigo-100 items-center justify-center mr-4'>
-                      <Calendar size={24} color='#6366F1' strokeWidth={1.5} />
+                  <View className='flex-col items-center justify-center mb-3'>
+                    <View className='w-16 h-16 rounded-full bg-indigo-100 items-center justify-center mr-4'>
+                      <Calendar size={32} color='#6366F1' strokeWidth={2.5} />
                     </View>
                     <View>
-                      <Text className='text-lg font-semibold text-indigo-900'>
-                        Lịch hẹn
-                      </Text>
-                      <Text className='text-sm text-indigo-600'>
-                        Quản lý lịch hẹn với phụ huynh
+                      <Text className='text-xl mt-2 font-bold text-indigo-900'>
+                        Quản lý lịch hẹn
                       </Text>
                     </View>
                   </View>
                   <View className='flex-row items-center justify-between'>
                     <View className='flex-row items-center'>
-                      <Text className='text-sm font-bold text-indigo-600 mr-2'>
+                      <Text className='text-lg font-bold text-indigo-600 mr-2'>
                         Xem chi tiết
                       </Text>
                       <ArrowRight size={20} color='#6366F1' />

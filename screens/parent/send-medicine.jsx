@@ -43,7 +43,12 @@ export default function SendMedicine() {
       const response = await getMedicineRequestDetailService(medicineRequestId);
 
       if (response.code === 200 && response.data) {
-        setMedicineRequestDetail(response.data);
+        const filteredSlots =
+          response.data.slots?.filter((slot) => slot.isDeleted === false) || [];
+        setMedicineRequestDetail({
+          ...response.data,
+          slots: filteredSlots,
+        });
       } else {
         console.error('Invalid detail API response:', response);
         Alert.alert('Lỗi', 'Không thể tải chi tiết yêu cầu thuốc.');
@@ -794,17 +799,17 @@ export default function SendMedicine() {
                     )}
 
                   {/* General Note */}
-                  {medicineRequestDetail.note &&
-                    medicineRequestDetail.note.trim() && (
-                      <View className='p-4 mb-10 bg-yellow-50 rounded-xl dark:bg-yellow-900'>
-                        <Text className='mb-2 text-sm font-medium text-yellow-700 dark:text-yellow-300'>
-                          📝 Ghi chú chung
-                        </Text>
+                  <View className='p-4 mb-10 bg-yellow-50 rounded-xl dark:bg-yellow-900'>
+                    <Text className='mb-2 text-sm font-medium text-yellow-700 dark:text-yellow-300'>
+                      📝 Ghi chú
+                    </Text>
+                    {medicineRequestDetail.note &&
+                      medicineRequestDetail.note.trim() && (
                         <Text className='text-sm text-gray-700 dark:text-gray-300'>
                           {medicineRequestDetail.note}
                         </Text>
-                      </View>
-                    )}
+                      )}
+                  </View>
                 </View>
               ) : (
                 <View className='justify-center items-center p-8'>
