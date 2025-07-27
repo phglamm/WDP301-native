@@ -424,3 +424,15 @@ export const getAppointmentHistory = async () => {
     throw error.response?.data || error.message;
   }
 };
+
+export const getInjectionReports = async (eventId) => {
+  try {
+    const response = await axiosInstance.get(
+      `/post-injection-report/injection-event/${eventId}`
+    );
+    return response;
+  } catch (error) {
+    console.log("Error at getInjectionReports: ", error);
+    throw error.response?.data || error.message;
+  }
+};

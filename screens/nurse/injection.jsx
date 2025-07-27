@@ -246,6 +246,19 @@ export default function InjectionScreen() {
             </Text>
           </View>
         </View>
+
+        {/* Action Button */}
+        <TouchableOpacity
+          className="bg-orange-500 rounded-xl py-3 px-4 flex-row items-center justify-center active:bg-orange-600"
+          onPress={() =>
+            router.push(`/(nurse)/report-injection?eventId=${event.id}`)
+          }
+        >
+          <Activity size={18} color="white" />
+          <Text className="text-white font-semibold ml-2">
+            Báo cáo Sau tiêm
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   };
