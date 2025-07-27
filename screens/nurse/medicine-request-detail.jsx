@@ -31,12 +31,14 @@ import {
   Pill,
   Sun,
   Moon,
+  Trash2,
 } from "lucide-react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import {
   approveMedicineRequest,
   getMedicineRequestDetail,
   rejectMedicineRequest,
+  deleteMedicineSlot,
 } from "../../services/nurseService";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -51,6 +53,7 @@ export default function MedicineRequestDetailScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [processingAction, setProcessingAction] = useState(false);
+  const [deletingSlot, setDeletingSlot] = useState(null);
 
   // Mock data based on your API response structure
   useEffect(() => {
@@ -215,8 +218,50 @@ export default function MedicineRequestDetailScreen() {
     ]);
   };
 
+  const handleDeleteSlot = async (slotId, slotSession) => {
+    Alert.alert(
+      "Xác nhận xóa",
+      `Bạn có chắc chắn muốn xóa buổi uống thuốc "${slotSession}"?`,
+      [
+        { text: "Hủy", style: "cancel" },
+        {
+          text: "Xóa",
+          style: "destructive",
+          onPress: async () => {
+            setDeletingSlot(slotId);
+            try {
+              console.log(slotId);
+              const response = await deleteMedicineSlot(slotId);
+              console.log("Delete slot response:", response);
+
+              // Update local state to remove the deleted slot
+              setRequest((prevRequest) => ({
+                ...prevRequest,
+                slots: prevRequest.slots.filter((slot) => slot.id !== slotId),
+              }));
+
+              Alert.alert("Thành công", "Buổi uống thuốc đã được xóa");
+            } catch (error) {
+              console.error("Delete slot error:", error);
+              Alert.alert("Lỗi", "Không thể xóa buổi uống thuốc");
+            } finally {
+              setDeletingSlot(null);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const renderMedicineSlots = () => {
     if (!request.slots || request.slots.length === 0) {
+      return null;
+    }
+
+    // Filter slots that are not deleted
+    const activeSlots = request.slots.filter((slot) => !slot.isDeleted);
+
+    if (activeSlots.length === 0) {
       return null;
     }
 
@@ -230,7 +275,7 @@ export default function MedicineRequestDetailScreen() {
         </View>
 
         <View className="space-y-4">
-          {request?.slots?.map((slot, index) => {
+          {activeSlots?.map((slot, index) => {
             const SessionIcon = getSessionIcon(slot.session);
             const sessionColor = getSessionColor(slot.session);
 
@@ -254,6 +299,22 @@ export default function MedicineRequestDetailScreen() {
                     Buổi {slot.session}
                   </Text>
                   <View className="flex-1" />
+
+                  {/* Delete Button - Only show if request is pending */}
+                  {request.status === "pending" && (
+                    <TouchableOpacity
+                      className="p-2 rounded-full bg-red-100 mr-2 active:bg-red-200"
+                      onPress={() => handleDeleteSlot(slot.id, slot.session)}
+                      disabled={deletingSlot === slot.id}
+                    >
+                      {deletingSlot === slot.id ? (
+                        <ActivityIndicator size={16} color="#EF4444" />
+                      ) : (
+                        <Trash2 size={16} color="#EF4444" />
+                      )}
+                    </TouchableOpacity>
+                  )}
+
                   <View
                     className={`px-2 py-1 rounded-full ${
                       slot.status ? "bg-green-100" : "bg-yellow-100"
@@ -335,12 +396,12 @@ export default function MedicineRequestDetailScreen() {
           </Text>
           <View className="flex-row justify-between">
             <Text className="text-blue-800 text-sm">
-              Tổng số buổi: {request.slots.length}
+              Tổng số buổi: {activeSlots.length}
             </Text>
             <Text className="text-blue-800 text-sm">
               Đã hoàn thành:
-              {request.slots.filter((slot) => slot.status).length}/
-              {request.slots.length}
+              {activeSlots.filter((slot) => slot.status).length}/
+              {activeSlots.length}
             </Text>
           </View>
         </View>

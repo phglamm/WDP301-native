@@ -365,6 +365,16 @@ export const rejectMedicineRequest = async (requestId) => {
   }
 };
 
+export const deleteMedicineSlot = async (slotId) => {
+  try {
+    const response = await axiosInstance.delete(`/slot/${slotId}`);
+    return response;
+  } catch (error) {
+    console.log("Error at deleteMedicineSlot: ", error);
+    throw error.response?.data || error.message;
+  }
+};
+
 export const getAllParents = async () => {
   try {
     const response = await axiosInstance.get(`/user/parents`);
