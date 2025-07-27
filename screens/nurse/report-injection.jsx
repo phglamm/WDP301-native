@@ -244,42 +244,6 @@ export default function ReportInjectionScreen() {
         )}
 
         {/* Injection Record Details */}
-        <View className="bg-gray-50 rounded-xl p-4">
-          <View className="flex-row items-center mb-3">
-            <Shield size={16} color="#10B981" />
-            <Text className="text-gray-700 font-semibold ml-2">
-              Thông tin tiêm chủng
-            </Text>
-          </View>
-          <View className="space-y-2">
-            <View className="flex-row justify-between">
-              <Text className="text-gray-500 text-sm">Ngày tiêm:</Text>
-              <Text className="text-gray-700 font-medium text-sm">
-                {formatDate(report.injectionRecord.registrationDate)}
-              </Text>
-            </View>
-            <View className="flex-row justify-between">
-              <Text className="text-gray-500 text-sm">Vị trí tiêm:</Text>
-              <Text className="text-gray-700 font-medium text-sm">
-                {report.injectionRecord.injectionSite || "Chưa xác định"}
-              </Text>
-            </View>
-            <View className="flex-row justify-between">
-              <Text className="text-gray-500 text-sm">
-                Nhiệt độ trước tiêm:
-              </Text>
-              <Text className="text-gray-700 font-medium text-sm">
-                {report.injectionRecord.preInjectionTemperature}°C
-              </Text>
-            </View>
-            <View className="flex-row justify-between">
-              <Text className="text-gray-500 text-sm">Nhiệt độ sau tiêm:</Text>
-              <Text className="text-gray-700 font-medium text-sm">
-                {report.injectionRecord.postInjectionTemperature}°C
-              </Text>
-            </View>
-          </View>
-        </View>
       </View>
     );
   };
